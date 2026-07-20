@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — LEGISTA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #FAF7F0;
+  --bg2: #F3EEE1;
+  --gold: #B8860B;
+  --gold-soft: #8B6F1F;
+  --cyber: #0077B6;
+  --white: #1A1A2E;
+  --gray: #6B6B78;
+  --success: #0F9D68;
+  --danger: #E5484D;
+  --surface: #FFFFFF;
+  --border: rgba(184,134,11,0.18);
+}
+* , *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white); min-height:100vh; }
+::-webkit-scrollbar { width:8px; } ::-webkit-scrollbar-thumb { background:rgba(184,134,11,0.25); border-radius:4px; }
+ 
+/* ══ LOGIN GATE ══ */
+#loginScreen { position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; align-items:center; justify-content:center; }
+.login-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:44px 36px; width:100%; max-width:360px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.08); }
+.login-box .logo { font-family:'Syne',sans-serif; font-weight:800; letter-spacing:6px; font-size:22px; background:linear-gradient(90deg,var(--gold),var(--gold-soft)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:6px; }
+.login-box h1 { font-size:16px; font-weight:800; margin:14px 0 22px; }
+.login-box input { width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--border); background:var(--bg2); font-family:'Cairo',sans-serif; font-size:14px; text-align:center; letter-spacing:2px; outline:none; margin-bottom:14px; }
+.login-box input:focus { border-color:var(--gold); }
+.login-box button { width:100%; padding:13px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--gold),#96700e); color:#fff; font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+.login-err { color:var(--danger); font-size:12px; margin-top:10px; min-height:14px; }
+ 
+/* ══ SHELL ══ */
+#dashboard { display:none; }
+#dashboard.show { display:block; }
+.topbar { position:sticky; top:0; z-index:100; background:rgba(255,255,255,0.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
+.topbar .logo { font-family:'Syne',sans-serif; font-weight:800; letter-spacing:5px; font-size:16px; background:linear-gradient(90deg,var(--gold),var(--gold-soft)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.topbar .tabs { display:flex; gap:4px; flex-wrap:wrap; }
+.topbar .tab-btn { padding:9px 16px; border-radius:8px; border:none; background:transparent; color:var(--gray); font-family:'Cairo',sans-serif; font-size:12.5px; font-weight:700; cursor:pointer; transition:all .15s; }
+.topbar .tab-btn:hover { background:var(--bg2); color:var(--white); }
+.topbar .tab-btn.active { background:var(--gold); color:#fff; }
+.logout-btn { background:transparent; border:1px solid var(--border); color:var(--gray); padding:8px 14px; border-radius:8px; font-family:'Cairo',sans-serif; font-size:12px; font-weight:700; cursor:pointer; }
+ 
+.wrap { max-width:1200px; margin:0 auto; padding:28px 24px 80px; }
+.view { display:none; }
+.view.active { display:block; animation:fadeIn .3s; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+ 
+/* ══ STAT CARDS ══ */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; }
+.stat-card .lbl { font-size:12px; color:var(--gray); font-weight:700; margin-bottom:8px; }
+.stat-card .val { font-family:'Syne',sans-serif; font-size:32px; font-weight:800; }
+.stat-card.gold .val { color:var(--gold); }
+.stat-card.success .val { color:var(--success); }
+.stat-card.danger .val { color:var(--danger); }
+.stat-card.cyber .val { color:var(--cyber); }
+ 
+.chart-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:20px; }
+.chart-card h3 { font-size:14px; font-weight:800; margin-bottom:16px; }
+.charts-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
+@media (max-width:800px) { .charts-grid { grid-template-columns:1fr; } }
+ 
+/* ══ SEARCH ══ */
+.search-bar { display:flex; gap:10px; margin-bottom:18px; }
+.search-bar input { flex:1; padding:12px 16px; border-radius:10px; border:1px solid var(--border); background:var(--surface); font-family:'Cairo',sans-serif; font-size:13px; outline:none; }
+.search-bar input:focus { border-color:var(--gold); }
+ 
+/* ══ USER CARDS ══ */
+.user-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:12px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.user-card img.avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--bg2); }
+.user-card .info { flex:1; min-width:180px; }
+.user-card .name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px; }
+.user-card .name { font-size:14px; font-weight:800; }
+.user-card .code { font-size:10px; color:var(--gold-soft); background:rgba(184,134,11,0.1); padding:2px 8px; border-radius:6px; font-weight:800; }
+.user-card .email { font-size:12px; color:var(--gray); }
+.user-card .phone-link { font-size:12px; color:var(--success); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:4px; }
+.user-card .phone-link:hover { text-decoration:underline; }
+.badge { font-size:11px; font-weight:800; padding:5px 12px; border-radius:20px; white-space:nowrap; }
+.badge.paid { background:rgba(15,157,104,0.12); color:var(--success); }
+.badge.free { background:rgba(107,107,120,0.12); color:var(--gray); }
+.sub-toggle-btn { border:none; padding:9px 16px; border-radius:8px; font-family:'Cairo',sans-serif; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.sub-toggle-btn.to-paid { background:var(--success); color:#fff; }
+.sub-toggle-btn.to-free { background:var(--gray); color:#fff; }
+.user-card .shot-thumb { width:44px; height:44px; border-radius:8px; object-fit:cover; cursor:pointer; border:1px solid var(--border); }
+.empty-state { text-align:center; padding:60px 20px; color:var(--gray); font-size:13px; }
+ 
+/* ══ EXPIRY ══ */
+.expiry-row { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 18px; margin-bottom:10px; }
+.expiry-row .days-left { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; min-width:70px; text-align:center; }
+.expiry-row .days-left.soon { color:var(--danger); }
+.expiry-row .days-left.ok { color:var(--success); }
+.expiry-row .meta { flex:1; }
+.expiry-row .meta .n { font-size:13px; font-weight:700; }
+.expiry-row .meta .d { font-size:11px; color:var(--gray); }
+ 
+/* ══ PAYMENT REQUESTS ══ */
+.payment-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px; display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; }
+.payment-card img.shot { width:90px; height:90px; border-radius:10px; object-fit:cover; cursor:pointer; border:1px solid var(--border); flex-shrink:0; }
+.payment-card .info { flex:1; min-width:200px; font-size:12.5px; line-height:2; }
+.payment-card .info b { color:var(--white); }
+.payment-actions { display:flex; gap:8px; flex-wrap:wrap; align-self:center; }
+.pbtn { border:none; padding:9px 16px; border-radius:8px; font-family:'Cairo',sans-serif; font-size:12px; font-weight:800; cursor:pointer; }
+.pbtn.approve { background:var(--success); color:#fff; }
+.pbtn.reject { background:var(--danger); color:#fff; }
+.pbtn.pending { background:rgba(107,107,120,0.15); color:var(--gray); }
+.status-tag { font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; }
+.status-tag.pending { background:rgba(107,107,120,0.12); color:var(--gray); }
+.status-tag.approved { background:rgba(15,157,104,0.12); color:var(--success); }
+.status-tag.rejected { background:rgba(229,72,77,0.12); color:var(--danger); }
+ 
+/* ══ FEEDBACK ══ */
+.feedback-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:12px; }
+.feedback-card .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.feedback-card .type-tag { font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; background:rgba(0,119,182,0.1); color:var(--cyber); }
+.feedback-card .name { font-size:13px; font-weight:800; }
+.feedback-card .msg { font-size:13px; color:var(--white); line-height:1.8; margin-bottom:10px; }
+.feedback-card img { max-width:160px; border-radius:8px; cursor:pointer; }
+.feedback-card .date { font-size:11px; color:var(--gray); }
+ 
+/* ══ MAINTENANCE ══ */
+.maint-box { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:36px; text-align:center; max-width:480px; margin:0 auto; }
+.maint-box .icon { font-size:40px; margin-bottom:16px; }
+.maint-status { font-size:14px; font-weight:800; margin-bottom:20px; padding:10px; border-radius:10px; }
+.maint-status.off { background:rgba(15,157,104,0.1); color:var(--success); }
+.maint-status.on { background:rgba(229,72,77,0.1); color:var(--danger); }
+.maint-btn { padding:14px 32px; border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+.maint-btn.enable { background:var(--danger); color:#fff; }
+.maint-btn.disable { background:var(--success); color:#fff; }
+ 
+/* ══ FILES ══ */
+.file-toolbar { display:flex; gap:10px; margin-bottom:18px; align-items:center; flex-wrap:wrap; }
+.upload-btn { background:linear-gradient(135deg,var(--gold),#96700e); color:#fff; border:none; padding:11px 20px; border-radius:10px; font-family:'Cairo',sans-serif; font-size:13px; font-weight:800; cursor:pointer; }
+.file-row { display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:8px; }
+.file-row .fname { flex:1; font-size:13px; font-weight:700; }
+.file-row .fsize { font-size:11px; color:var(--gray); }
+.file-del-btn { background:rgba(229,72,77,0.1); color:var(--danger); border:none; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; }
+.file-view-btn { background:rgba(0,119,182,0.1); color:var(--cyber); border:none; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; text-decoration:none; }
+ 
+.section-title { font-size:18px; font-weight:900; margin-bottom:18px; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--white); color:#fff; padding:12px 22px; border-radius:10px; font-size:13px; font-weight:700; z-index:5000; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(-6px); }
+.lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:6000; display:none; align-items:center; justify-content:center; padding:24px; }
+.lightbox.show { display:flex; }
+.lightbox img { max-width:90vw; max-height:90vh; border-radius:8px; }
+.loading-msg { text-align:center; padding:40px; color:var(--gray); font-size:13px; }
+</style>
+</head>
+<body>
+ 
+<!-- ══ LOGIN GATE ══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="logo">LEGISTA</div>
+    <h1>🔒 لوحة التحكم</h1>
+    <input type="password" id="adminPasswordInput" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')checkAdminPassword()">
+    <button onclick="checkAdminPassword()">دخول</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+ 
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="logo">LEGISTA — Admin</div>
+    <div class="tabs" id="tabsBar">
+      <button class="tab-btn active" data-view="overview">نظرة عامة</button>
+      <button class="tab-btn" data-view="users">المستخدمين والاشتراكات</button>
+      <button class="tab-btn" data-view="expiry">مواعيد الانتهاء</button>
+      <button class="tab-btn" data-view="payments">طلبات الدفع</button>
+      <button class="tab-btn" data-view="feedback">الشكاوى والمقترحات</button>
+      <button class="tab-btn" data-view="maintenance">وضع الصيانة</button>
+      <button class="tab-btn" data-view="files">ملفات الموقع</button>
+    </div>
+    <button class="logout-btn" onclick="logoutAdmin()">خروج</button>
+  </div>
+ 
+  <div class="wrap">
+ 
+    <!-- OVERVIEW -->
+    <div class="view active" id="view-overview">
+      <div class="section-title">نظرة عامة</div>
+      <div class="stats-grid">
+        <div class="stat-card gold"><div class="lbl">إجمالي المستخدمين</div><div class="val" id="statTotalUsers">—</div></div>
+        <div class="stat-card success"><div class="lbl">مشتركين</div><div class="val" id="statSubscribed">—</div></div>
+        <div class="stat-card danger"><div class="lbl">غير مشتركين</div><div class="val" id="statUnsubscribed">—</div></div>
+        <div class="stat-card cyber"><div class="lbl">زوار اليوم</div><div class="val" id="statVisitsToday">—</div></div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card"><h3>الزوار (آخر 30 يوم)</h3><canvas id="visitsChart" height="140"></canvas></div>
+        <div class="chart-card"><h3>مشتركين مقابل غير مشتركين</h3><canvas id="subsChart" height="140"></canvas></div>
+      </div>
+      <div class="charts-grid" style="margin-top:16px;">
+        <div class="chart-card"><h3>الزوار — هذا الشهر مقابل هذه السنة</h3>
+          <div class="stats-grid" style="margin-bottom:0;">
+            <div class="stat-card"><div class="lbl">زوار الشهر</div><div class="val" id="statVisitsMonth">—</div></div>
+            <div class="stat-card"><div class="lbl">زوار السنة</div><div class="val" id="statVisitsYear">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- USERS & SUBSCRIPTIONS -->
+    <div class="view" id="view-users">
+      <div class="section-title">المستخدمين والاشتراكات</div>
+      <div class="search-bar">
+        <input type="text" id="userSearchInput" placeholder="ابحث بالإيميل أو رقم الهاتف..." oninput="renderUsers()">
+      </div>
+      <div id="usersListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+ 
+    <!-- EXPIRY -->
+    <div class="view" id="view-expiry">
+      <div class="section-title">مواعيد انتهاء الاشتراكات (الأقرب انتهاءً أولًا)</div>
+      <div id="expiryListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+ 
+    <!-- PAYMENTS -->
+    <div class="view" id="view-payments">
+      <div class="section-title">طلبات الدفع</div>
+      <div id="paymentsListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+ 
+    <!-- FEEDBACK -->
+    <div class="view" id="view-feedback">
+      <div class="section-title">الشكاوى والمقترحات</div>
+      <div id="feedbackListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+ 
+    <!-- MAINTENANCE -->
+    <div class="view" id="view-maintenance">
+      <div class="section-title">وضع الصيانة</div>
+      <div class="maint-box">
+        <div class="icon">🛠️</div>
+        <div class="maint-status off" id="maintStatusBadge">الموقع شغال بشكل طبيعي</div>
+        <p style="font-size:12.5px; color:var(--gray); margin-bottom:22px; line-height:1.8;">
+          لما تفعّل وضع الصيانة، هيظهر للزوار طبقة شفافة فوق الموقع مكتوب عليها "جارٍ الآن إجراء بعض الإصلاحات" ومش هيقدروا يستخدموا الموقع لحد ما توقفها.
+        </p>
+        <button class="maint-btn enable" id="maintToggleBtn" onclick="toggleMaintenance()">تفعيل وضع الصيانة</button>
+      </div>
+    </div>
+ 
+    <!-- FILES -->
+    <div class="view" id="view-files">
+      <div class="section-title">ملفات الموقع (GitHub)</div>
+      <div class="file-toolbar">
+        <input type="file" id="fileUploadInput" style="display:none" onchange="handleFileUpload(event)">
+        <button class="upload-btn" onclick="document.getElementById('fileUploadInput').click()">⬆️ رفع ملف جديد</button>
+        <button class="upload-btn" style="background:var(--cyber)" onclick="loadFiles()">🔄 تحديث القائمة</button>
+      </div>
+      <div id="filesListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+ 
+  </div>
+</div>
+ 
+<div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('show')"><img id="lightboxImg" src=""></div>
+ 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc,
+  query, orderBy, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+ 
+const firebaseConfig = {
+  apiKey: "AIzaSyC6PRK7EECoPF3qDawVSRYmMg0uufTs6Xw",
+  authDomain: "legista-o.firebaseapp.com",
+  projectId: "legista-o",
+  appId: "1:964258159036:web:a3a66d4f5ea38f9964f3b9"
+};
+const app = initializeApp(firebaseConfig, "legista-admin");
+const db = getFirestore(app);
+ 
+window._db = db;
+window._fs = { collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, orderBy, runTransaction };
+ 
+window.dispatchEvent(new Event('firebase-ready'));
+</script>
+ 
+<script>
+const ADMIN_PASSWORD = "OMAR0801";
+ 
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('show');
+}
+ 
+/* ══ LOGIN GATE ══ */
+function checkAdminPassword() {
+  const val = document.getElementById('adminPasswordInput').value;
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem('legista_admin_ok', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').classList.add('show');
+    initDashboardData();
+  } else {
+    document.getElementById('loginErr').textContent = 'كلمة المرور غلط';
+  }
+}
+function logoutAdmin() {
+  sessionStorage.removeItem('legista_admin_ok');
+  location.reload();
+}
+if (sessionStorage.getItem('legista_admin_ok') === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').classList.add('show');
+}
+ 
+/* ══ TABS ══ */
+document.getElementById('tabsBar').addEventListener('click', e => {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const view = btn.dataset.view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+});
+ 
+/* ══ GLOBAL STATE ══ */
+let ALL_USERS = [];
+let ALL_PAYMENTS = [];
+let ALL_FEEDBACK = [];
+let ALL_VISITS = {};
+ 
+async function initDashboardData() {
+  if (!window._db) {
+    window.addEventListener('firebase-ready', initDashboardData, { once: true });
+    return;
+  }
+  await Promise.all([loadUsers(), loadPayments(), loadFeedback(), loadVisits(), loadMaintenanceStatus()]);
+  renderOverview();
+}
+ 
+/* ══ USERS ══ */
+async function loadUsers() {
+  const { collection, getDocs } = window._fs;
+  const snap = await getDocs(collection(window._db, 'users'));
+  ALL_USERS = [];
+  snap.forEach(d => ALL_USERS.push({ id: d.id, ...d.data() }));
+  // backfill codes for users missing one
+  for (const u of ALL_USERS) {
+    if (!u.code) {
+      u.code = await generateUserCode();
+      const { doc, updateDoc } = window._fs;
+      try { await updateDoc(doc(window._db, 'users', u.id), { code: u.code }); } catch (e) {}
+    }
+  }
+  renderUsers();
+  renderExpiry();
+}
+ 
+async function generateUserCode() {
+  const { doc, runTransaction } = window._fs;
+  const counterRef = doc(window._db, 'siteSettings', 'counters');
+  let next = 1;
+  try {
+    await runTransaction(window._db, async (tx) => {
+      const snap = await tx.get(counterRef);
+      const current = snap.exists() ? (snap.data().userCounter || 0) : 0;
+      next = current + 1;
+      tx.set(counterRef, { userCounter: next }, { merge: true });
+    });
+  } catch (e) {
+    next = Math.floor(Math.random() * 9000) + 1000;
+  }
+  return 'LEG-' + String(next).padStart(4, '0');
+}
+ 
+function renderUsers() {
+  const wrap = document.getElementById('usersListWrap');
+  const term = (document.getElementById('userSearchInput').value || '').trim().toLowerCase();
+  let list = ALL_USERS;
+  if (term) {
+    list = list.filter(u =>
+      (u.email || '').toLowerCase().includes(term) ||
+      (u.phone || '').toLowerCase().includes(term)
+    );
+  }
+  if (!list.length) { wrap.innerHTML = '<div class="empty-state">مفيش مستخدمين مطابقين</div>'; return; }
+  wrap.innerHTML = list.map(u => userCardHtml(u)).join('');
+}
+ 
+function userCardHtml(u) {
+  const isPaid = u.subscription === 'paid';
+  const phoneClean = (u.phone || '').replace(/[^0-9]/g, '');
+  const waLink = phoneClean ? `https://wa.me/${phoneClean.replace(/^0/, '20')}` : null;
+  return `
+    <div class="user-card">
+      <img class="avatar" src="${u.picture || ''}" onerror="this.style.visibility='hidden'">
+      <div class="info">
+        <div class="name-row">
+          <span class="name">${escapeHtml(u.name || 'بدون اسم')}</span>
+          <span class="code">${u.code || '—'}</span>
+        </div>
+        <div class="email">${escapeHtml(u.email || '')}</div>
+        ${waLink ? `<a class="phone-link" href="${waLink}" target="_blank">📱 ${escapeHtml(u.phone)}</a>` : `<span style="font-size:12px;color:var(--gray)">بدون رقم هاتف</span>`}
+      </div>
+      ${u.paymentScreenshot ? `<img class="shot-thumb" src="${u.paymentScreenshot}" onclick="openLightbox('${u.paymentScreenshot}')">` : ''}
+      <span class="badge ${isPaid ? 'paid' : 'free'}">${isPaid ? 'مشترك' : 'غير مشترك'}</span>
+      <button class="sub-toggle-btn ${isPaid ? 'to-free' : 'to-paid'}" onclick="toggleSubscription('${u.id}')">
+        ${isPaid ? 'إلغاء الاشتراك' : 'تفعيل الاشتراك'}
+      </button>
+    </div>`;
+}
+ 
+async function toggleSubscription(userId) {
+  const { doc, updateDoc } = window._fs;
+  const u = ALL_USERS.find(x => x.id === userId);
+  if (!u) return;
+  const nowPaid = u.subscription === 'paid';
+  const updates = nowPaid
+    ? { subscription: 'free', subscriptionExpiry: null }
+    : { subscription: 'paid', subscriptionExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+  await updateDoc(doc(window._db, 'users', userId), updates);
+  Object.assign(u, updates);
+  renderUsers();
+  renderExpiry();
+  renderOverview();
+  showToast(nowPaid ? 'تم إلغاء اشتراك المستخدم' : 'تم تفعيل اشتراك المستخدم');
+}
+ 
+/* ══ EXPIRY ══ */
+function renderExpiry() {
+  const wrap = document.getElementById('expiryListWrap');
+  const withExpiry = ALL_USERS.filter(u => u.subscription === 'paid' && u.subscriptionExpiry)
+    .sort((a, b) => a.subscriptionExpiry - b.subscriptionExpiry);
+  if (!withExpiry.length) { wrap.innerHTML = '<div class="empty-state">مفيش مشتركين نشطين حاليًا</div>'; return; }
+  const now = Date.now();
+  wrap.innerHTML = withExpiry.map(u => {
+    const daysLeft = Math.ceil((u.subscriptionExpiry - now) / (24 * 60 * 60 * 1000));
+    const dateStr = new Date(u.subscriptionExpiry).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+    return `
+      <div class="expiry-row">
+        <div class="days-left ${daysLeft <= 5 ? 'soon' : 'ok'}">${daysLeft > 0 ? daysLeft : 0} يوم</div>
+        <div class="meta">
+          <div class="n">${escapeHtml(u.name || u.email)}</div>
+          <div class="d">${escapeHtml(u.email)} — ينتهي في ${dateStr}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+ 
+/* ══ PAYMENTS ══ */
+async function loadPayments() {
+  const { collection, getDocs, query, orderBy } = window._fs;
+  try {
+    const snap = await getDocs(query(collection(window._db, 'paymentRequests'), orderBy('createdAt', 'desc')));
+    ALL_PAYMENTS = [];
+    snap.forEach(d => ALL_PAYMENTS.push({ id: d.id, ...d.data() }));
+  } catch (e) { ALL_PAYMENTS = []; }
+  renderPayments();
+}
+ 
+function renderPayments() {
+  const wrap = document.getElementById('paymentsListWrap');
+  if (!ALL_PAYMENTS.length) { wrap.innerHTML = '<div class="empty-state">مفيش طلبات دفع حاليًا</div>'; return; }
+  wrap.innerHTML = ALL_PAYMENTS.map(p => `
+    <div class="payment-card">
+      ${p.screenshot ? `<img class="shot" src="${p.screenshot}" onclick="openLightbox('${p.screenshot}')">` : ''}
+      <div class="info">
+        <div><b>الاسم:</b> ${escapeHtml(p.name || '—')}</div>
+        <div><b>الإيميل:</b> ${escapeHtml(p.email || '—')}</div>
+        <div><b>الهاتف:</b> ${escapeHtml(p.phone || '—')}</div>
+        <div><b>المحول منه:</b> ${escapeHtml(p.senderNumber || '—')}</div>
+        <div><b>الباقة:</b> ${escapeHtml(p.package || '—')} ${p.price ? '(' + p.price + ' جنيه)' : ''}</div>
+        <div><b>الحالة:</b> <span class="status-tag ${p.status || 'pending'}">${statusLabel(p.status)}</span></div>
+      </div>
+      <div class="payment-actions">
+        <button class="pbtn approve" onclick="setPaymentStatus('${p.id}','approved')">✔ موافقة</button>
+        <button class="pbtn pending" onclick="setPaymentStatus('${p.id}','pending')">⏳ تعليق</button>
+        <button class="pbtn reject" onclick="setPaymentStatus('${p.id}','rejected')">✕ رفض</button>
+      </div>
+    </div>`).join('');
+}
+function statusLabel(s) { return s === 'approved' ? 'تمت الموافقة' : s === 'rejected' ? 'مرفوض' : 'قيد الانتظار'; }
+ 
+async function setPaymentStatus(paymentId, status) {
+  const { doc, updateDoc } = window._fs;
+  const p = ALL_PAYMENTS.find(x => x.id === paymentId);
+  if (!p) return;
+  await updateDoc(doc(window._db, 'paymentRequests', paymentId), { status });
+  p.status = status;
+ 
+  // If approved and we know the user's email, activate their subscription too
+  if (status === 'approved' && p.email) {
+    let u = ALL_USERS.find(x => x.email === p.email);
+    const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+    if (u) {
+      await updateDoc(doc(window._db, 'users', u.id), { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
+      Object.assign(u, { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
+    } else {
+      const { setDoc } = window._fs;
+      const code = await generateUserCode();
+      await setDoc(doc(window._db, 'users', p.email), {
+        name: p.name || '', email: p.email, phone: p.phone || '', subscription: 'paid',
+        subscriptionExpiry: expiry, paymentScreenshot: p.screenshot || '', code, createdAt: Date.now()
+      }, { merge: true });
+      ALL_USERS.push({ id: p.email, name: p.name, email: p.email, phone: p.phone, subscription: 'paid', subscriptionExpiry: expiry, paymentScreenshot: p.screenshot, code });
+    }
+  }
+  renderPayments();
+  renderUsers();
+  renderExpiry();
+  renderOverview();
+  showToast('تم تحديث حالة الطلب');
+}
+ 
+/* ══ FEEDBACK ══ */
+async function loadFeedback() {
+  const { collection, getDocs, query, orderBy } = window._fs;
+  try {
+    const snap = await getDocs(query(collection(window._db, 'feedback'), orderBy('createdAt', 'desc')));
+    ALL_FEEDBACK = [];
+    snap.forEach(d => ALL_FEEDBACK.push({ id: d.id, ...d.data() }));
+  } catch (e) { ALL_FEEDBACK = []; }
+  renderFeedback();
+}
+function renderFeedback() {
+  const wrap = document.getElementById('feedbackListWrap');
+  if (!ALL_FEEDBACK.length) { wrap.innerHTML = '<div class="empty-state">مفيش شكاوى أو مقترحات لسه</div>'; return; }
+  wrap.innerHTML = ALL_FEEDBACK.map(f => `
+    <div class="feedback-card">
+      <div class="top">
+        <span class="type-tag">${escapeHtml(f.type || 'شكوى')}</span>
+        <span class="date">${f.createdAt ? new Date(f.createdAt).toLocaleString('ar-EG') : ''}</span>
+      </div>
+      <div class="name">${escapeHtml(f.name || 'بدون اسم')}</div>
+      <div class="msg">${escapeHtml(f.message || '')}</div>
+      ${f.image ? `<img src="${f.image}" onclick="openLightbox('${f.image}')">` : ''}
+    </div>`).join('');
+}
+ 
+/* ══ VISITS ══ */
+async function loadVisits() {
+  const { collection, getDocs } = window._fs;
+  try {
+    const snap = await getDocs(collection(window._db, 'visits'));
+    ALL_VISITS = {};
+    snap.forEach(d => ALL_VISITS[d.id] = d.data().count || 0);
+  } catch (e) { ALL_VISITS = {}; }
+}
+ 
+/* ══ MAINTENANCE ══ */
+async function loadMaintenanceStatus() {
+  const { doc, getDoc } = window._fs;
+  try {
+    const snap = await getDoc(doc(window._db, 'siteSettings', 'config'));
+    const on = snap.exists() && snap.data().maintenanceMode;
+    updateMaintUI(!!on);
+  } catch (e) { updateMaintUI(false); }
+}
+function updateMaintUI(on) {
+  const badge = document.getElementById('maintStatusBadge');
+  const btn = document.getElementById('maintToggleBtn');
+  if (on) {
+    badge.className = 'maint-status on'; badge.textContent = '⚠️ وضع الصيانة مفعّل دلوقتي — الموقع مقفول على الزوار';
+    btn.className = 'maint-btn disable'; btn.textContent = 'إيقاف وضع الصيانة';
+  } else {
+    badge.className = 'maint-status off'; badge.textContent = 'الموقع شغال بشكل طبيعي';
+    btn.className = 'maint-btn enable'; btn.textContent = 'تفعيل وضع الصيانة';
+  }
+  window._maintOn = on;
+}
+async function toggleMaintenance() {
+  const { doc, setDoc } = window._fs;
+  const newVal = !window._maintOn;
+  await setDoc(window._db ? doc(window._db, 'siteSettings', 'config') : null, {
+    maintenanceMode: newVal,
+    maintenanceMessage: 'جارٍ الآن إجراء بعض الإصلاحات'
+  }, { merge: true });
+  updateMaintUI(newVal);
+  showToast(newVal ? 'تم تفعيل وضع الصيانة' : 'تم إيقاف وضع الصيانة');
+}
+ 
+/* ══ OVERVIEW / CHARTS ══ */
+let visitsChartInstance, subsChartInstance;
+function renderOverview() {
+  const total = ALL_USERS.length;
+  const subscribed = ALL_USERS.filter(u => u.subscription === 'paid').length;
+  const unsubscribed = total - subscribed;
+  document.getElementById('statTotalUsers').textContent = total;
+  document.getElementById('statSubscribed').textContent = subscribed;
+  document.getElementById('statUnsubscribed').textContent = unsubscribed;
+ 
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayCount = ALL_VISITS[todayKey] || 0;
+  document.getElementById('statVisitsToday').textContent = todayCount;
+ 
+  const now = new Date();
+  const monthPrefix = todayKey.slice(0, 7);
+  const yearPrefix = todayKey.slice(0, 4);
+  let monthTotal = 0, yearTotal = 0;
+  const last30 = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    last30.push({ key, count: ALL_VISITS[key] || 0 });
+  }
+  Object.keys(ALL_VISITS).forEach(k => {
+    if (k.startsWith(monthPrefix)) monthTotal += ALL_VISITS[k];
+    if (k.startsWith(yearPrefix)) yearTotal += ALL_VISITS[k];
+  });
+  document.getElementById('statVisitsMonth').textContent = monthTotal;
+  document.getElementById('statVisitsYear').textContent = yearTotal;
+ 
+  const vCtx = document.getElementById('visitsChart');
+  if (visitsChartInstance) visitsChartInstance.destroy();
+  visitsChartInstance = new Chart(vCtx, {
+    type: 'line',
+    data: {
+      labels: last30.map(x => x.key.slice(5)),
+      datasets: [{ label: 'زوار', data: last30.map(x => x.count), borderColor: '#0077B6', backgroundColor: 'rgba(0,119,182,0.08)', fill: true, tension: 0.3 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+ 
+  const sCtx = document.getElementById('subsChart');
+  if (subsChartInstance) subsChartInstance.destroy();
+  subsChartInstance = new Chart(sCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['مشتركين', 'غير مشتركين'],
+      datasets: [{ data: [subscribed, unsubscribed], backgroundColor: ['#0F9D68', '#6B6B78'] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+}
+ 
+/* ══ FILE MANAGER ══ */
+async function loadFiles() {
+  const wrap = document.getElementById('filesListWrap');
+  wrap.innerHTML = '<div class="loading-msg">جارٍ التحميل...</div>';
+  try {
+    const res = await fetch('/api/files-list', { headers: { 'x-admin-password': ADMIN_PASSWORD } });
+    const data = await res.json();
+    if (!res.ok) { wrap.innerHTML = `<div class="empty-state">خطأ: ${escapeHtml(data.error || 'غير معروف')}</div>`; return; }
+    const files = (data.files || []).filter(f => f.type === 'file');
+    if (!files.length) { wrap.innerHTML = '<div class="empty-state">مفيش ملفات</div>'; return; }
+    wrap.innerHTML = files.map(f => `
+      <div class="file-row">
+        <span class="fname">${escapeHtml(f.name)}</span>
+        <span class="fsize">${(f.size / 1024).toFixed(1)} KB</span>
+        ${f.download_url ? `<a class="file-view-btn" href="${f.download_url}" target="_blank">عرض</a>` : ''}
+        <button class="file-del-btn" onclick="deleteFile('${f.path}')">حذف</button>
+      </div>`).join('');
+  } catch (e) {
+    wrap.innerHTML = `<div class="empty-state">تعذر الاتصال بالسيرفرلس فنكشن: ${escapeHtml(e.message)}</div>`;
+  }
+}
+async function deleteFile(path) {
+  if (!confirm(`متأكد إنك عايز تحذف "${path}"؟`)) return;
+  try {
+    const res = await fetch('/api/files-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': ADMIN_PASSWORD },
+      body: JSON.stringify({ path })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast('خطأ: ' + (data.error || '')); return; }
+    showToast('تم حذف الملف');
+    loadFiles();
+  } catch (e) { showToast('خطأ في الاتصال'); }
+}
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const base64 = reader.result.split(',')[1];
+    try {
+      const res = await fetch('/api/files-write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': ADMIN_PASSWORD },
+        body: JSON.stringify({ path: file.name, contentBase64: base64, message: `رفع ${file.name} من لوحة التحكم` })
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('خطأ: ' + (data.error || '')); return; }
+      showToast('تم رفع الملف بنجاح');
+      loadFiles();
+    } catch (err) { showToast('خطأ في رفع الملف'); }
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+document.querySelector('[data-view="files"]').addEventListener('click', () => { if (sessionStorage.getItem('legista_admin_ok') === '1') loadFiles(); });
+ 
+/* ══ HELPERS ══ */
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+</script>
+</body>
+</html>
+ 

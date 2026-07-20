@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGISTA — مكتبة الدفوع القانونية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --bg2: #121217;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --success: #00FFB2;
+  --surface: #1A1A22;
+  --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--white); overflow-x: hidden; cursor: none; }
+
+#cursor { position: fixed; width: 12px; height: 12px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform .1s, width .2s, height .2s, background .2s; mix-blend-mode: screen; }
+#cursor-glow { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .08s; }
+
+#bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+/* NAV */
+nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 48px); max-width: 1100px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(10,10,13,0.6); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; transition: padding .3s, box-shadow .3s; }
+nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 5px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a { font-size: 12px; color: var(--gray); text-decoration: none; letter-spacing: 1px; font-weight: 600; transition: color .2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { background: transparent; border: 1px solid rgba(212,175,55,0.5); color: var(--gold); padding: 9px 20px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: none; letter-spacing: 1px; position: relative; overflow: hidden; transition: color .25s; text-decoration: none; display: inline-block; }
+.nav-cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--gold), #a8891f); transform: scaleX(0); transform-origin: right; transition: transform .3s; z-index: -1; }
+.nav-cta:hover { color: #0A0A0D; }
+.nav-cta:hover::before { transform: scaleX(1); }
+
+/* HERO */
+.page-hero { padding: 140px 24px 60px; text-align: center; position: relative; z-index: 2; }
+.breadcrumb { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
+.breadcrumb a { font-size: 11px; color: var(--gray); text-decoration: none; letter-spacing: 2px; transition: color .2s; }
+.breadcrumb a:hover { color: var(--gold); }
+.breadcrumb-sep { font-size: 11px; color: var(--gray); opacity: .4; }
+.breadcrumb-cur { font-size: 11px; color: var(--gold); letter-spacing: 2px; font-weight: 700; }
+.page-eyebrow { font-size: 10px; letter-spacing: 6px; color: var(--cyber); font-weight: 700; margin-bottom: 16px; opacity: 0.8; }
+.page-h1 { font-size: clamp(32px, 5vw, 60px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+.page-h1 span { background: linear-gradient(90deg, var(--gold), var(--gold-soft), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.page-sub { font-size: 15px; color: var(--gray); max-width: 500px; margin: 0 auto; line-height: 1.9; }
+
+/* TYPE SELECTOR */
+.type-selector { position: relative; z-index: 2; padding: 40px 24px 0; max-width: 700px; margin: 0 auto; }
+.type-tabs { display: flex; gap: 0; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 6px; }
+.type-tab { flex: 1; padding: 14px 20px; border-radius: 10px; text-align: center; font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; cursor: none; transition: all .25s; border: none; background: transparent; color: var(--gray); letter-spacing: 1px; position: relative; }
+.type-tab.active-tab { background: linear-gradient(135deg, #1a1a22, #222230); color: var(--white); }
+.type-tab.active-tab.criminal { box-shadow: 0 0 20px rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.25); color: var(--cyber); }
+.type-tab.active-tab.civil { box-shadow: 0 0 20px rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); }
+.type-tab-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.type-tab-count { font-size: 10px; letter-spacing: 2px; opacity: .6; font-weight: 400; display: block; }
+
+/* SECTIONS */
+.sections-wrap { position: relative; z-index: 2; padding: 48px 24px 80px; max-width: 1100px; margin: 0 auto; }
+.section-label-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+.slb-line { flex: 1; height: 1px; }
+.slb-line.criminal { background: linear-gradient(90deg, rgba(0,229,255,0.3), transparent); }
+.slb-line.civil { background: linear-gradient(90deg, rgba(212,175,55,0.3), transparent); }
+.slb-text { font-size: 10px; letter-spacing: 5px; font-weight: 700; }
+.slb-text.criminal { color: var(--cyber); }
+.slb-text.civil { color: var(--gold); }
+
+/* CARDS GRID */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.section-card { position: relative; border-radius: 20px; padding: 32px; text-decoration: none; color: inherit; overflow: hidden; cursor: none; transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s; display: flex; flex-direction: column; gap: 16px; border: 1px solid rgba(255,255,255,0.06); }
+.section-card:hover { transform: translateY(-6px); }
+
+/* Criminal cards */
+.section-card.criminal { background: linear-gradient(145deg, #0e0e18 0%, #0a0f1a 100%); }
+.section-card.criminal:hover { box-shadow: 0 20px 50px rgba(0,229,255,0.1), 0 0 0 1px rgba(0,229,255,0.2); border-color: rgba(0,229,255,0.25); }
+.section-card.criminal::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 10%, rgba(0,229,255,0.07) 0%, transparent 60%); pointer-events: none; }
+
+/* Civil cards */
+.section-card.civil { background: linear-gradient(145deg, #130f07 0%, #1a1408 100%); }
+.section-card.civil:hover { box-shadow: 0 20px 50px rgba(212,175,55,0.12), 0 0 0 1px rgba(212,175,55,0.25); border-color: rgba(212,175,55,0.35); }
+.section-card.civil::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 10%, rgba(212,175,55,0.08) 0%, transparent 60%); pointer-events: none; }
+
+/* Scan line */
+.section-card .scan-line { position: absolute; left: 0; right: 0; height: 1px; opacity: 0; pointer-events: none; top: 0; }
+.section-card.criminal .scan-line { background: linear-gradient(90deg, transparent, rgba(0,229,255,0.5), transparent); }
+.section-card.civil .scan-line { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.5), transparent); }
+.section-card:hover .scan-line { animation: scanAnim 2s ease-in-out infinite; opacity: 1; }
+@keyframes scanAnim { 0% { top: 0%; } 100% { top: 100%; } }
+
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; position: relative; z-index: 1; }
+.card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.criminal .card-icon { background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); }
+.civil .card-icon { background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); }
+
+.card-badge { font-size: 9px; font-weight: 700; letter-spacing: 2px; padding: 5px 12px; border-radius: 20px; }
+.criminal .card-badge { background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); color: var(--cyber); }
+.civil .card-badge { background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); color: var(--gold); }
+
+.card-title { font-size: 20px; font-weight: 900; position: relative; z-index: 1; line-height: 1.3; }
+.card-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.8; position: relative; z-index: 1; }
+.card-divider { height: 1px; position: relative; z-index: 1; }
+.criminal .card-divider { background: linear-gradient(90deg, rgba(0,229,255,0.2), transparent); }
+.civil .card-divider { background: linear-gradient(90deg, rgba(212,175,55,0.25), transparent); }
+
+.card-preview { display: flex; flex-direction: column; gap: 6px; position: relative; z-index: 1; }
+.card-preview-item { font-size: 11px; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 8px; transition: color .2s; }
+.section-card:hover .card-preview-item { color: rgba(255,255,255,0.5); }
+.card-preview-item::before { content: '—'; font-size: 9px; flex-shrink: 0; }
+.criminal .card-preview-item::before { color: rgba(0,229,255,0.4); }
+.civil .card-preview-item::before { color: rgba(212,175,55,0.4); }
+
+.card-footer { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; margin-top: auto; }
+.card-count { font-family: 'Syne', sans-serif; }
+.card-count span { font-size: 36px; font-weight: 800; display: block; line-height: 1; }
+.criminal .card-count span { color: var(--cyber); }
+.civil .card-count span { color: var(--gold); }
+.card-count-lbl { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.card-arrow { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: transform .3s, box-shadow .3s; }
+.criminal .card-arrow { background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); color: var(--cyber); }
+.civil .card-arrow { background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); color: var(--gold); }
+.section-card:hover .card-arrow { transform: translateX(-6px); }
+.criminal:hover .card-arrow { box-shadow: 0 0 20px rgba(0,229,255,0.2); }
+.civil:hover .card-arrow { box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+
+/* HIDDEN PANEL */
+.cards-panel { display: none; }
+.cards-panel.active { display: block; }
+
+/* reveal */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s, transform .6s; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+footer { position: relative; z-index: 2; padding: 48px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px; }
+.footer-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 6px; color: var(--gold); margin-bottom: 12px; }
+.footer-sub { font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+
+@media (max-width: 768px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .type-tabs { flex-direction: column; }
+  .nav-links { display: none; }
+}
+
+/* Float CTA */
+.float-cta { position: fixed; bottom: 32px; left: 32px; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--gold), #b8941a); color: #0A0A0D; padding: 14px 22px; border-radius: 50px; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 900; text-decoration: none; z-index: 500; box-shadow: 0 8px 32px rgba(212,175,55,0.3); transition: transform .2s, box-shadow .2s; cursor: none; }
+.float-cta:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(212,175,55,0.4); }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-glow"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">LEGISTA</a>
+  <div class="nav-links">
+    <a href="index.html#modules">الأقسام</a>
+    <a href="dafou.html" style="color:var(--white)">الدفوع</a>
+    <a href="index.html#esteshara">استشارة</a>
+  </div>
+  <a class="nav-cta" href="inzarat.html">الإنذارات ⚡</a>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb">
+    <a href="index.html">الرئيسية</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-cur">مكتبة الدفوع</span>
+  </div>
+  <p class="page-eyebrow">LEGAL DEFENSE LIBRARY · LEGISTA</p>
+  <h1 class="page-h1">مكتبة الدفوع القانونية<br><span>جاهزة للمعركة.</span></h1>
+  <p class="page-sub">اختر نوع الدفع — جنائي أو مدني — ثم اختر القسم المناسب لقضيتك.</p>
+</div>
+
+<!-- TYPE TABS -->
+<div class="type-selector">
+  <div class="type-tabs">
+    <button class="type-tab active-tab criminal" onclick="showPanel('criminal', this)">
+      <span class="type-tab-icon">⚔️</span>
+      الدفوع الجنائية
+      <span class="type-tab-count">8 أقسام · 200+ دفع</span>
+    </button>
+    <button class="type-tab civil" onclick="showPanel('civil', this)">
+      <span class="type-tab-icon">🛡️</span>
+      الدفوع المدنية
+      <span class="type-tab-count">3 أقسام · 50+ دفع</span>
+    </button>
+  </div>
+</div>
+
+<div class="sections-wrap">
+
+  <!-- ══ CRIMINAL PANEL ══ -->
+  <div class="cards-panel active" id="panel-criminal">
+    <div class="section-label-bar reveal">
+      <div class="slb-text criminal">CRIMINAL DEFENSE</div>
+      <div class="slb-line criminal"></div>
+    </div>
+    <div class="cards-grid">
+
+      <!-- 1. البطلان والجنحة المباشرة -->
+      <a href="dafou-detail.html?section=butlan" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">⚖️</div>
+          <div class="card-badge">NULLITY · بطلان</div>
+        </div>
+        <div class="card-title">الدفع بالبطلان<br>والجنحة المباشرة</div>
+        <div class="card-desc">بطلان الإجراءات والتحقيقات وأوراق الجنحة المباشرة — الأساس القانوني للدفاع.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">بطلان الاعتراف لعيب في الإرادة</div>
+          <div class="card-preview-item">بطلان القبض والتفتيش</div>
+          <div class="card-preview-item">بطلان الإعلان وإجراءات التكليف</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>١١٨+</span><div class="card-count-lbl">دفع ببطلان</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 2. الشيك -->
+      <a href="dafou-detail.html?section=cheque" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🏦</div>
+          <div class="card-badge">CHEQUE · شيك</div>
+        </div>
+        <div class="card-title">الدفوع في<br>الشيك</div>
+        <div class="card-desc">كافة الدفوع المتعلقة بجرائم الشيك — التقادم، النية، الرصيد، والأركان.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بانقضاء الدعوى بالتقادم</div>
+          <div class="card-preview-item">الدفع بانعدام القصد الجنائي</div>
+          <div class="card-preview-item">الدفع بعدم توافر أركان الجريمة</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٢٤+</span><div class="card-count-lbl">دفع في الشيك</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 3. المباني -->
+      <a href="dafou-detail.html?section=mabani" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🏗️</div>
+          <div class="card-badge">BUILDINGS · مباني</div>
+        </div>
+        <div class="card-title">الدفوع في<br>المباني</div>
+        <div class="card-desc">دفوع جرائم البناء والتعدي على حقوق الملكية والعقارات.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بانعدام الصفة الجنائية</div>
+          <div class="card-preview-item">الدفع بعدم الاختصاص الولائي</div>
+          <div class="card-preview-item">الدفع بحسن النية</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٢٠+</span><div class="card-count-lbl">دفع في المباني</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 4. الجنح -->
+      <a href="dafou-detail.html?section=jonah" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">⚔️</div>
+          <div class="card-badge">MISDEMEANOR · جنح</div>
+        </div>
+        <div class="card-title">الدفوع في<br>الجنح</div>
+        <div class="card-desc">دفوع الجنح بكافة أنواعها — إجرائية وموضوعية وشكلية.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بانقضاء الدعوى الجنائية</div>
+          <div class="card-preview-item">الدفع بعدم جدية التحريات</div>
+          <div class="card-preview-item">الدفع ببطلان صحيفة الجنحة</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٣٠+</span><div class="card-count-lbl">دفع في الجنح</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 5. الجنايات -->
+      <a href="dafou-detail.html?section=jnayat" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🔱</div>
+          <div class="card-badge">FELONY · جنايات</div>
+        </div>
+        <div class="card-title">الدفوع في<br>الجنايات</div>
+        <div class="card-desc">دفوع القتل والضرب والإيذاء وسائر جرائم الجنايات.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع باستحالة وقوع الجريمة</div>
+          <div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+          <div class="card-preview-item">الدفع بالدفاع الشرعي</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٢٥+</span><div class="card-count-lbl">دفع في الجنايات</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 6. التشريعات الجنائية الخاصة -->
+      <a href="dafou-detail.html?section=tashriaat" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">📜</div>
+          <div class="card-badge">SPECIAL · تشريعات</div>
+        </div>
+        <div class="card-title">الدفوع في التشريعات<br>الجنائية الخاصة</div>
+        <div class="card-desc">دفوع المخدرات والأسلحة وغسيل الأموال والجرائم الإلكترونية.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بانتفاء حيازة المخدر</div>
+          <div class="card-preview-item">الدفع ببطلان إجراءات الضبط</div>
+          <div class="card-preview-item">الدفع بعدم جدية التحريات</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٢٠+</span><div class="card-count-lbl">دفع في التشريعات</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 7. طرق الطعن -->
+      <a href="dafou-detail.html?section=taaan" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🔓</div>
+          <div class="card-badge">APPEALS · طعن</div>
+        </div>
+        <div class="card-title">الدفوع في طرق<br>الطعن في الأحكام</div>
+        <div class="card-desc">بطلان أسباب الأحكام ومسوغات النقض والاستئناف والمعارضة.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">بطلان الحكم لخلوه من التوقيع</div>
+          <div class="card-preview-item">بطلان الحكم لتناقض أسبابه</div>
+          <div class="card-preview-item">بطلان الحكم لقصور البيان</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٩٧+</span><div class="card-count-lbl">وجه طعن</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- 8. الاعتراف -->
+      <a href="dafou-detail.html?section=ettiraf" class="section-card criminal reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🗣️</div>
+          <div class="card-badge">CONFESSION · اعتراف</div>
+        </div>
+        <div class="card-title">الدفوع في<br>الاعتراف</div>
+        <div class="card-desc">الطعن في صحة الاعتراف وظروفه ومدى حجيته أمام القضاء.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بصدور الاعتراف تحت الإكراه</div>
+          <div class="card-preview-item">الدفع بأن الاعتراف جزئي لا كلي</div>
+          <div class="card-preview-item">الدفع ببطلان الاعتراف لعدم صراحته</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>١٦+</span><div class="card-count-lbl">دفع في الاعتراف</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+<!-- القتل العمد -->
+<a href="dafou-detail.html?section=katl" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">⚔️</div>
+    <div class="card-badge">HOMICIDE · قتل عمد</div>
+  </div>
+  <div class="card-title">دفوع القتل<br>العمد</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بنية القتل والدفاع الشرعي وعلاقة السببية.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+<div class="card-preview-item">الدفع بتوافر الدفاع الشرعي</div>
+<div class="card-preview-item">الدفع بانتفاء علاقة السببية</div>
+<div class="card-preview-item">الدفع بتناقض الدليلين القولي والفني</div>
+<div class="card-preview-item">الدفع بانتفاء سبق الإصرار في القتل</div>
+<div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+<div class="card-preview-item">الدفع بتوافر الدفاع الشرعي</div>
+<div class="card-preview-item">الدفع بانتفاء سبق الإصرار</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>١٤</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- الضرب المفضي للموت -->
+<a href="dafou-detail.html?section=darb" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">👊</div>
+    <div class="card-badge">ASSAULT · ضرب مفضي</div>
+  </div>
+  <div class="card-title">دفوع الضرب<br>المفضي للموت</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم الضرب المفضي إلى الموت.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء العلاقة السببية</div>
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+    <div class="card-preview-item">الدفع بشيوع الاتهام عند تعدد الجناة</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٣</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- الضرب المفضي لعاهة مستديمة -->
+<a href="dafou-detail.html?section=aaha" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">🩹</div>
+    <div class="card-badge">INJURY · عاهة مستديمة</div>
+  </div>
+  <div class="card-title">دفوع الضرب المفضي<br>لعاهة مستديمة</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم الضرب المفضي إلى عاهة مستديمة.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بعدم حدوث العاهة المستديمة</div>
+    <div class="card-preview-item">الدفع بالقابلية للشفاء</div>
+    <div class="card-preview-item">الدفع بانتفاء العلاقة السببية</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٥</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- الجرائم المضرة بالمصلحة العامة -->
+<a href="dafou-detail.html?section=masalha" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">🏛️</div>
+    <div class="card-badge">PUBLIC INTEREST · مصلحة عامة</div>
+  </div>
+  <div class="card-title">دفوع الجرائم المضرة<br>بالمصلحة العامة</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم الرشوة والجرائم المضرة بالمصلحة العامة.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بأن المتهم ليس موظفاً عاماً</div>
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي في الرشوة</div>
+    <div class="card-preview-item">الدفع ببطلان التسجيلات</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>١٢</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- الاختلاس -->
+<a href="dafou-detail.html?section=ikhtilas" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">💰</div>
+    <div class="card-badge">EMBEZZLEMENT · اختلاس</div>
+  </div>
+  <div class="card-title">دفوع<br>الاختلاس</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم الاختلاس.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء فعل الاختلاس</div>
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+    <div class="card-preview-item">الدفع بعدم توافر صفة الموظف العام</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٨</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- الاعتداء على العرض -->
+<a href="dafou-detail.html?section=erd" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">⚖️</div>
+    <div class="card-badge">SEXUAL ASSAULT · الاعتداء على العرض</div>
+  </div>
+  <div class="card-title">دفوع الاعتداء<br>على العرض</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجنايات الاعتداء على العرض.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي في الاغتصاب</div>
+    <div class="card-preview-item">الدفع بانتفاء القوة وتوافر الرضا</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٢</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- هتك العرض -->
+<a href="dafou-detail.html?section=hatk" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">⚖️</div>
+    <div class="card-badge">INDECENCY · هتك العرض</div>
+  </div>
+  <div class="card-title">دفوع<br>هتك العرض</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم هتك العرض.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء الركن المادي</div>
+    <div class="card-preview-item">الدفع برضاء المجني عليها</div>
+    <div class="card-preview-item">الدفع بانتفاء الركن المعنوي</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٦</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- خطف الإناث -->
+<a href="dafou-detail.html?section=khatf" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">🚨</div>
+    <div class="card-badge">KIDNAPPING · خطف الإناث</div>
+  </div>
+  <div class="card-title">دفوع<br>خطف الإناث</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم خطف الإناث.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء التحايل والقصد الجنائي</div>
+    <div class="card-preview-item">الدفع بانتفاء الركن المادي</div>
+    <div class="card-preview-item">الدفع ببطلان الاعتراف</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٥</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- جرائم الإجهاض -->
+<a href="dafou-detail.html?section=ijhad" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">🏥</div>
+    <div class="card-badge">ABORTION · جرائم الإجهاض</div>
+  </div>
+  <div class="card-title">دفوع جرائم<br>الإجهاض</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم الإجهاض.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بإباحة الإجهاض لأسباب طبية</div>
+    <div class="card-preview-item">الدفع بانتفاء الركن المادي</div>
+    <div class="card-preview-item">الدفع بانتفاء الركن المعنوي</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>١١</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- جنايات الاعتداء على الأموال -->
+<a href="dafou-detail.html?section=amwal" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">💼</div>
+    <div class="card-badge">PROPERTY · الاعتداء على الأموال</div>
+  </div>
+  <div class="card-title">دفوع جنايات الاعتداء<br>على الأموال</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجنايات الاعتداء على الأموال.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء ركن الإكراه</div>
+    <div class="card-preview-item">الدفع ببطلان الاعتراف</div>
+    <div class="card-preview-item">الدفع بتلفيق الاتهام</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٦</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- اغتصاب السندات والتوقيعات -->
+<a href="dafou-detail.html?section=sanadat" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">📄</div>
+    <div class="card-badge">COERCION · اغتصاب السندات</div>
+  </div>
+  <div class="card-title">دفوع اغتصاب<br>السندات والتوقيعات</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجرائم اغتصاب السندات والتوقيعات.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء الركن المادي</div>
+    <div class="card-preview-item">الدفع بانتفاء علاقة السببية</div>
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٣</span><div class="card-count-lbl">دفع جنائي</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+<!-- النصب -->
+<a href="dafou-detail.html?section=nasb" class="section-card criminal reveal">
+  <div class="scan-line"></div>
+  <div class="card-top">
+    <div class="card-icon">🎭</div>
+    <div class="card-badge">FRAUD · النصب</div>
+  </div>
+  <div class="card-title">الدفوع في<br>النصب</div>
+  <div class="card-desc">الدفوع الجنائية المتعلقة بجريمة النصب بجميع عناصرها وصورها.</div>
+  <div class="card-divider"></div>
+  <div class="card-preview">
+    <div class="card-preview-item">الدفع بانتفاء القصد الجنائي</div>
+    <div class="card-preview-item">الدفع بانتفاء فعل التسليم</div>
+    <div class="card-preview-item">الدفع بعدم توافر الاسم الكاذب</div>
+  </div>
+  <div class="card-footer">
+    <div class="card-count"><span>٣٦</span><div class="card-count-lbl">دفع في النصب</div></div>
+    <div class="card-arrow">←</div>
+  </div>
+</a>
+    </div><!-- end cards-grid -->
+  </div><!-- end criminal panel -->
+
+  <!-- ══ CIVIL PANEL ══ -->
+  <div class="cards-panel" id="panel-civil">
+    <div class="section-label-bar reveal">
+      <div class="slb-text civil">CIVIL DEFENSE</div>
+      <div class="slb-line civil"></div>
+    </div>
+    <div class="cards-grid">
+
+      <!-- الاختصاص -->
+      <a href="dafou-detail.html?section=ikhtisas" class="section-card civil reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🏛️</div>
+          <div class="card-badge">JURISDICTION · اختصاص</div>
+        </div>
+        <div class="card-title">الدفوع المتعلقة<br>بعدم الاختصاص</div>
+        <div class="card-desc">دفوع عدم اختصاص المحكمة نوعياً أو محلياً أو ولائياً.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بعدم الاختصاص لأن الواقعة جناية</div>
+          <div class="card-preview-item">الدفع بعدم اختصاص أمام المحاكم العسكرية</div>
+          <div class="card-preview-item">الدفع بعدم الاختصاص لانعدام الضرر المادي</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>١٠+</span><div class="card-count-lbl">دفع باختصاص</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- القبول -->
+      <a href="dafou-detail.html?section=qabool" class="section-card civil reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">📋</div>
+          <div class="card-badge">ADMISSIBILITY · قبول</div>
+        </div>
+        <div class="card-title">الدفوع المتعلقة<br>بعدم القبول</div>
+        <div class="card-desc">عدم قبول الدعوى المدنية لأسباب شكلية أو موضوعية أو تتعلق بالصفة والأهلية.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بعدم قبول الدعوى ضد الموظف العام</div>
+          <div class="card-preview-item">الدفع بعدم قبول الدعوى لانتفاء الصفة</div>
+          <div class="card-preview-item">الدفع بسقوط الحق في اختيار الطريق الجنائي</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>٢٠+</span><div class="card-count-lbl">دفع بعدم القبول</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+
+      <!-- دفوع متنوعة -->
+      <a href="dafou-detail.html?section=motanawia" class="section-card civil reveal">
+        <div class="scan-line"></div>
+        <div class="card-top">
+          <div class="card-icon">🛡️</div>
+          <div class="card-badge">MISC · متنوعة</div>
+        </div>
+        <div class="card-title">الدفوع المدنية<br>المتنوعة</div>
+        <div class="card-desc">دفوع الانقضاء والتصالح والتقادم وعناصر المسئولية المدنية.</div>
+        <div class="card-divider"></div>
+        <div class="card-preview">
+          <div class="card-preview-item">الدفع بانقضاء الدعوى بمضي المدة</div>
+          <div class="card-preview-item">الدفع بانقضاء الدعوى الجنائية بالتصالح</div>
+          <div class="card-preview-item">الدفع بعدم إحاطة الحكم بعناصر المسئولية</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-count"><span>١٥+</span><div class="card-count-lbl">دفع مدني</div></div>
+          <div class="card-arrow">←</div>
+        </div>
+      </a>
+    </div>
+  </div><!-- end civil panel -->
+
+</div><!-- end sections-wrap -->
+
+<footer>
+  <div class="footer-logo">LEGISTA</div>
+  <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
+</footer>
+
+<a href="index.html#esteshara" class="float-cta">
+  <span>⚖️</span>
+  <span>استشارة قانونية</span>
+</a>
+
+<script>
+/* cursor */
+const cur = document.getElementById('cursor');
+const curGlow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  curGlow.style.left = e.clientX + 'px'; curGlow.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('button, a, .section-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width='24px'; cur.style.height='24px'; cur.style.opacity='0.7'; });
+  el.addEventListener('mouseleave', () => { cur.style.width='12px'; cur.style.height='12px'; cur.style.opacity='1'; });
+});
+
+/* nav scroll */
+window.addEventListener('scroll', () => { document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 60); });
+
+/* reveal */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* tab switch */
+function showPanel(type, btn) {
+  document.querySelectorAll('.cards-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.type-tab').forEach(t => {
+    t.classList.remove('active-tab', 'criminal', 'civil');
+    t.classList.add(t.dataset.type || 'criminal');
+  });
+  document.getElementById('panel-' + type).classList.add('active');
+  document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active-tab'));
+  btn.classList.add('active-tab', type);
+  // re-observe new visible cards
+  document.querySelectorAll('#panel-' + type + ' .reveal').forEach(el => {
+    el.classList.add('visible');
+  });
+}
+
+/* bg canvas */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const streams = Array.from({length: 12}, () => ({
+  x: Math.random()*1200, y: Math.random()*-800,
+  speed: 0.3+Math.random()*0.4,
+  chars: Array.from({length:18}, ()=>String.fromCharCode(0x600+Math.floor(Math.random()*100))),
+  opacity: 0.02+Math.random()*0.03
+}));
+function drawBG() {
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(212,175,55,0.025)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.font='11px Cairo';
+  streams.forEach(s=>{
+    ctx.fillStyle=`rgba(0,229,255,${s.opacity})`;
+    s.chars.forEach((c,i)=>{if(s.y+i*16>0&&s.y+i*16<H)ctx.fillText(c,s.x%W,s.y+i*16);});
+    s.y+=s.speed; if(s.y>H+200){s.y=-300;s.x=Math.random()*W;}
+  });
+  requestAnimationFrame(drawBG);
+}
+drawBG();
+
+// fix tab data attrs
+document.querySelectorAll('.type-tab').forEach((t,i) => {
+  t.dataset.type = i === 0 ? 'criminal' : 'civil';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة المواريث الشرعية — LEGISTA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --bg2: #121217;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --success: #00FFB2;
+  --danger: #FF5C5C;
+  --surface: #1A1A22;
+  --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; overflow-x:hidden; width:100%; max-width:100%; }
+body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white); direction:rtl; overflow-x:hidden; width:100%; max-width:100%; line-height:1.7; }
+
+/* ══ NAV ══ */
+nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 48px); max-width: 1100px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(10,10,13,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; }
+.nav-logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; letter-spacing:5px; background:linear-gradient(90deg,var(--gold),var(--gold-soft)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; flex-shrink:0; }
+.nav-links { display:flex; gap:28px; }
+.nav-links a { font-size:12px; color:var(--gray); text-decoration:none; letter-spacing:1px; font-weight:600; transition:color .2s; }
+.nav-links a:hover, .nav-links a.active { color:var(--gold); }
+.nav-hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:4px; }
+.nav-hamburger span { display:block; width:22px; height:2px; background:var(--gold); border-radius:2px; }
+@media (max-width:768px){
+  nav{ width:calc(100% - 24px); padding:12px 16px; left:12px; right:12px; transform:none; flex-wrap:wrap; gap:8px; }
+  .nav-links{ display:none; position:absolute; top:100%; left:0; right:0; background:rgba(10,10,13,0.97); border:1px solid var(--border); border-radius:12px; margin-top:8px; padding:16px; flex-direction:column; gap:0; width:100%; }
+  .nav-links.open{ display:flex; }
+  .nav-links a{ padding:12px 8px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:14px; }
+  .nav-hamburger{ display:flex; }
+}
+
+/* ══ PAGE HERO ══ */
+.page-hero { padding:150px 24px 60px; max-width:1000px; margin:0 auto; text-align:center; }
+.breadcrumb { font-size:11px; letter-spacing:2px; color:var(--gray); margin-bottom:18px; }
+.breadcrumb a { color:var(--gray); text-decoration:none; }
+.breadcrumb a:hover { color:var(--gold); }
+.page-title { font-size:clamp(28px,5vw,46px); font-weight:900; margin-bottom:16px; line-height:1.2; }
+.page-title span { background:linear-gradient(90deg,var(--gold),var(--gold-soft),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.page-sub { font-size:14px; color:var(--gray); max-width:640px; margin:0 auto; line-height:1.9; }
+
+.wrap { max-width:1000px; margin:0 auto; padding:0 24px 100px; position:relative; z-index:2; }
+
+/* ══ ALERT / COMPLIANCE BANNER ══ */
+.compliance-banner {
+  background:linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));
+  border:1px solid rgba(212,175,55,0.25);
+  border-radius:16px; padding:20px 24px; margin-bottom:36px;
+  display:flex; gap:14px; align-items:flex-start;
+}
+.compliance-banner .icon { font-size:22px; flex-shrink:0; }
+.compliance-banner p { font-size:13px; color:var(--white); line-height:1.9; }
+.compliance-banner b { color:var(--gold-soft); }
+
+/* ══ FORM ══ */
+.form-card { background:var(--surface); border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:32px; margin-bottom:24px; position:relative; overflow:hidden; }
+.form-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left, rgba(212,175,55,0.04), transparent 60%); pointer-events:none; }
+.form-section-title { font-size:15px; font-weight:800; color:var(--gold); margin-bottom:6px; display:flex; align-items:center; gap:8px; position:relative; z-index:1; }
+.form-section-sub { font-size:12px; color:var(--gray); margin-bottom:20px; position:relative; z-index:1; }
+
+.gender-toggle { display:flex; gap:12px; margin-bottom:8px; position:relative; z-index:1; }
+.gender-btn { flex:1; text-align:center; padding:14px; border-radius:12px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-family:'Cairo',sans-serif; font-size:13px; font-weight:700; color:var(--gray); transition:all .2s; }
+.gender-btn.active { border-color:var(--gold); background:rgba(212,175,55,0.1); color:var(--gold-soft); }
+
+.field-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; position:relative; z-index:1; }
+.field { background:var(--surface); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:border-color .2s; }
+.field:hover { border-color:rgba(212,175,55,0.25); }
+.field label { font-size:13px; font-weight:600; color:var(--white); flex:1; }
+.field .hint { font-size:10px; color:var(--gray); display:block; margin-top:2px; font-weight:400; }
+.field input[type="number"] {
+  width:64px; background:var(--surface); border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px; color:var(--white); text-align:center; padding:8px 4px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700;
+}
+.field input[type="number"]:focus { outline:none; border-color:var(--gold); }
+.field input[type="checkbox"] { width:20px; height:20px; accent-color:var(--gold); cursor:pointer; flex-shrink:0; }
+
+.estate-field { display:flex; align-items:center; gap:12px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.2); border-radius:12px; padding:16px 18px; position:relative; z-index:1; }
+.estate-field label { font-size:13px; font-weight:700; color:var(--gold-soft); white-space:nowrap; }
+.estate-field input { flex:1; background:var(--surface); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--white); padding:10px 14px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:600; }
+.estate-field input:focus { outline:none; border-color:var(--gold); }
+.estate-field span.unit { font-size:12px; color:var(--gray); white-space:nowrap; }
+
+.calc-btn { width:100%; background:linear-gradient(135deg,var(--gold),#b8941a); border:none; color:#0A0A0D; padding:18px; border-radius:14px; font-family:'Cairo',sans-serif; font-size:16px; font-weight:900; cursor:pointer; margin-top:8px; transition:transform .15s, box-shadow .2s; }
+.calc-btn:hover { transform:scale(1.01); box-shadow:0 4px 32px rgba(212,175,55,0.35); }
+.calc-btn:active { transform:scale(0.99); }
+
+/* ══ RESULTS ══ */
+#results { display:none; margin-top:36px; }
+.results-header { text-align:center; margin-bottom:28px; }
+.results-header h2 { font-size:24px; font-weight:900; margin-bottom:8px; }
+.results-header p { font-size:13px; color:var(--gray); }
+
+.adjustment-note { background:rgba(0,229,255,0.06); border:1px solid rgba(0,229,255,0.2); border-radius:14px; padding:16px 20px; margin-bottom:20px; font-size:13px; color:var(--white); line-height:1.9; }
+.adjustment-note b { color:var(--cyber); }
+
+.heir-card { background:var(--surface); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:22px 24px; margin-bottom:14px; display:flex; align-items:center; gap:20px; position:relative; overflow:hidden; }
+.heir-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left, rgba(212,175,55,0.05), transparent 60%); pointer-events:none; }
+.heir-frac { width:64px; height:64px; border-radius:50%; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--gold); flex-shrink:0; position:relative; z-index:1; }
+.heir-body { flex:1; position:relative; z-index:1; }
+.heir-name { font-size:16px; font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.heir-pct { font-size:12px; color:var(--gold-soft); font-weight:700; }
+.heir-amount { font-size:13px; color:var(--success); font-weight:700; }
+.heir-reason { font-size:12.5px; color:var(--gray); line-height:1.8; }
+
+.excluded-box, .warning-box { border-radius:16px; padding:20px 24px; margin-top:20px; }
+.excluded-box { background:var(--surface); border:1px solid rgba(255,255,255,0.08); }
+.excluded-box h3 { font-size:13px; color:var(--gray); margin-bottom:10px; font-weight:800; letter-spacing:1px; }
+.excluded-item { font-size:12.5px; color:var(--gray); padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+.excluded-item:last-child { border-bottom:none; }
+.excluded-item b { color:var(--white); }
+
+.warning-box { background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25); }
+.warning-box h3 { font-size:13px; color:var(--danger); margin-bottom:10px; font-weight:800; letter-spacing:1px; }
+.warning-item { font-size:12.5px; color:var(--white); padding:6px 0; line-height:1.8; }
+
+.total-check { text-align:center; margin-top:20px; font-size:12px; color:var(--gray); }
+.total-check b { color:var(--success); }
+
+.footer-disclaimer { margin-top:40px; background:var(--surface); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:24px; font-size:12px; color:var(--gray); line-height:1.9; }
+.footer-disclaimer b { color:var(--gray); }
+
+footer { position:relative; z-index:2; padding:48px 24px; text-align:center; border-top:1px solid rgba(255,255,255,0.05); }
+.footer-logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; letter-spacing:6px; color:var(--gold); margin-bottom:10px; }
+.footer-sub { font-size:11px; color:var(--gray); letter-spacing:2px; }
+
+@media (max-width:600px){
+  .heir-card{ flex-direction:column; text-align:center; }
+  .field-grid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+  .estate-field{ flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">LEGISTA</a>
+  <div class="nav-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="index.html#modules">الأقسام</a>
+    <a href="mawareeth.html" class="active">حاسبة المواريث</a>
+    <a href="index.html#esteshara">استشارة</a>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="القائمة"><span></span><span></span><span></span></button>
+</nav>
+
+<section class="page-hero">
+  <p class="breadcrumb"><a href="index.html">الرئيسية</a> ← حاسبة المواريث</p>
+  <h1 class="page-title">حاسبة <span>المواريث الشرعية</span></h1>
+  <p class="page-sub">
+    محرك حساب دقيق يطبّق أحكام علم الفرائض (الحجب، الفروض، التعصيب، العول، الرد) على أكثر حالات الميراث شيوعًا،
+    ويشرح لك سبب كل نصيب بالتفصيل، بما يتوافق مع الشريعة الإسلامية والقانون المصري للمواريث رقم 77 لسنة 1943.
+  </p>
+</section>
+
+<div class="wrap">
+
+  <div class="compliance-banner">
+    <div class="icon">⚖️</div>
+    <p>
+      هذه الأداة تغطي <b>الحالات الشائعة</b> لأصحاب الفروض والعصبة وفق الرأي الراجح في الفقه الإسلامي والقانون المصري.
+      حالات <b>الجد مع الإخوة</b>، أو وجود <b>خنثى</b>، أو <b>حمل مستكن</b>، أو <b>مفقود</b> تحتاج تقديرًا فقهيًا خاصًا بها،
+      وسيظهر لك تنبيه صريح إن انطبقت إحداها — ويجب في هذه الحالة عرض المسألة على محامٍ متخصص في الأحوال الشخصية والمواريث قبل اعتماد أي قسمة نهائية.
+    </p>
+  </div>
+
+  <form id="inheritanceForm">
+
+    <!-- الزوجية -->
+    <div class="form-card">
+      <div class="form-section-title">👤 حالة المتوفى</div>
+      <div class="form-section-sub">حدّد جنس المتوفى أولاً لأن نصيب الزوجية يختلف (زوج أو زوجة/زوجات)</div>
+      <div class="gender-toggle">
+        <div class="gender-btn active" data-gender="male">المتوفى ذكر</div>
+        <div class="gender-btn" data-gender="female">المتوفاة أنثى</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-section-title">💍 الزوجية</div>
+      <div class="form-section-sub" id="spouseHint">أدخل عدد الزوجات الوارثات (بحد أقصى 4)</div>
+      <div class="field-grid" id="spouseFields">
+        <div class="field" id="wivesField">
+          <label>عدد الزوجات<span class="hint">إن وُجدن</span></label>
+          <input type="number" min="0" max="4" value="0" data-key="wivesCount">
+        </div>
+        <div class="field" id="husbandField" style="display:none">
+          <label>الزوج</label>
+          <input type="checkbox" data-key="husband">
+        </div>
+      </div>
+    </div>
+
+    <!-- الأصول -->
+    <div class="form-card">
+      <div class="form-section-title">🧓 الأصول (الوالدان والأجداد)</div>
+      <div class="form-section-sub">الجد هنا يُقصد به الجد الصحيح لأب (أب الأب)، ويُحجب تلقائيًا بوجود الأب</div>
+      <div class="field-grid">
+        <div class="field"><label>الأب</label><input type="checkbox" data-key="father"></div>
+        <div class="field"><label>الأم</label><input type="checkbox" data-key="mother"></div>
+        <div class="field"><label>الجد لأب<span class="hint">إن لم يوجد الأب</span></label><input type="checkbox" data-key="grandfather"></div>
+        <div class="field"><label>الجدة<span class="hint">أي جدة صحيحة</span></label><input type="checkbox" data-key="grandmother"></div>
+      </div>
+    </div>
+
+    <!-- الفروع -->
+    <div class="form-card">
+      <div class="form-section-title">👶 الفروع (الأبناء والأحفاد)</div>
+      <div class="form-section-sub">أبناء/بنات الابن لا يرثون إلا في حال عدم وجود ابن للمتوفى مباشرة</div>
+      <div class="field-grid">
+        <div class="field"><label>عدد الأبناء</label><input type="number" min="0" value="0" data-key="sons"></div>
+        <div class="field"><label>عدد البنات</label><input type="number" min="0" value="0" data-key="daughters"></div>
+        <div class="field"><label>أبناء الابن</label><input type="number" min="0" value="0" data-key="grandsons"></div>
+        <div class="field"><label>بنات الابن</label><input type="number" min="0" value="0" data-key="granddaughters"></div>
+      </div>
+    </div>
+
+    <!-- الإخوة -->
+    <div class="form-card">
+      <div class="form-section-title">👥 الإخوة والأخوات</div>
+      <div class="form-section-sub">يُحجب جميع الإخوة بوجود الأب أو الابن أو ابن الابن</div>
+      <div class="field-grid">
+        <div class="field"><label>إخوة أشقاء</label><input type="number" min="0" value="0" data-key="fullBrothers"></div>
+        <div class="field"><label>أخوات شقيقات</label><input type="number" min="0" value="0" data-key="fullSisters"></div>
+        <div class="field"><label>إخوة لأب</label><input type="number" min="0" value="0" data-key="paternalBrothers"></div>
+        <div class="field"><label>أخوات لأب</label><input type="number" min="0" value="0" data-key="paternalSisters"></div>
+        <div class="field"><label>إخوة لأم</label><input type="number" min="0" value="0" data-key="maternalBrothers"></div>
+        <div class="field"><label>أخوات لأم</label><input type="number" min="0" value="0" data-key="maternalSisters"></div>
+      </div>
+    </div>
+
+    <!-- مبلغ التركة -->
+    <div class="form-card">
+      <div class="form-section-title">💰 مبلغ التركة (اختياري)</div>
+      <div class="form-section-sub">إن أدخلته سنعرض لك المبلغ الفعلي لكل وارث بجانب النسبة</div>
+      <div class="estate-field">
+        <label>صافي التركة</label>
+        <input type="number" min="0" id="estateAmount" placeholder="مثال: 1200000">
+        <span class="unit">جنيه مصري</span>
+      </div>
+    </div>
+
+    <button type="submit" class="calc-btn">⚡ احسب الأنصبة الشرعية</button>
+  </form>
+
+  <div id="results"></div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">LEGISTA</div>
+  <div class="footer-sub">المحرك القانوني الذكي</div>
+</footer>
+
+<script>
+/* ============================================================
+   محرك حساب المواريث الشرعي — Faraid Engine
+   ============================================================ */
+function frac(n,d){ return n/d; }
+
+function calculateInheritance(raw){
+  const inp = Object.assign({
+    deceasedGender:'male', husband:false, wivesCount:0,
+    father:false, mother:false, grandfather:false, grandmother:false,
+    sons:0, daughters:0, grandsons:0, granddaughters:0,
+    fullBrothers:0, fullSisters:0, paternalBrothers:0, paternalSisters:0,
+    maternalBrothers:0, maternalSisters:0
+  }, raw);
+
+  ['sons','daughters','grandsons','granddaughters','fullBrothers','fullSisters',
+   'paternalBrothers','paternalSisters','maternalBrothers','maternalSisters','wivesCount']
+   .forEach(k=>{ inp[k] = Number(inp[k])||0; });
+  ['husband','father','mother','grandfather','grandmother'].forEach(k=>{ inp[k]=!!inp[k]; });
+
+  const warnings = [];
+  const notes = [];
+  const excluded = [];
+  const shares = {};
+
+  const hasSpouseHusband = inp.deceasedGender === 'female' && inp.husband;
+  const hasSpouseWives = inp.deceasedGender === 'male' && inp.wivesCount > 0;
+
+  const hasMaleDescendant = inp.sons>0 || inp.grandsons>0;
+  const hasAnyDescendant = inp.sons>0 || inp.daughters>0 || inp.grandsons>0 || inp.granddaughters>0;
+
+  let grandsons = inp.grandsons, granddaughters = inp.granddaughters;
+  if (inp.sons>0){
+    if (inp.grandsons>0) excluded.push({label:'ابن الابن', reason:'محجوب بوجود الابن'});
+    if (inp.granddaughters>0) excluded.push({label:'بنت الابن', reason:'محجوبة بوجود الابن'});
+    grandsons = 0; granddaughters = 0;
+  }
+
+  let hasGrandfather = inp.grandfather;
+  if (inp.father && inp.grandfather){
+    excluded.push({label:'الجد', reason:'محجوب بوجود الأب'});
+    hasGrandfather = false;
+  }
+
+  let hasGrandmother = inp.grandmother;
+  if (inp.mother && inp.grandmother){
+    excluded.push({label:'الجدة', reason:'محجوبة بوجود الأم'});
+    hasGrandmother = false;
+  } else if (inp.father && inp.grandmother && !inp.mother){
+    warnings.push('تم اعتبار الجدة وارثة لعدم وجود الأم، لكن إذا كانت "جدة لأب" فقد تُحجب بالأب أيضًا حسب الرأي الراجح — يُنصح بمراجعة محامٍ لتحديد نوع الجدة بدقة.');
+  }
+
+  const blockAllSiblingsByDescendantOrFather = hasMaleDescendant || inp.father;
+  const grandfatherWithSiblingsPresent = hasGrandfather && (inp.fullBrothers+inp.fullSisters+inp.paternalBrothers+inp.paternalSisters)>0;
+  if (grandfatherWithSiblingsPresent){
+    warnings.push('⚠️ حالة "الجد مع الإخوة الأشقاء/لأب" فيها تفصيل خاص في القانون المصري رقم 77 لسنة 1943 (نظام المقاسمة) لم يُطبَّق هنا بدقة كاملة، وتم افتراض حجب الجد للإخوة تقديريًا فقط. يجب مراجعة محامٍ متخصص لهذه الحالة تحديدًا قبل اعتماد أي قسمة.');
+  }
+  const blockFullPaternalSiblings = blockAllSiblingsByDescendantOrFather || hasGrandfather;
+  const blockMaternalSiblings = hasAnyDescendant || inp.father || hasGrandfather;
+
+  let fullBrothers = inp.fullBrothers, fullSisters = inp.fullSisters;
+  let paternalBrothers = inp.paternalBrothers, paternalSisters = inp.paternalSisters;
+  let maternalBrothers = inp.maternalBrothers, maternalSisters = inp.maternalSisters;
+
+  function reasonFor(){ return inp.father? 'محجوب/ة بوجود الأب' : (hasMaleDescendant? 'محجوب/ة بوجود الابن/ابن الابن':'محجوب/ة بوجود الجد'); }
+
+  if (blockFullPaternalSiblings){
+    if (fullBrothers>0) excluded.push({label:'الإخوة الأشقاء', reason: reasonFor()});
+    if (fullSisters>0) excluded.push({label:'الأخوات الشقيقات', reason: reasonFor()});
+    if (paternalBrothers>0) excluded.push({label:'الإخوة لأب', reason: reasonFor()});
+    if (paternalSisters>0) excluded.push({label:'الأخوات لأب', reason: reasonFor()});
+    fullBrothers=0; fullSisters=0; paternalBrothers=0; paternalSisters=0;
+  }
+  if (blockMaternalSiblings && (maternalBrothers>0||maternalSisters>0)){
+    excluded.push({label:'الإخوة/الأخوات لأم', reason: inp.father? 'محجوبون بوجود الأب' : (hasAnyDescendant? 'محجوبون بوجود الفرع الوارث':'محجوبون بوجود الجد')});
+    maternalBrothers=0; maternalSisters=0;
+  }
+
+  if (fullBrothers>0 && (paternalBrothers>0||paternalSisters>0)){
+    if(paternalBrothers>0) excluded.push({label:'الإخوة لأب', reason:'محجوبون بوجود الأخ الشقيق'});
+    if(paternalSisters>0) excluded.push({label:'الأخوات لأب', reason:'محجوبات بوجود الأخ الشقيق'});
+    paternalBrothers=0; paternalSisters=0;
+  }
+
+  let spouseShareValue = 0;
+  if (hasSpouseHusband){
+    const v = hasAnyDescendant ? frac(1,4) : frac(1,2);
+    shares.husband = {label:'الزوج', fraction:v, reason: hasAnyDescendant? 'الربع لوجود الفرع الوارث (فرض)' : 'النصف لعدم وجود فرع وارث (فرض)'};
+    spouseShareValue = v;
+  }
+  if (hasSpouseWives){
+    const v = hasAnyDescendant ? frac(1,8) : frac(1,4);
+    shares.wives = {label: inp.wivesCount>1? `الزوجات (${inp.wivesCount})` : 'الزوجة', fraction:v, reason: hasAnyDescendant? 'الثمن لوجود الفرع الوارث، يُقسّم بالتساوي بين الزوجات (فرض)' : 'الربع لعدم وجود فرع وارث، يُقسّم بالتساوي بين الزوجات (فرض)', count: inp.wivesCount};
+    spouseShareValue = v;
+  }
+
+  const totalSiblingsRaw = inp.fullBrothers+inp.fullSisters+inp.paternalBrothers+inp.paternalSisters+inp.maternalBrothers+inp.maternalSisters;
+  const isGharrawain = (hasSpouseHusband||hasSpouseWives) && inp.father && inp.mother && !hasAnyDescendant && totalSiblingsRaw===0;
+
+  let motherShare = 0, fatherAsabaPending = false;
+  if (inp.mother){
+    if (isGharrawain){
+      const remainder = 1 - spouseShareValue;
+      motherShare = remainder * frac(1,3);
+      shares.mother = {label:'الأم', fraction: motherShare, reason:'حالة الغراوين: تأخذ ثلث الباقي بعد نصيب الزوج/الزوجة (اجتهاد عمر بن الخطاب رضي الله عنه)'};
+    } else {
+      motherShare = (hasAnyDescendant || totalSiblingsRaw>=2) ? frac(1,6) : frac(1,3);
+      shares.mother = {label:'الأم', fraction: motherShare, reason: (hasAnyDescendant||totalSiblingsRaw>=2) ? 'السدس لوجود فرع وارث أو اثنين فأكثر من الإخوة (فرض)' : 'الثلث لعدم وجود فرع وارث ولا إخوة (فرض)'};
+    }
+  }
+
+  if (inp.father){
+    if (isGharrawain){
+      const remainder = 1 - spouseShareValue;
+      shares.father = {label:'الأب', fraction: remainder - motherShare, reason:'حالة الغراوين: يأخذ باقي التركة بعد الزوج/الزوجة والأم (تعصيب)'};
+    } else if (hasMaleDescendant){
+      shares.father = {label:'الأب', fraction: frac(1,6), reason:'السدس فرضًا لوجود الابن أو ابن الابن الذي يعصّب دونه'};
+    } else if (hasAnyDescendant){
+      shares.father = {label:'الأب', fraction: frac(1,6), reason:'السدس فرضًا مع استحقاق الباقي تعصيبًا لوجود فرع وارث مؤنث فقط'};
+      fatherAsabaPending = true;
+    } else {
+      shares.father = {label:'الأب', fraction: 0, reason:'يأخذ التركة (أو الباقي) بالكامل تعصيبًا لعدم وجود فرع وارث', isAsabaOnly:true};
+      fatherAsabaPending = true;
+    }
+  }
+
+  let grandfatherAsabaPending = false;
+  if (hasGrandfather){
+    if (hasMaleDescendant){
+      shares.grandfather = {label:'الجد', fraction: frac(1,6), reason:'السدس فرضًا لوجود الابن أو ابن الابن'};
+    } else if (hasAnyDescendant){
+      shares.grandfather = {label:'الجد', fraction: frac(1,6), reason:'السدس فرضًا مع استحقاق الباقي تعصيبًا لوجود فرع وارث مؤنث فقط'};
+      grandfatherAsabaPending = true;
+    } else {
+      shares.grandfather = {label:'الجد', fraction: 0, reason:'يقوم مقام الأب ويأخذ الباقي تعصيبًا لعدم وجود فرع وارث', isAsabaOnly:true};
+      grandfatherAsabaPending = true;
+    }
+  }
+
+  if (hasGrandmother){
+    shares.grandmother = {label:'الجدة', fraction: frac(1,6), reason:'السدس فرضًا (منفردة أو مع جدة أخرى بالتساوي)'};
+  }
+
+  let femaleDescendantHasFixedShare = false;
+  let childrenAsaba = null;
+
+  if (inp.sons>0){
+    childrenAsaba = { members: [
+      {key:'sons', label:'الابن', count: inp.sons, unitEach:2},
+      ...(inp.daughters>0? [{key:'daughters', label:'البنت', count: inp.daughters, unitEach:1}]:[])
+    ]};
+  } else if (inp.daughters>0){
+    femaleDescendantHasFixedShare = true;
+    if (inp.daughters===1){
+      shares.daughters = {label:'البنت', fraction: frac(1,2), reason:'النصف فرضًا لانفرادها كبنت واحدة دون معصّب'};
+    } else {
+      shares.daughters = {label:`البنات (${inp.daughters})`, fraction: frac(2,3), reason:'الثلثان فرضًا لتعددهن (بنتان فأكثر) بالتساوي بينهن', count: inp.daughters};
+    }
+  }
+
+  if (grandsons>0){
+    if (inp.daughters===0){
+      childrenAsaba = { members: [
+        {key:'grandsons', label:'ابن الابن', count: grandsons, unitEach:2},
+        ...(granddaughters>0? [{key:'granddaughters', label:'بنت الابن', count: granddaughters, unitEach:1}]:[])
+      ]};
+    } else {
+      childrenAsaba = { members: [
+        {key:'grandsons', label:'ابن الابن', count: grandsons, unitEach:2},
+        ...(granddaughters>0? [{key:'granddaughters', label:'بنت الابن', count: granddaughters, unitEach:1}]:[])
+      ]};
+    }
+  } else if (granddaughters>0){
+    if (inp.daughters===0){
+      femaleDescendantHasFixedShare = true;
+      if (granddaughters===1){
+        shares.granddaughters = {label:'بنت الابن', fraction: frac(1,2), reason:'النصف فرضًا لانفرادها دون معصّب ودون بنت صلبية'};
+      } else {
+        shares.granddaughters = {label:`بنات الابن (${granddaughters})`, fraction: frac(2,3), reason:'الثلثان فرضًا لتعددهن بالتساوي', count: granddaughters};
+      }
+    } else if (inp.daughters===1){
+      shares.granddaughters = {label: granddaughters>1? `بنات الابن (${granddaughters})`:'بنت الابن', fraction: frac(1,6), reason:'السدس فرضًا تكملةً للثلثين مع وجود بنت صلبية واحدة وعدم وجود ابن ابن يعصّبهن', count: granddaughters};
+    } else {
+      excluded.push({label:'بنات الابن', reason:'محجوبات لاستكمال البنات الصلبيات (بنتان فأكثر) الثلثين، ولا يوجد ابن ابن يعصّبهن'});
+    }
+  }
+
+  let fullSisterAsabaMaGhair = false;
+  if (fullBrothers===0 && fullSisters>0 && femaleDescendantHasFixedShare){
+    fullSisterAsabaMaGhair = true;
+    shares.fullSisters = {label: fullSisters>1? `الأخوات الشقيقات (${fullSisters})`:'الأخت الشقيقة', fraction: 0, reason:'عصبة مع الغير (مع البنت/بنت الابن): تأخذ الباقي بعد الفروض', isAsabaOnly:true, count:fullSisters};
+    if (paternalBrothers>0||paternalSisters>0){
+      if(paternalBrothers>0) excluded.push({label:'الإخوة لأب', reason:'محجوبون بالأخوات الشقيقات العصبة مع الغير'});
+      if(paternalSisters>0) excluded.push({label:'الأخوات لأب', reason:'محجوبات بالأخوات الشقيقات العصبة مع الغير'});
+      paternalBrothers=0; paternalSisters=0;
+    }
+  }
+
+  let paternalSisterAsabaMaGhair = false;
+  if (!fullSisterAsabaMaGhair && fullBrothers===0 && fullSisters===0 && paternalBrothers===0 && paternalSisters>0 && femaleDescendantHasFixedShare){
+    paternalSisterAsabaMaGhair = true;
+    shares.paternalSisters = {label: paternalSisters>1? `الأخوات لأب (${paternalSisters})`:'الأخت لأب', fraction: 0, reason:'عصبة مع الغير (مع البنت/بنت الابن): تأخذ الباقي بعد الفروض', isAsabaOnly:true, count:paternalSisters};
+  }
+
+  let fullSiblingsAsaba = null;
+  if (!fullSisterAsabaMaGhair){
+    if (fullBrothers>0){
+      fullSiblingsAsaba = { members: [
+        {key:'fullBrothers', label:'الأخ الشقيق', count: fullBrothers, unitEach:2},
+        ...(fullSisters>0? [{key:'fullSisters', label:'الأخت الشقيقة', count: fullSisters, unitEach:1}]:[])
+      ]};
+    } else if (fullSisters>0){
+      if (fullSisters===1){
+        shares.fullSisters = {label:'الأخت الشقيقة', fraction: frac(1,2), reason:'النصف فرضًا لانفرادها دون معصّب ودون فرع وارث مؤنث يستوجب التعصيب'};
+      } else {
+        shares.fullSisters = {label:`الأخوات الشقيقات (${fullSisters})`, fraction: frac(2,3), reason:'الثلثان فرضًا لتعددهن بالتساوي', count: fullSisters};
+      }
+    }
+  }
+
+  let paternalSiblingsAsaba = null;
+  if (!fullSisterAsabaMaGhair && !paternalSisterAsabaMaGhair){
+    if (paternalBrothers>0){
+      paternalSiblingsAsaba = { members: [
+        {key:'paternalBrothers', label:'الأخ لأب', count: paternalBrothers, unitEach:2},
+        ...(paternalSisters>0? [{key:'paternalSisters', label:'الأخت لأب', count: paternalSisters, unitEach:1}]:[])
+      ]};
+    } else if (paternalSisters>0){
+      const fullSisCount = fullSisters;
+      if (fullSisCount===0){
+        if (paternalSisters===1){
+          shares.paternalSisters = {label:'الأخت لأب', fraction: frac(1,2), reason:'النصف فرضًا لانفرادها دون معصّب ودون أخت شقيقة'};
+        } else {
+          shares.paternalSisters = {label:`الأخوات لأب (${paternalSisters})`, fraction: frac(2,3), reason:'الثلثان فرضًا لتعددهن بالتساوي', count: paternalSisters};
+        }
+      } else if (fullSisCount===1){
+        shares.paternalSisters = {label: paternalSisters>1? `الأخوات لأب (${paternalSisters})`:'الأخت لأب', fraction: frac(1,6), reason:'السدس فرضًا تكملةً للثلثين مع وجود أخت شقيقة واحدة', count: paternalSisters};
+      } else {
+        excluded.push({label:'الأخوات لأب', reason:'محجوبات لاستكمال الأخوات الشقيقات (شقيقتان فأكثر) الثلثين'});
+      }
+    }
+  }
+
+  if (maternalBrothers>0 || maternalSisters>0){
+    const count = maternalBrothers+maternalSisters;
+    if (count===1){
+      const isM = maternalBrothers===1;
+      shares.maternalSiblings = {label: isM? 'الأخ لأم':'الأخت لأم', fraction: frac(1,6), reason:'السدس فرضًا للانفراد (لا فرق بين الذكر والأنثى في الإخوة لأم)'};
+    } else {
+      shares.maternalSiblings = {label: `الإخوة/الأخوات لأم (${count})`, fraction: frac(1,3), reason:'الثلث فرضًا للتعدد، يُقسّم بينهم بالتساوي دون تفضيل الذكر (فرض)', count, equalSplit:true};
+    }
+  }
+
+  let totalFixed = 0;
+  Object.keys(shares).forEach(k=>{ if(!shares[k].isAsabaOnly) totalFixed += shares[k].fraction; });
+
+  const asabaGroups = [];
+  if (childrenAsaba) asabaGroups.push({type:'children', ...childrenAsaba});
+  if (fullSiblingsAsaba) asabaGroups.push({type:'fullSiblings', ...fullSiblingsAsaba});
+  if (paternalSiblingsAsaba) asabaGroups.push({type:'paternalSiblings', ...paternalSiblingsAsaba});
+
+  const soloAsabaHeirs = [];
+  if (fatherAsabaPending) soloAsabaHeirs.push('father');
+  if (grandfatherAsabaPending) soloAsabaHeirs.push('grandfather');
+  if (fullSisterAsabaMaGhair) soloAsabaHeirs.push('fullSisters');
+  if (paternalSisterAsabaMaGhair) soloAsabaHeirs.push('paternalSisters');
+
+  const hasAnyAsabaClaim = asabaGroups.length>0 || soloAsabaHeirs.length>0;
+  let adjustment = null;
+
+  if (totalFixed > 1 + 1e-9){
+    adjustment = 'awl';
+    const scale = 1/totalFixed;
+    Object.keys(shares).forEach(k=>{
+      if (!shares[k].isAsabaOnly){ shares[k].fraction = shares[k].fraction * scale; }
+    });
+    notes.push(`تم تطبيق "العول": مجموع الفروض تجاوز أصل المسألة، فنُقص نصيب كل صاحب فرض بنفس النسبة حتى يتساوى المجموع مع كامل التركة (معامل التصحيح ×${scale.toFixed(4)}).`);
+  } else {
+    const residue = 1 - totalFixed;
+    if (hasAnyAsabaClaim){
+      let remaining = residue;
+      const totalGroupUnits = asabaGroups.reduce((s,g)=> s + g.members.reduce((s2,m)=> s2 + m.count*m.unitEach, 0), 0);
+      const totalSoloCount = soloAsabaHeirs.length;
+      const totalAsabaWeight = totalGroupUnits + totalSoloCount;
+
+      if (totalAsabaWeight>0){
+        const perUnit = remaining/ totalAsabaWeight;
+        asabaGroups.forEach(g=>{
+          g.members.forEach(m=>{
+            const val = m.count*m.unitEach*perUnit;
+            const already = shares[m.key]? shares[m.key].fraction : 0;
+            shares[m.key] = {
+              label: m.count>1? `${m.label} (${m.count})` : m.label,
+              fraction: already + val,
+              reason: (already>0? `بالإضافة إلى فرضه الثابت، ` : '') + 'تعصيبًا: يأخذ نصيبًا من الباقي بعد الفروض' + (m.unitEach===2? ' (للذكر مثل حظ الأنثيين)':''),
+              count: m.count
+            };
+          });
+        });
+        soloAsabaHeirs.forEach(key=>{
+          const val = perUnit;
+          if (key==='father'){ shares.father.fraction += val; }
+          else if (key==='grandfather'){ shares.grandfather.fraction += val; }
+          else if (key==='fullSisters'){ shares.fullSisters.fraction += val; }
+          else if (key==='paternalSisters'){ shares.paternalSisters.fraction += val; }
+        });
+      }
+    } else if (residue > 1e-9){
+      adjustment = 'radd';
+      const nonSpouseKeys = Object.keys(shares).filter(k=> k!=='husband' && k!=='wives' && !shares[k].isAsabaOnly);
+      const nonSpouseSum = nonSpouseKeys.reduce((s,k)=> s+shares[k].fraction, 0);
+      if (nonSpouseSum > 1e-9){
+        const scale = (1 - spouseShareValue) / nonSpouseSum;
+        nonSpouseKeys.forEach(k=>{ shares[k].fraction = shares[k].fraction * scale; });
+        notes.push(`تم تطبيق "الرد": بقي جزء من التركة ولا يوجد عصبة تستحقه، فيُرد الباقي على أصحاب الفروض (عدا الزوج/الزوجة) بنسبة أنصبتهم (معامل التصحيح ×${scale.toFixed(4)}).`);
+      } else if (spouseShareValue>0){
+        if (shares.husband) shares.husband.fraction = 1;
+        if (shares.wives) shares.wives.fraction = 1;
+        notes.push('لا يوجد وارث آخر سوى الزوج/الزوجة، فيُرد عليه الباقي ويستحق كامل التركة (لا وارث سواه في هذه المسألة).');
+      } else {
+        warnings.push('لم يتم إدخال أي وارث — لا يمكن حساب التوزيع.');
+      }
+    }
+  }
+
+  const resultShares = Object.keys(shares).map(k=>{
+    const s = shares[k];
+    return { key:k, label:s.label, fraction:s.fraction, reason:s.reason||'', count:s.count||null };
+  }).filter(s=> s.fraction>1e-9);
+
+  const totalCheck = resultShares.reduce((s,x)=>s+x.fraction,0);
+
+  return { shares: resultShares, excluded, notes, warnings, adjustment, totalCheck, isGharrawain };
+}
+
+/* ============================================================
+   أدوات مساعدة للعرض
+   ============================================================ */
+function gcd(a,b){ return b<1e-9? a : gcd(b, a%b); }
+function toFraction(value){
+  if (value<=0) return '0';
+  if (Math.abs(value-1)<1e-6) return 'الكل';
+  // بحث عن أبسط كسر بمقام معقول (مضاعفات شائعة في الفرائض)
+  const denominators = [2,3,4,5,6,7,8,9,10,12,14,16,18,20,21,24,27,32,36,40,42,48,54,64,72,96,108,128,144,192,216,288,384];
+  let best = null;
+  for (const d of denominators){
+    const n = Math.round(value*d);
+    if (n<1) continue;
+    if (Math.abs(n/d - value) < 0.0009){
+      const g = gcdInt(n,d);
+      const sn=n/g, sd=d/g;
+      if (!best || sd<best.d){ best = {n:sn, d:sd}; }
+    }
+  }
+  if (best) return `${toArabicNum(best.n)}/${toArabicNum(best.d)}`;
+  return (value*100).toFixed(1)+'%';
+}
+function gcdInt(a,b){ return b===0? a : gcdInt(b, a%b); }
+function toArabicNum(n){ return n.toLocaleString('ar-EG'); }
+
+/* ============================================================
+   ربط الواجهة
+   ============================================================ */
+document.querySelectorAll('.gender-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const gender = btn.dataset.gender;
+    document.getElementById('wivesField').style.display = gender==='male' ? 'flex' : 'none';
+    document.getElementById('husbandField').style.display = gender==='female' ? 'flex' : 'none';
+    document.getElementById('spouseHint').textContent = gender==='male'
+      ? 'أدخل عدد الزوجات الوارثات (بحد أقصى 4)'
+      : 'حدّد إن كان الزوج موجودًا على قيد الحياة';
+  });
+});
+
+document.getElementById('navHamburger').addEventListener('click', ()=>{
+  document.querySelector('.nav-links').classList.toggle('open');
+});
+
+document.getElementById('inheritanceForm').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const input = { deceasedGender: document.querySelector('.gender-btn.active').dataset.gender };
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const key = el.dataset.key;
+    input[key] = el.type==='checkbox' ? el.checked : (el.value || 0);
+  });
+
+  const result = calculateInheritance(input);
+  const estateAmount = parseFloat(document.getElementById('estateAmount').value) || 0;
+
+  renderResults(result, estateAmount);
+});
+
+function renderResults(result, estateAmount){
+  const box = document.getElementById('results');
+  box.style.display = 'block';
+
+  let html = `<div class="results-header">
+    <h2>📜 نتيجة القسمة الشرعية</h2>
+    <p>مجموع الأنصبة: <b style="color:var(--success)">${(result.totalCheck*100).toFixed(2)}%</b> من التركة</p>
+  </div>`;
+
+  if (result.warnings.length){
+    html += `<div class="warning-box"><h3>⚠️ تنبيهات هامة — تحتاج مراجعة محامٍ</h3>`;
+    result.warnings.forEach(w=> html += `<div class="warning-item">${w}</div>`);
+    html += `</div>`;
+  }
+
+  if (result.notes.length){
+    result.notes.forEach(n=> html += `<div class="adjustment-note"><b>${result.adjustment==='awl'?'📈 العول':'📉 الرد'}:</b> ${n}</div>`);
+  }
+
+  if (result.shares.length===0){
+    html += `<div class="warning-box"><h3>لا يمكن الحساب</h3><div class="warning-item">لم يتم تحديد أي وارث. من فضلك أدخل بيانات الورثة أولاً.</div></div>`;
+  } else {
+    result.shares.sort((a,b)=> b.fraction-a.fraction).forEach(s=>{
+      const pct = (s.fraction*100).toFixed(2);
+      const amountHtml = estateAmount>0
+        ? `<div class="heir-amount">${Math.round(s.fraction*estateAmount).toLocaleString('ar-EG')} جنيه</div>`
+        : '';
+      html += `
+      <div class="heir-card">
+        <div class="heir-frac">${toFraction(s.fraction)}</div>
+        <div class="heir-body">
+          <div class="heir-name">${s.label} <span class="heir-pct">${pct}%</span></div>
+          ${amountHtml}
+          <div class="heir-reason">${s.reason}</div>
+        </div>
+      </div>`;
+    });
+  }
+
+  if (result.excluded.length){
+    html += `<div class="excluded-box"><h3>🚫 ورثة محجوبون (لا يستحقون في هذه المسألة)</h3>`;
+    result.excluded.forEach(ex=> html += `<div class="excluded-item"><b>${ex.label}</b> — ${ex.reason}</div>`);
+    html += `</div>`;
+  }
+
+  html += `<div class="footer-disclaimer">
+    <b>ملاحظة شرعية وقانونية:</b> هذه الحاسبة أداة استرشادية مبنية على الراجح من أحكام الفرائض في الفقه الإسلامي وما يتوافق مع القانون المصري للمواريث رقم 77 لسنة 1943،
+    وتغطي الورثة الاثني عشر الأساسيين (الزوجين، الأبوين، الجد والجدة، الأبناء والبنات وأبناء وبنات الابن، والإخوة بأنواعهم الثلاثة).
+    لا تغطي هذه النسخة حالات: <b>الجد مع الإخوة الأشقاء/لأب</b> بتفصيلها الكامل، أو <b>الخنثى المشكل</b>، أو <b>الحمل المستكن</b>، أو <b>المفقود</b> — وهذه حالات نادرة ومعقدة يجب فيها الرجوع لمحامٍ متخصص في الأحوال الشخصية والمواريث لتقدير الأنصبة يدويًا بدقة قبل أي قسمة فعلية للتركة.
+  </div>`;
+
+  box.innerHTML = html;
+  box.scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+</body>
+</html>

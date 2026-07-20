@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEGISTA — تسجيل الدخول</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0A0D;
+      --bg2: #121217;
+      --gold: #D4AF37;
+      --gold-soft: #F4E5A6;
+      --cyber: #00E5FF;
+      --white: #FFFFFF;
+      --gray: #8A8A8F;
+      --success: #00FFB2;
+      --surface: #1A1A22;
+      --border: rgba(212,175,55,0.15);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; overflow-x: hidden; height: 100%; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: none;
+      direction: rtl;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ══ CURSOR ══ */
+    #cursor { position: fixed; width: 12px; height: 12px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform .1s, width .2s, height .2s; mix-blend-mode: screen; }
+    #cursor-glow { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .08s; }
+
+    /* ══ BG CANVAS ══ */
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* ══ PARTICLES ══ */
+    .particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 1; animation: floatParticle linear infinite; }
+    @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.6; } 100% { transform: translateY(-100px) rotate(360deg); opacity: 0; } }
+
+    /* ══ LAYOUT ══ */
+    .login-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* الجانب الأيسر — ديكور */
+    .left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(0,229,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .left-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 800;
+      letter-spacing: 10px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-soft), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      animation: fadeUp 0.8s 0.2s both;
+    }
+
+    .left-tagline {
+      font-size: clamp(13px, 1.5vw, 16px);
+      color: var(--gray);
+      letter-spacing: 2px;
+      margin-bottom: 56px;
+      animation: fadeUp 0.8s 0.4s both;
+    }
+
+    .left-features {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 360px;
+      animation: fadeUp 0.8s 0.6s both;
+    }
+
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      transition: border-color .2s;
+    }
+
+    .feature-row:hover { border-color: rgba(212,175,55,0.25); }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(212,175,55,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .feature-icon.cy { background: rgba(0,229,255,0.08); }
+
+    .feature-text strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .feature-text span {
+      font-size: 11px;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    /* الجانب الأيمن — فورم */
+    .right-panel {
+      width: 480px;
+      min-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+      background: rgba(18,18,23,0.7);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    .right-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .form-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 6px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      animation: fadeUp 0.8s 0.3s both;
+    }
+
+    .form-subtitle {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 40px;
+      letter-spacing: 0.5px;
+      text-align: center;
+      animation: fadeUp 0.8s 0.4s both;
+    }
+
+    /* ══ Google Button ══ */
+    .google-login-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 24px;
+      background: #fff;
+      color: #3c4043;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: box-shadow .2s, transform .15s;
+      margin-bottom: 24px;
+      animation: fadeUp 0.8s 0.5s both;
+      position: relative;
+      z-index: 1;
+    }
+
+    .google-login-btn:hover {
+      box-shadow: 0 6px 24px rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+    }
+
+    .google-login-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+
+    /* ══ Policy Text ══ */
+    .policy-text {
+      font-size: 11px;
+      color: var(--gray);
+      text-align: center;
+      line-height: 1.8;
+      animation: fadeUp 0.8s 0.75s both;
+    }
+
+    .policy-text a {
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+      transition: border-color .2s, color .2s;
+      cursor: pointer;
+    }
+
+    .policy-text a:hover {
+      color: var(--gold-soft);
+      border-color: var(--gold-soft);
+    }
+
+    /* ══ MODAL ══ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(20px);
+      transition: transform .3s;
+      overflow: hidden;
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--gray);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, color .2s;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+    .modal-body {
+      padding: 28px;
+      overflow-y: auto;
+      flex: 1;
+      direction: rtl;
+    }
+
+    .modal-body::-webkit-scrollbar { width: 4px; }
+    .modal-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    .modal-body::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 2px; }
+
+    .policy-section {
+      margin-bottom: 24px;
+    }
+
+    .policy-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(212,175,55,0.12);
+    }
+
+    .policy-section-body {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      line-height: 2;
+    }
+
+    .policy-section-body ul {
+      padding-right: 20px;
+      margin-top: 8px;
+    }
+
+    .policy-section-body ul li {
+      margin-bottom: 6px;
+    }
+
+    /* ══ Animations ══ */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ══ Google hidden button ══ */
+    #googleBtnHidden {
+      position: fixed !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+      z-index: -1 !important;
+    }
+
+    /* إخفاء كل عناصر Google اللي بتكسر الـ layout */
+    #credential_picker_container,
+    #credential_picker_iframe,
+    .credential_picker_container,
+    iframe[src*="accounts.google.com"],
+    iframe[src*="google.com/gsi"],
+    div[id^="credential_picker"],
+    div[id*="g_id_onload"],
+    .g_id_signin {
+      display: none !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+      position: fixed !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      z-index: -9999 !important;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 900px) {
+      .left-panel { display: none; }
+      .right-panel {
+        width: 100%;
+        min-width: unset;
+        border-right: none;
+        padding: 48px 32px;
+        background: transparent;
+      }
+      body { align-items: flex-start; }
+      .login-wrapper { min-height: 100vh; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .right-panel { padding: 40px 20px; }
+      .form-logo { font-size: 18px; letter-spacing: 4px; }
+      .google-login-btn { font-size: 14px; padding: 13px 20px; }
+      .continue-btn { font-size: 14px; }
+      .modal-box { max-height: 85vh; border-radius: 16px; }
+      .modal-header { padding: 18px 20px; }
+      .modal-body { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-glow"></div>
+<canvas id="bg-canvas"></canvas>
+<div id="googleBtnHidden" aria-hidden="true"></div>
+
+<!-- ══ MODAL الاتفاقية ══ -->
+<div class="modal-overlay" id="policyModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">سياسة الاستخدام — LEGISTA</span>
+      <button class="modal-close" id="modalClose" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="policy-section">
+        <div class="policy-section-body">
+          مرحبًا بك في Legista. باستخدامك للموقع أو التطبيق، فإنك توافق على الالتزام بسياسة الاستخدام هذه. إذا كنت لا توافق على أي من البنود الواردة، فيرجى عدم استخدام الخدمة.
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">١. قبول الشروط</div>
+        <div class="policy-section-body">باستخدامك للموقع أو التطبيق فإنك تقر بأنك قرأت هذه السياسة وفهمتها وتوافق على الالتزام بها، وكذلك بأي تحديثات مستقبلية قد يتم نشرها.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٢. وصف الخدمة</div>
+        <div class="policy-section-body">يوفر Legista أدوات وخدمات ومحتوى يهدف إلى مساعدة المستخدمين في الوصول إلى المعلومات القانونية، وإدارة المستندات، والاستفادة من الأدوات المتاحة داخل المنصة.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٣. استخدام الخدمة</div>
+        <div class="policy-section-body">
+          يجب على المستخدم:
+          <ul>
+            <li>استخدام الخدمة بطريقة قانونية.</li>
+            <li>عدم استغلال الموقع في أي نشاط غير مشروع.</li>
+            <li>عدم محاولة اختراق الموقع أو تعطيله أو العبث ببياناته.</li>
+            <li>عدم رفع أو نشر أي محتوى مخالف للقانون أو ينتهك حقوق الآخرين.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٤. الحسابات</div>
+        <div class="policy-section-body">
+          إذا قمت بإنشاء حساب، فأنت مسؤول عن:
+          <ul>
+            <li>الحفاظ على سرية بيانات تسجيل الدخول.</li>
+            <li>جميع الأنشطة التي تتم من خلال حسابك.</li>
+            <li>إخطار إدارة الموقع فورًا عند الاشتباه في أي استخدام غير مصرح به.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٥. الملكية الفكرية</div>
+        <div class="policy-section-body">جميع الحقوق المتعلقة بالموقع، بما في ذلك التصميم، والبرمجة، والشعارات، والنصوص، وقواعد البيانات، والمحتوى، محفوظة لمالك الموقع، ولا يجوز نسخها أو إعادة استخدامها أو توزيعها دون إذن كتابي مسبق.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٦. المحتوى القانوني</div>
+        <div class="policy-section-body">يتم توفير النماذج والمعلومات القانونية بهدف المساعدة والإرشاد فقط، ولا تُعد استشارة قانونية أو رأيًا قانونيًا ملزمًا، ولا تغني عن استشارة محامٍ مختص عند الحاجة.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٧. إخلاء المسؤولية</div>
+        <div class="policy-section-body">
+          يبذل فريق العمل أقصى جهد للحفاظ على دقة المعلومات وسلامة الخدمات، إلا أن الموقع أو التطبيق يُقدم "كما هو" دون أي ضمانات. لا يتحمل مالك الموقع أي مسؤولية عن:
+          <ul>
+            <li>أي أخطاء أو سهو في المحتوى.</li>
+            <li>أي خسائر أو أضرار مباشرة أو غير مباشرة تنتج عن استخدام الموقع.</li>
+            <li>أي أعطال تقنية أو انقطاع مؤقت للخدمة.</li>
+            <li>أي قرارات يتخذها المستخدم اعتمادًا على المعلومات المنشورة.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٨. توفر الخدمة</div>
+        <div class="policy-section-body">يجوز لإدارة الموقع تعديل الخدمات أو إيقافها مؤقتًا أو دائمًا أو إضافة مزايا جديدة في أي وقت دون إشعار مسبق.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">٩. تحديث السياسة</div>
+        <div class="policy-section-body">تحتفظ إدارة الموقع بحق تعديل سياسة الاستخدام في أي وقت، ويصبح أي تعديل نافذًا بمجرد نشره داخل الموقع أو التطبيق.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">١٠. إنهاء الاستخدام</div>
+        <div class="policy-section-body">يجوز لإدارة الموقع تعليق أو إيقاف أي حساب يخالف هذه السياسة أو يستخدم الخدمة بطريقة تضر بالموقع أو بالمستخدمين الآخرين.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">١١. حدود المسؤولية</div>
+        <div class="policy-section-body">إلى الحد الذي يسمح به القانون، لا يتحمل الموقع أو مالكه أي مسؤولية عن أي أضرار أو خسائر أو مطالبات تنتج عن استخدام الخدمة أو عدم القدرة على استخدامها.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">١٢. القانون الواجب التطبيق</div>
+        <div class="policy-section-body">تخضع هذه السياسة للقوانين المعمول بها في الدولة التي يعمل منها الموقع، وتختص المحاكم المختصة بالفصل في أي نزاع ينشأ بشأن استخدام الخدمة.</div>
+      </div>
+
+      <div class="policy-section">
+        <div class="policy-section-title">١٣. التواصل</div>
+        <div class="policy-section-body">لأي استفسارات أو ملاحظات تتعلق بسياسة الاستخدام أو الخدمات المقدمة، يمكن التواصل مع إدارة الموقع عبر وسائل التواصل الرسمية الموضحة داخل التطبيق أو الموقع.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN LAYOUT ══ -->
+<div class="login-wrapper">
+
+  <!-- الجانب الأيسر -->
+  <div class="left-panel">
+    <div class="left-brand">LEGISTA</div>
+    <div class="left-tagline">المحرك القانوني الذكي · GEN 2035</div>
+    <div class="left-features">
+      <div class="feature-row">
+        <div class="feature-icon cy">⚡</div>
+        <div class="feature-text">
+          <strong>توليد فوري في ثوانٍ</strong>
+          <span>عقود، إنذارات، ومذكرات بمعايير قانونية معتمدة</span>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">🛡️</div>
+        <div class="feature-text">
+          <strong>تشفير عسكري AES-256</strong>
+          <span>بياناتك لا تُخزَّن ولا تُشارَك مع أي طرف</span>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon cy">⚖️</div>
+        <div class="feature-text">
+          <strong>+5000 قالب قانوني</strong>
+          <span>يغطي جميع أنواع المحررات والصيغ القانونية</span>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-text">
+          <strong>مراجعة ثغرات صفرية</strong>
+          <span>الذكاء الاصطناعي يفحص كل بند قبل التوقيع</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الجانب الأيمن — فورم -->
+  <div class="right-panel">
+    <div class="form-logo">LEGISTA</div>
+    <div class="form-subtitle">سجّل دخولك وابدأ التوليد القانوني الآن</div>
+
+    <!-- زرار جوجل -->
+    <button class="google-login-btn" id="googleLoginBtn" type="button">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      متابعة بحساب جوجل
+    </button>
+
+    <!-- نص الاتفاقية -->
+    <div class="policy-text">
+      بالمتابعة، فإنك توافق على
+      <a id="openPolicy">سياسة استخدام Legista</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══ CURSOR ══
+const cur = document.getElementById('cursor');
+const curGlow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+  curGlow.style.left = e.clientX + 'px';
+  curGlow.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('button, a, input, .feature-row').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width='24px'; cur.style.height='24px'; cur.style.opacity='0.7'; });
+  el.addEventListener('mouseleave', () => { cur.style.width='12px'; cur.style.height='12px'; cur.style.opacity='1'; });
+});
+
+// ══ BG CANVAS ══
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+const streams = Array.from({length: 12}, () => ({
+  x: Math.random() * 1200,
+  y: Math.random() * -800,
+  speed: 0.3 + Math.random() * 0.5,
+  chars: Array.from({length: 20}, () => String.fromCharCode(0x600 + Math.floor(Math.random() * 100))),
+  opacity: 0.02 + Math.random() * 0.03
+}));
+function drawBG() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(212,175,55,0.03)';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  const grad = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, W*0.45);
+  grad.addColorStop(0, 'rgba(0,229,255,0.02)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+  ctx.font = '11px Cairo';
+  streams.forEach(s => {
+    ctx.fillStyle = `rgba(0,229,255,${s.opacity})`;
+    s.chars.forEach((c, i) => { if (s.y + i*16 > 0 && s.y + i*16 < H) ctx.fillText(c, s.x % W, s.y + i*16); });
+    s.y += s.speed;
+    if (s.y > H + 200) { s.y = -300; s.x = Math.random() * W; }
+    s.chars = s.chars.map(() => Math.random() > 0.98 ? String.fromCharCode(0x600 + Math.floor(Math.random() * 100)) : s.chars[Math.floor(Math.random() * s.chars.length)]);
+  });
+  requestAnimationFrame(drawBG);
+}
+drawBG();
+
+// ══ PARTICLES ══
+function createParticle() {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = 1 + Math.random() * 2;
+  p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}vw;background:rgba(212,175,55,${0.2+Math.random()*0.4});animation-duration:${10+Math.random()*20}s;animation-delay:${Math.random()*10}s;`;
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 30000);
+}
+setInterval(createParticle, 1200);
+
+// ══ MODAL ══
+const modal = document.getElementById('policyModal');
+document.getElementById('openPolicy').addEventListener('click', () => {
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+document.getElementById('modalClose').addEventListener('click', () => {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+});
+modal.addEventListener('click', e => {
+  if (e.target === modal) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { modal.classList.remove('open'); document.body.style.overflow = ''; }
+});
+
+// ══ GOOGLE SIGN-IN ══
+const GOOGLE_CLIENT_ID = '330964633875-mbfh0ddlsdgkpcrjlvllssgqdj4ldbf1.apps.googleusercontent.com';
+let googleInitialized = false;
+
+function cleanupGoogleArtifacts() {
+  document.querySelectorAll(
+    '#credential_picker_container, #credential_picker_iframe, .credential_picker_container, ' +
+    'iframe[src*="accounts.google.com"], iframe[src*="google.com/gsi"], div[id^="credential_picker"]'
+  ).forEach(el => {
+    if (el.closest('#googleBtnHidden')) return;
+    el.remove();
+  });
+  document.body.style.removeProperty('overflow');
+  document.body.style.removeProperty('padding-right');
+  document.body.style.removeProperty('margin-right');
+  document.body.style.removeProperty('padding-left');
+  document.body.style.removeProperty('margin-left');
+  document.documentElement.style.overflowX = 'hidden';
+}
+
+function handleGoogleCredential(response) {
+  const base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  const payload = JSON.parse(jsonPayload);
+  const userData = {
+    name: payload.name,
+    email: payload.email,
+    picture: payload.picture,
+    token: response.credential
+  };
+  localStorage.setItem('legista_user', JSON.stringify(userData));
+  cleanupGoogleArtifacts();
+  // ارجع للصفحة اللي المستخدم كان جاي منها (لو موجودة)، وإلا الصفحة الرئيسية
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get('next');
+  window.location.href = next ? decodeURIComponent(next) : 'index.html';
+}
+
+function initGoogleSignIn() {
+  if (googleInitialized || typeof google === 'undefined') return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+    use_fedcm_for_prompt: false
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('googleBtnHidden'),
+    { type: 'standard', theme: 'outline', size: 'large', width: 200, locale: 'ar' }
+  );
+  googleInitialized = true;
+}
+
+function triggerGoogleLogin() {
+  initGoogleSignIn();
+  const gBtn = document.querySelector('#googleBtnHidden div[role="button"]');
+  if (gBtn) {
+    gBtn.click();
+  } else {
+    setTimeout(() => {
+      document.querySelector('#googleBtnHidden div[role="button"]')?.click();
+    }, 200);
+  }
+}
+
+function waitForGoogle(cb) {
+  if (typeof google !== 'undefined' && google.accounts) cb();
+  else setTimeout(() => waitForGoogle(cb), 100);
+}
+
+waitForGoogle(() => {
+  initGoogleSignIn();
+  // لو هو logged in أصلاً ارجعه لمكانه (أو الرئيسية لو مفيش next)
+  const saved = localStorage.getItem('legista_user');
+  if (saved) {
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
+    window.location.href = next ? decodeURIComponent(next) : 'index.html';
+  }
+  cleanupGoogleArtifacts();
+});
+
+let googleCleanupTimer;
+new MutationObserver(() => {
+  clearTimeout(googleCleanupTimer);
+  googleCleanupTimer = setTimeout(cleanupGoogleArtifacts, 150);
+}).observe(document.body, { childList: true, subtree: true });
+
+document.getElementById('googleLoginBtn').addEventListener('click', () => {
+  triggerGoogleLogin();
+});
+
+
+</script>
+</body>
+</html>

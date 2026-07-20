@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خريطة الجلسات — LEGISTA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0D; --bg2:#121217; --surface:#16161C; --surface2:#1D1D26;
+  --gold:#D4AF37; --gold-soft:#F4E5A6; --cyber:#00E5FF; --success:#00FFB2;
+  --white:#FFFFFF; --gray:#8A8A8F; --border:rgba(212,175,55,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);direction:rtl;min-height:100vh;}
+.mono{font-family:'JetBrains Mono',monospace;}
+
+/* ── backdrop ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(0,229,255,0.05), transparent 45%),
+    radial-gradient(circle at 90% 20%, rgba(212,175,55,0.06), transparent 40%);
+}
+
+/* ── header ── */
+header{position:relative;z-index:2;padding:36px 24px 20px;text-align:center;}
+.eyebrow{font-size:10px;letter-spacing:5px;color:var(--cyber);font-weight:700;opacity:.8;margin-bottom:14px;}
+h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,42px);font-weight:800;letter-spacing:1px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-soft),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;}
+.sub{color:var(--gray);font-size:14px;max-width:560px;margin:0 auto;line-height:1.8;}
+.disclaimer{
+  max-width:720px;margin:22px auto 0;padding:14px 18px;border-radius:12px;
+  background:rgba(212,175,55,0.06);border:1px solid var(--border);
+  font-size:12.5px;color:var(--gold-soft);line-height:1.9;text-align:right;
+}
+.disclaimer b{color:var(--gold);}
+
+/* ── controls ── */
+.controls{position:relative;z-index:2;max-width:1000px;margin:28px auto 0;padding:0 20px;display:flex;flex-direction:column;gap:14px;}
+.complex-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.tab-btn{
+  background:var(--surface);border:1px solid var(--border);color:var(--gray);
+  padding:10px 20px;border-radius:10px;font-family:'Cairo';font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s;letter-spacing:.3px;
+}
+.tab-btn.active{color:#0A0A0D;background:linear-gradient(135deg,var(--gold),#b8941a);border-color:transparent;}
+.tab-btn:hover:not(.active){border-color:rgba(212,175,55,0.4);color:var(--white);}
+
+.day-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.day-btn{
+  background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--gray);
+  padding:8px 16px;border-radius:999px;font-family:'Cairo';font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s;
+}
+.day-btn.active{border-color:var(--cyber);color:var(--cyber);background:rgba(0,229,255,0.08);}
+.day-btn:hover:not(.active){border-color:rgba(255,255,255,0.3);color:var(--white);}
+
+.search-wrap{display:flex;justify-content:center;}
+.search-box{
+  width:100%;max-width:440px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:12px 18px;color:var(--white);font-family:'Cairo';font-size:14px;
+  outline:none;transition:border-color .2s;
+}
+.search-box::placeholder{color:var(--gray);}
+.search-box:focus{border-color:var(--gold);}
+
+/* ── board ── */
+.board{position:relative;z-index:2;max-width:1100px;margin:34px auto 60px;padding:0 20px;}
+.floor-block{margin-bottom:30px;}
+.floor-title{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.floor-title .line{flex:1;height:1px;background:var(--border);}
+.floor-title span{font-size:12px;letter-spacing:3px;color:var(--gold);font-weight:700;}
+
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.room-card{
+  background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:14px;
+  padding:16px 18px;transition:transform .15s, border-color .15s, opacity .2s;
+  position:relative;overflow:hidden;
+}
+.room-card:hover{transform:translateY(-2px);border-color:rgba(212,175,55,0.3);}
+.room-card.dim{opacity:.25;}
+.room-card.hit{border-color:var(--success);box-shadow:0 0 0 1px rgba(0,255,178,0.3);}
+.room-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.room-no{font-family:'JetBrains Mono';font-weight:700;font-size:13px;color:var(--gray);letter-spacing:1px;}
+.room-no b{color:var(--white);font-size:15px;}
+.judge-flip{
+  font-family:'JetBrains Mono';font-weight:700;font-size:18px;color:var(--cyber);
+  background:rgba(0,229,255,0.07);border-radius:6px;padding:2px 8px;
+}
+.case-type{font-size:13.5px;color:var(--white);line-height:1.6;min-height:20px;}
+.case-type.empty{color:var(--gray);font-style:normal;font-size:12px;}
+
+.empty-state{text-align:center;color:var(--gray);font-size:13px;padding:40px 0;}
+
+/* flip animation on day change */
+@keyframes flipIn{
+  0%{transform:rotateX(90deg);opacity:0;}
+  60%{transform:rotateX(-8deg);opacity:1;}
+  100%{transform:rotateX(0);opacity:1;}
+}
+.flip{animation:flipIn .38s ease both;transform-origin:top center;}
+
+footer{position:relative;z-index:2;text-align:center;padding:26px 20px 50px;color:var(--gray);font-size:12px;letter-spacing:1px;}
+footer b{color:var(--gold);}
+
+@media(max-width:600px){
+  .rooms-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">LEGISTA · دليل القاعات</div>
+  <h1>خريطة الجلسات</h1>
+  <p class="sub">اعرف قاعتك ودورك في ثانية — اختر المجمع واليوم، أو دوّر برقم الدائرة أو نوع القضية.</p>
+  <div class="disclaimer">
+    <b>ملحوظة مهمة:</b> البيانات دي منقولة يدويًا من كشوف ورقية مصوّرة (مطوية ومهترئة في أماكن)، فبعض الخانات ممكن تكون غير واضحة تمامًا في الصورة الأصلية. من فضلك تأكد من رقم القاعة والدائرة من اللوحة الرسمية بالمحكمة قبل الاعتماد عليها في الحضور الفعلي، وابعتلنا أي خانة غلط عشان نظبطها فورًا.
+  </div>
+</header>
+
+<div class="controls">
+  <div class="complex-tabs" id="complexTabs"></div>
+  <div class="day-row" id="dayRow"></div>
+  <div class="search-wrap">
+    <input type="text" class="search-box" id="searchBox" placeholder="ابحث برقم الدائرة، نوع القضية، أو رقم القاعة...">
+  </div>
+</div>
+
+<div class="board" id="board"></div>
+
+<footer>
+  محمد عبد الوهاب &middot; <b>عضو مجلس نقابة المحامين العامة</b> &middot; مقرر لجنة الشباب
+</footer>
+
+<script>
+const DAYS = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+
+// ══ DATA ══ رقم القاعة | schedule بترتيب الأيام أعلاه [ {n: رقم الدائرة, t: نوع القضية} أو null ]
+const DATA = {
+  sayed_kareem: {
+    label: 'مجمع السيد كريم — المحكمة البحرية',
+    floors: [
+      { name:'الدور الأرضي', rooms:[
+        {no:'1', s:[{n:'23',t:'جنح الرمل أول + ثالث'},{n:'33',t:'جنح ومخالفات المنتزة ثان'},{n:'29',t:'جنح ومخالفات المنشية'},{n:'30',t:'جنح ومخالفات'},{n:'30',t:'مدني وصحة توقيع العطارين'},{n:'30',t:'جنح ومخالفات باب شرقي + قضايا الإرهاب'}]},
+        {no:'2', s:[{n:'18',t:'جنح ومخالفات المنتزة (الفترة)'},{n:'21',t:'مدني صحة توقيع المنتزة'},{n:'14',t:'جنح ومخالفات صحة توقيع المنتزة'},{n:'13',t:'جنح مستأنف الرمل + توقيع صحة'},{n:'13',t:'مدني وصحة توقيع المنتزة'},{n:'13',t:'جنح صحة توقيع باب شرقي'}]},
+        {no:'3', s:[{n:'41',t:'مدني صحة توقيع المنتزة'},{n:'41',t:'مدني المنتزة صحة توقيع'},{n:'21',t:'مدني صحة توقيع المنتزة'},{n:'39',t:'جنح مدني الرمل أول وثالث'},{n:'40',t:'مدني وصحة توقيع سيدي جابر'},{n:'40',t:'مدني وصحة توقيع سيدي جابر'}]},
+        {no:'4', s:[{n:'31',t:'مدني الرمل سيدي جابر'},{n:'14',t:'جنح'},{n:'14',t:'جنح ومخالفات المنشية'},{n:'19',t:'مدني الرمل توقيع صحة أول وثالث'},{n:'19',t:'جنح صحة توقيع المنتزة ثان'},{n:'19',t:'جنح صحة توقيع باب شرقي'}]},
+        {no:'5', s:[{n:'14',t:'جنح'},{n:'21',t:'مدني ثان'},{n:'21',t:'جنح صحة توقيع المنتزة'},{n:'15',t:'جنح مدني الرمل ثان + قضايا الإرهاب'},null,{n:'27',t:'جنح مستأنف باب شرقي'}]},
+        {no:'6', s:[null,null,null,null,null,null]},
+        {no:'7', s:[{n:'41',t:'مدني صحة توقيع المنتزة'},{n:'41',t:'مدني المنتزة صحة توقيع'},{n:'18',t:'مدني وصحة توقيع المنتزة'},{n:'40',t:'جنح ومخالفات سيدي جابر'},{n:'40',t:'مدني وصحة توقيع سيدي جابر'},{n:'40',t:'مدني صحة توقيع سيدي جابر'}]},
+        {no:'8', s:[{n:'18',t:'جنح ومخالفات المنتزة (الفترة)'},{n:'29',t:'مدني سيدي جابر'},{n:'11',t:'جنح صحة توقيع سيدي جابر'},{n:'32',t:'جنح ومخالفات باب شرقي'},{n:'32',t:'مدني وصحة توقيع سيدي جابر'},{n:'32',t:'جنح ومخالفات باب شرقي'}]},
+        {no:'9', s:[{n:'13',t:'مدني ثان'},{n:'11',t:'جنح'},{n:'11',t:'مدني صحة توقيع المنتزة'},{n:'35',t:'مدني وصحة توقيع سيدي جابر'},{n:'35',t:'مدني وصحة توقيع سيدي جابر'},{n:'35',t:'مدني وصحة توقيع العطارين'}]},
+      ]},
+      { name:'الدور الأول العلوي', rooms:[
+        {no:'10', s:[{n:'17',t:'مدني صحة توقيع المنتزة'},{n:'17',t:'مدني سيدي جابر صحة توقيع الرمل'},{n:'17',t:'مدني وصحة توقيع المنتزة'},{n:'39',t:'جنح مدني الرمل أول وثالث'},{n:'39',t:'جنح مدني الرمل أول وثالث'},{n:'39',t:'جنح صحة توقيع باب شرقي + قضايا الإرهاب'}]},
+        {no:'11', s:[null,null,null,{n:'29',t:'جنح صحة توقيع الرمل'},{n:'15',t:'جنح ومخالفات سيدي جابر'},{n:'19',t:'جنح صحة توقيع باب شرقي + قضايا الإرهاب'}]},
+        {no:'12', s:[{n:'57',t:'أسرة الرمل'},{n:'57',t:'أسرة الرمل زوجي'},{n:'57',t:'أسرة سيدي جابر'},{n:'32',t:'أسرة العطارين والمنشية — نقص وحبس ووراثات ومال'},{n:'32',t:'أسرة محرم بك (انتخابية) — تحديد حبس الجمارك واللبنان والميناء'},{n:'51',t:'أسرة الرمل — تحديد حبس الجمارك واللبنان والميناء'}]},
+        {no:'13', s:[{n:'19',t:'أسرة باب شرقي'},{n:'19',t:'أسرة باب شرقي زوجي'},{n:'19',t:'أسرة باب شرقي'},{n:'40',t:'أسرة العطارين'},{n:'40',t:'أسرة العطارين'},{n:'40',t:'أسرة العطارين'}]},
+        {no:'14', s:[{n:'14',t:'أسرة الرمل'},{n:'14',t:'أسرة الرمل'},{n:'14',t:'أسرة الرمل'},null,null,{n:'51',t:'أسرة الرمل'}]},
+        {no:'16', s:[{n:'5',t:'جنح الجمارك — تجديد حبس الجمارك واللبنان والميناء'},{n:'3',t:'جنح البيان الانتخابية — تحديد حبس الجمارك واللبنان والميناء'},{n:'3',t:'جنح البيان (الجرائم الانتخابية) — تحديد حبس الجمارك واللبنان والميناء'},{n:'8',t:'جنح الجمارك — تجديد حبس اللبنان والجمارك والميناء'},{n:'8',t:'جنح الجمارك — تجديد حبس اللبنان والجمارك والميناء'},{n:'8',t:'جنح الجمارك — تجديد حبس اللبنان والجمارك والميناء'}]},
+      ]},
+    ]
+  },
+  new_complex: {
+    label: 'مجمع المحاكم الجديد',
+    floors: [
+      { name:'الدور الأول', rooms:[
+        {no:'1 (خاصة)', s:[{n:'52',t:'عمالية ق١ — خاصة'},{n:'52',t:'عمالية ق١ — خاصة'},{n:'52',t:'عمالية ق١ — خاصة'},{n:'42-45',t:'عمالية ق٢/ق١ — الجرائم الانتخابية'},{n:'42-45',t:'عمالية ق٢/ق١'},{n:'42-45',t:'عمالية ق٢/ق١'}]},
+        {no:'4', s:[{n:'34',t:'جنح مستأنف المنتزة'},{n:'34',t:'جنح مستأنف الجمرك'},{n:'34',t:'جنح مستأنف اللبنان والميناء'},{n:'21',t:'مدني كلي مستأنف كرموز'},{n:'8',t:'جنح مستأنف الأمور العارضة'},{n:'8',t:'جنح مستأنف الأمور العامة'}]},
+        {no:'5', s:[{n:'54',t:'مدني كلي'},{n:'54',t:'مدني كلي'},{n:'54',t:'احداث شرق وغرب'},{n:'5',t:'جنح مستأنف كرموز'},{n:'8',t:'جنح مستأنف العامرية'},{n:'8',t:'مساكن'}]},
+        {no:'6', s:[{n:'26',t:'مدني كلي'},{n:'26',t:'مدني كلي'},null,{n:'29',t:'جنح مستأنف — الجرائم الانتخابية'},{n:'29',t:'جنح مستأنف — قضايا الأوقاف'},{n:'29',t:'جنح مستأنف — قضايا الأوقاف'}]},
+        {no:'7', s:[{n:'11',t:'جنح سيدي جابر — قضايا الأرهاب — قضايا المباني'},{n:'11',t:'جنح جابر — قضايا الأوقاف'},{n:'11',t:'مساكن'},{n:'20',t:'مدني مستأنف'},{n:'20',t:'مدني مستأنف'},{n:'20',t:'مدني مستأنف'}]},
+      ]},
+      { name:'الدور الثالث', rooms:[
+        {no:'8 (خاصة)', s:[{n:'1',t:'أسرة مستأنف'},{n:'1',t:'أسرة مستأنف'},{n:'1',t:'أسرة مستأنف'},{n:'18',t:'مدني كلي — مخالفات المباني والجرائم الانتخابية'},{n:'18',t:'مدني كلي — مخالفات المباني'},{n:'18',t:'مدني كلي — مخالفات المباني'}]},
+        {no:'9 (خاصة)', s:[{n:'11',t:'أسرة مستعجل'},{n:'11',t:'أسرة مستعجل'},{n:'11',t:'أسرة مستعجل'},null,null,{n:'4',t:'تنفيذ'}]},
+        {no:'10', s:[{n:'51',t:'أسرة كرموز'},{n:'51',t:'تعويضات'},{n:'51',t:'تعويضات'},{n:'51',t:'أسرة قضايا الأوقاف'},{n:'51',t:'أسرة قضايا الأوقاف'},{n:'51',t:'أسرة قضايا الأوقاف'}]},
+        {no:'12', s:[{n:'4',t:'مدني كلي'},{n:'13',t:'أسرة مينا البصل'},{n:'13',t:'أسرة مينا البصل'},{n:'41',t:'أسرة المنتزة'},{n:'41',t:'أسرة المنتزة'},{n:'41',t:'أسرة المنتزة'}]},
+      ]},
+      { name:'الدور الرابع', rooms:[
+        {no:'خاصة', s:[{n:'1',t:'مدني كلي مستأنف'},{n:'1',t:'مدني كلي مستأنف'},null,null,null,null]},
+      ]},
+      { name:'الدور الخامس', rooms:[
+        {no:'14', s:[{n:'6',t:'مدني كلي'},{n:'6',t:'مدني كلي'},{n:'6',t:'مساكن'},{n:'37',t:'مدني كلي + صحة توقيع المنتزة'},{n:'37',t:'مدني كلي + صحة توقيع المنتزة'},{n:'37',t:'مدني كلي + صحة توقيع المنتزة'}]},
+        {no:'15', s:[{n:'2',t:'مدني مستأنف'},{n:'2',t:'مدني مستأنف'},{n:'2',t:'مدني مستأنف'},{n:'28',t:'مساكن'},{n:'28',t:'مساكن'},{n:'28',t:'مساكن'}]},
+        {no:'16', s:[null,null,null,{n:'22',t:'مساكن'},{n:'22',t:'مساكن'},{n:'22',t:'مساكن'}]},
+        {no:'17', s:[{n:'8',t:'مساكن'},{n:'8',t:'مدني مستأنف'},{n:'8',t:'مدني كلي'},{n:'10',t:'مساكن'},{n:'10',t:'مساكن'},{n:'10',t:'مساكن'}]},
+      ]},
+    ]
+  }
+};
+
+let activeComplex = 'sayed_kareem';
+let activeDay = 0;
+
+function initTabs(){
+  const wrap = document.getElementById('complexTabs');
+  Object.entries(DATA).forEach(([key,val])=>{
+    const b = document.createElement('button');
+    b.className = 'tab-btn' + (key===activeComplex?' active':'');
+    b.textContent = val.label;
+    b.onclick = ()=>{ activeComplex = key; render(true); refreshTabs(); };
+    b.dataset.key = key;
+    wrap.appendChild(b);
+  });
+  const drow = document.getElementById('dayRow');
+  DAYS.forEach((d,i)=>{
+    const b = document.createElement('button');
+    b.className = 'day-btn' + (i===activeDay?' active':'');
+    b.textContent = d;
+    b.onclick = ()=>{ activeDay = i; render(true); refreshDays(); };
+    b.dataset.i = i;
+    drow.appendChild(b);
+  });
+}
+function refreshTabs(){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.key===activeComplex));
+}
+function refreshDays(){
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active', +b.dataset.i===activeDay));
+}
+
+function render(flip){
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  const complex = DATA[activeComplex];
+  const query = document.getElementById('searchBox').value.trim();
+
+  complex.floors.forEach(floor=>{
+    const fb = document.createElement('div');
+    fb.className = 'floor-block';
+    fb.innerHTML = `<div class="floor-title"><span>${floor.name}</span><div class="line"></div></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'rooms-grid';
+
+    floor.rooms.forEach(room=>{
+      const entry = room.s[activeDay];
+      const card = document.createElement('div');
+      card.className = 'room-card' + (flip?' flip':'');
+
+      let matches = true;
+      if(query){
+        const hay = (room.no + ' ' + (entry? entry.n+' '+entry.t : '')).toLowerCase();
+        matches = hay.includes(query.toLowerCase());
+        card.classList.toggle('dim', !matches);
+        card.classList.toggle('hit', matches);
+      }
+
+      card.innerHTML = `
+        <div class="room-head">
+          <span class="room-no">قاعة <b>${room.no}</b></span>
+          ${entry? `<span class="judge-flip">${entry.n}</span>` : ''}
+        </div>
+        <div class="case-type ${entry?'':'empty'}">${entry? entry.t : 'لا توجد جلسة مسجّلة'}</div>
+      `;
+      grid.appendChild(card);
+    });
+    fb.appendChild(grid);
+    board.appendChild(fb);
+  });
+
+  if(!board.children.length){
+    board.innerHTML = '<div class="empty-state">لا توجد نتائج مطابقة</div>';
+  }
+}
+
+document.getElementById('searchBox').addEventListener('input', ()=>render(false));
+
+initTabs();
+render(true);
+</script>
+</body>
+</html>

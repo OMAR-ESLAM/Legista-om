@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGISTA — روابط رول الجلسات والنيابات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --bg2: #121217;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --success: #00FFB2;
+  --surface: #1A1A22;
+  --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--white); overflow-x: hidden; cursor: none; }
+
+#cursor { position: fixed; width: 12px; height: 12px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform .1s, width .2s, height .2s, background .2s; mix-blend-mode: screen; }
+#cursor-glow { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .08s; }
+#bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 48px); max-width: 1100px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(10,10,13,0.6); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; transition: padding .3s, box-shadow .3s; }
+nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 5px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a { font-size: 12px; color: var(--gray); text-decoration: none; letter-spacing: 1px; font-weight: 600; transition: color .2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { background: transparent; border: 1px solid rgba(212,175,55,0.5); color: var(--gold); padding: 9px 20px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: none; letter-spacing: 1px; text-decoration: none; display: inline-block; }
+
+.page-hero { padding: 140px 24px 40px; text-align: center; position: relative; z-index: 2; }
+.breadcrumb { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
+.breadcrumb a { font-size: 11px; color: var(--gray); text-decoration: none; letter-spacing: 2px; }
+.breadcrumb a:hover { color: var(--gold); }
+.breadcrumb-sep { font-size: 11px; color: var(--gray); opacity: .4; }
+.breadcrumb-cur { font-size: 11px; color: var(--gold); letter-spacing: 2px; font-weight: 700; }
+.page-eyebrow { font-size: 10px; letter-spacing: 6px; color: var(--cyber); font-weight: 700; margin-bottom: 16px; opacity: 0.8; }
+.page-h1 { font-size: clamp(28px, 5vw, 50px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
+.page-h1 span { background: linear-gradient(90deg, var(--gold), var(--gold-soft), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.page-sub { font-size: 14px; color: var(--gray); max-width: 560px; margin: 0 auto; line-height: 1.9; }
+
+.search-wrap { position: relative; z-index: 2; padding: 8px 24px 0; max-width: 720px; margin: 0 auto; }
+.search-box { position: relative; }
+.search-box input { width: 100%; padding: 16px 52px 16px 20px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: var(--white); font-family: 'Cairo', sans-serif; font-size: 14px; outline: none; transition: border-color .2s; cursor: text; }
+.search-box input:focus { border-color: rgba(212,175,55,0.4); }
+.search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: 16px; }
+.result-count { text-align: center; font-size: 11px; color: var(--gray); letter-spacing: 1px; margin-top: 10px; }
+
+.region-tabs { display: flex; justify-content: center; gap: 10px; margin: 22px auto 0; flex-wrap: wrap; }
+.region-tab { padding: 9px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: var(--surface); color: var(--gray); font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: none; letter-spacing: .5px; transition: all .2s; }
+.region-tab.active { border-color: rgba(212,175,55,0.4); color: var(--gold); background: rgba(212,175,55,0.08); }
+
+.groups-wrap { position: relative; z-index: 2; padding: 40px 24px 80px; max-width: 1100px; margin: 0 auto; }
+.group-block { margin-bottom: 40px; }
+.group-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.group-line { flex: 1; min-width: 40px; height: 1px; background: linear-gradient(90deg, rgba(212,175,55,0.3), transparent); }
+.group-title { font-size: 15px; font-weight: 800; color: var(--gold-soft); }
+.group-count { font-size: 10px; color: var(--gray); background: var(--surface); padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
+
+.links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.link-card { display: flex; align-items: center; gap: 12px; padding: 13px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--white); transition: transform .2s, border-color .2s, box-shadow .2s; }
+.link-card:hover { transform: translateY(-3px); border-color: rgba(0,119,182,0.3); box-shadow: 0 10px 30px rgba(0,119,182,0.08); }
+.link-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.link-icon.telegram { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.25); }
+.link-icon.whatsapp { background: rgba(0,255,178,0.1); border: 1px solid rgba(0,255,178,0.25); }
+.link-icon.drive { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25); }
+.link-icon.other { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+.link-name { font-size: 12.5px; line-height: 1.5; flex: 1; }
+.link-arrow { font-size: 13px; color: var(--gray); flex-shrink: 0; }
+
+.no-results { text-align: center; padding: 60px 20px; color: var(--gray); font-size: 13px; display: none; }
+
+footer { position: relative; z-index: 2; padding: 48px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+.footer-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 6px; color: var(--gold); margin-bottom: 12px; }
+.footer-sub { font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+
+.float-cta { position: fixed; bottom: 32px; left: 32px; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--gold), #b8941a); color: #0A0A0D; padding: 14px 22px; border-radius: 50px; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 900; text-decoration: none; z-index: 500; box-shadow: 0 8px 32px rgba(212,175,55,0.3); cursor: none; }
+
+@media (max-width: 768px) {
+  .links-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  nav { width: calc(100% - 24px); padding: 12px 16px; }
+  .nav-cta { font-size: 11px; padding: 8px 14px; }
+  .page-hero { padding: 120px 16px 30px; }
+  .groups-wrap { padding: 30px 16px 60px; }
+  .search-wrap { padding: 8px 16px 0; }
+  .float-cta { bottom: 16px; left: 16px; padding: 12px 18px; font-size: 12px; }
+  .group-title { font-size: 13px; }
+  .group-count { font-size: 9px; white-space: nowrap; }
+}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-glow"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">LEGISTA</a>
+  <div class="nav-links">
+    <a href="index.html#modules">الأقسام</a>
+    <a href="dafou.html">الدفوع</a>
+    <a href="index.html#esteshara">استشارة</a>
+  </div>
+  <a class="nav-cta" href="inzarat.html">الإنذارات ⚡</a>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb">
+    <a href="index.html">الرئيسية</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-cur">روابط رول الجلسات والنيابات</span>
+  </div>
+  <p class="page-eyebrow">QUICK ACCESS · روابط سريعة</p>
+  <h1 class="page-h1">روابط رول الجلسات<br><span>محاكم ونيابات شرق وغرب الإسكندرية.</span></h1>
+  <p class="page-sub">روابط مباشرة لتليجرام ودرايف الدوائر والنيابات — استعلم عن رقمك في الرول من غير ما تدور.</p>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="ابحث باسم المحكمة أو الدائرة أو النيابة..." oninput="filterLinks()">
+  </div>
+  <p class="result-count" id="resultCount"></p>
+</div>
+
+<div class="region-tabs">
+  <button class="region-tab active" data-region="all" onclick="setRegion('all', this)">الكل</button>
+  <button class="region-tab" data-region="east" onclick="setRegion('east', this)">شرق الإسكندرية</button>
+  <button class="region-tab" data-region="west" onclick="setRegion('west', this)">غرب الإسكندرية</button>
+  <button class="region-tab" data-region="other" onclick="setRegion('other', this)">مجلس الدولة</button>
+  <button class="region-tab" data-region="giza" onclick="setRegion('giza', this)">جنوب الجيزة</button>
+  <button class="region-tab" data-region="cairo" onclick="setRegion('cairo', this)">القاهرة والجيزة</button>
+</div>
+
+<div class="groups-wrap" id="groupsWrap"></div>
+<p class="no-results" id="noResults">مفيش نتائج مطابقة للبحث.</p>
+
+<footer>
+  <div class="footer-logo">LEGISTA</div>
+  <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
+</footer>
+
+<a href="index.html#esteshara" class="float-cta">
+  <span>⚖️</span>
+  <span>استشارة قانونية</span>
+</a>
+
+<script>
+const GROUPS = [
+  {
+    title: 'محكمة شرق الإسكندرية الابتدائية وجزئياتها',
+    region: 'east',
+    items: [
+      ['مجمع محاكم المنشية', 'https://drive.google.com/drive/u/0/mobile/folders/1x0Rwy2aWDIwVS6lWDlNLDKxbeNflaF0O/1Kh2V_sc_4rMQQbzViX1ZsYDPTOjqiklF?usp=sharing&sort=13&di'],
+      ['نيابة الشئون المالية والاقتصادية "فحص"', 'https://screening-unit-ebesnyrkv-heba89-lj.vercel.app/'],
+      ['جنح مستأنف العطارين + جنح (العطارين - المنشية - رمل اول - باب شرق - مباني - سيدي جابر - محرم بك)', 'https://drive.google.com/drive/u/0/mobile/folders/1_YrBgO0NCiMsKXVBQa0-qsm4Rj95n5cx?usp=sharing'],
+      ['جنح مستأنف المنتزه - جنح مستأنف الرمل', 'https://drive.google.com/drive/folders/1-4T0r2hhbXfy0hzTQ3HZRMLQ2PNdITRR'],
+      ['جنح مستأنف الاحداث شرق وغرب د11 الاثنين', 'https://drive.google.com/drive/u/0/mobile/folders/1-HrBKQT3lT3EtMeJ5zzf6Fj5t-sSHcWu'],
+      ['المدني الجزئي وصحة التوقيع', 'https://drive.google.com/drive/u/0/mobile/folders/1x0Rwy2aWDIwVS6lWDlNLDKxbeNflaF0O?usp=sharing'],
+    ]
+  },
+  {
+    title: 'نيابات شرق الإسكندرية',
+    region: 'east',
+    items: [
+      ['جنح العطارين', 'https://drive.google.com/drive/folders/18kzAPIL56-0RO48aANaTMwD8XYigngkJ'],
+      ['جنح المنشية', 'https://drive.google.com/drive/u/0/mobile/folders/1-HGsAjGzxbMZpLrnx5TFP9-ovokyNanM'],
+      ['جنح المنتزه اول وثالث - السبت (أ/اسلام شومان)', 'https://drive.google.com/drive/folders/13vU8LH5eBQvp9r0oX7BIOv7AlXZqgAYr'],
+      ['جنح المنتزه اول وثالث - الثلاثاء (أ/اسلام شومان)', 'https://drive.google.com/drive/folders/112yR_nMfZRk4kCBXs4GTOuo1PMgyVsBX'],
+      ['جنح المنتزه اول وثالث - الخميس (أ/اسلام شومان)', 'https://drive.google.com/drive/folders/16BhZcP1rezkbporf1mr980-Zv8AVTsGD'],
+      ['جنح المنتزه اول وثالث - السبت (أ/صلاح)', 'https://drive.google.com/drive/folders/11O-0-OWLH35PalkeULbUZCwMdKTQkMI3'],
+      ['جنح المنتزه اول وثالث - الاثنين (أ/صلاح)', 'https://drive.google.com/drive/folders/11PQ6JPh8LehEhMD4JBXnboqBU4vA-CDc'],
+      ['جنح المنتزه ثالث - الثلاثاء (أ/صلاح)', 'https://drive.google.com/drive/folders/11QHRwHanf7H4zgg0ArWIc5MPxRrdARay'],
+      ['جنح المنتزه اول وثالث - الاحد (أ/محمد حسنين)', 'https://drive.google.com/drive/folders/1-S-wy-PYzLN1ImhOBzrQmmMGMLpanizL'],
+      ['جنح المنتزه اول وثالث - الثلاثاء (أ/محمد حسنين)', 'https://drive.google.com/drive/folders/1-_1KzrcrPEzrhVmmlTPp7yYkEKt48HCw'],
+      ['جنح المنتزه اول وثالث - الخميس (أ/محمد حسنين)', 'https://drive.google.com/drive/folders/1-c3P3qZCBIOzQYEeyqdGjC1vn7dPyUZ3'],
+      ['جنح المنتزه اول وثالث - الاربعاء (أ/حسن الدليل)', 'https://drive.google.com/drive/folders/1xM9ql-IVMyA9rRiYm84cCG8F-uM6K7ao'],
+      ['جنح المنتزه اول وثالث - الاربعاء (أ/سمير)', 'https://drive.google.com/drive/folders/16HPWyU1nCwMN03dXlUXV7O7uWvHt3lop'],
+      ['جنح المنتزه اول وثالث - الخميس (أ/سمير)', 'https://drive.google.com/drive/folders/16EVjaQYWFDqp5JmXBV-kMvv2RRXXG25K'],
+      ['جنح المنتزه ثان د18 الاحد', 'https://drive.google.com/drive/u/0/mobile/folders/1-6R15tPMan7Ab4TXYnPiE0AL8JCYxRxP'],
+      ['جنح المنتزه ثان د19 الاربعاء', 'https://drive.google.com/drive/u/0/mobile/folders/1-Bp-HNq3kGmYslVbCzmDyRIX6llibya4'],
+      ['جنح المنتزه ثان د20 الخميس', 'https://drive.google.com/drive/u/0/mobile/folders/1-7LqrEvG_3MpPodgA6A-owul3NrP0lTK'],
+      ['جنح المنتزه ثان د24 مباني الاربعاء', 'https://drive.google.com/drive/u/0/mobile/folders/1-6mw1HzzT_dz50D2XY8z73bLAKZVbAFG'],
+      ['جنح المنتزه ثان د30 الخميس', 'https://drive.google.com/drive/u/0/mobile/folders/1-8E77vRKQf2bQQJet848vb1qxADn9qsz'],
+      ['جنح المنتزه ثان د40 الاربعاء', 'https://drive.google.com/drive/u/0/mobile/folders/1-6bnFZM56IVH-wycZTb6xiZI7UYO-jDp'],
+      ['جنح الرمل ثان اعتبارا من 2025/1/1', 'https://drive.google.com/drive/folders/1k2jA4EIMnwGO8fedgRrwQXDc3jCMkpws'],
+      ['جنح الرمل ثان - الاثنين', 'https://drive.google.com/drive/u/0/folders/1LNPpaAGFZ8_i-bDJCTqQpcfxBg5wfloe?sort=13&direction=a'],
+      ['جنح الرمل ثان من 2023/9', 'https://drive.google.com/drive/folders/1-pG9dgSLu65VAgtN5CpplD-VGdk8Z0rH'],
+      ['جنح الرمل ثان (قديم)', 'https://drive.google.com/drive/folders/1-I4aUnrX52QuGXjJTI7lNq7YogoIIhZw'],
+      ['جنح محرم بك د21، د25، د27، د39', 'https://drive.google.com/drive/u/0/mobile/folders/11QOL8CMyanhxwkq1g8AtCcddF8_yNUM9'],
+    ]
+  },
+  {
+    title: 'نيابات شرق الإسكندرية لشئون الأسرة',
+    region: 'east',
+    items: [
+      ['اسرة باب شرق - تليجرام', 'https://t.me/BabSharqOsra'],
+      ['أسرة باب شرق د57 السبت - الاحد', 'https://drive.google.com/drive/u/0/mobile/folders/14Kaby87s0et6N2unGSD3y1m2LndBaaZA'],
+      ['اسرة المنشية - تليجرام', 'https://t.me/OsraAlManshey'],
+      ['اسرة العطارين - تليجرام', 'https://t.me/osraelatareen1'],
+      ['أسرة المنشية والعطارين - محدث', 'https://drive.google.com/folderview?id=1cUhDsDZ8DIvn46f5R-x4ivGQy5yeNw94'],
+      ['اسرة سيدي جابر - تليجرام', 'https://t.me/osrasidegaber'],
+      ['اسرة سيدي جابر من مارس 2025', 'https://drive.google.com/drive/u/0/mobile/folders/15mXwbRBVrW7McNWmWgNO4xCo2UjoocG0'],
+      ['أسرة سيدي جابر د19 السبت - الاثنين', 'https://drive.google.com/drive/folders/1QOIPUzCe8Z3Jek0QLyEgPfqJTjVi1nXp'],
+      ['اسرة محرم بك - تليجرام', 'https://t.me/MoharramBekOsra'],
+      ['أسرة محرم بك د40 الاربعاء - الخميس', 'https://drive.google.com/drive/folders/1gUeZEepyHtmDMbITosTIWQMqpx0P_BEA'],
+      ['اسرة المنتزه - تليجرام', 'https://t.me/MontazahOsra'],
+      ['أسرة المنتزه د57 الاثنين', 'https://drive.google.com/drive/u/0/mobile/folders/17qSCAKNj92R1dxf8Xt7YZ6CjwpolfFEg'],
+      ['أسرة المنتزه د4 السبت والاحد 2025', 'https://drive.google.com/drive/folders/18qK_lXGz4FYs4_vNJUZ7N1NRnP9SUFeN'],
+      ['أسرة المنتزه د4 السبت من 2024/10/5', 'https://drive.google.com/drive/folders/1JZsiocKQifaDpK7bpiUuKi8YFxyC-3UK'],
+      ['أسرة المنتزه د4 الاحد من 2024/10/13', 'https://drive.google.com/drive/u/0/folders/1HFI3naGlAujI_cKzWnFu4-zwMJHFd6II'],
+      ['أسرة المنتزه د4 الاثنين 2024', 'https://drive.google.com/drive/folders/16PLPYc3Kq5TRAGZIniKB--TkwozDlEt5'],
+      ['أسرة المنتزه د4 قديم السبت - الاحد - الاثنين', 'https://drive.google.com/drive/mobile/folders/1-0gEQS8j1x8JMrbprXWDKI4dSUZygvh4?sort=15&direction=d'],
+      ['اسرة المنتزه د4 الاثنين من 2020/12/4', 'https://drive.google.com/drive/folders/16PLPYc3Kq5TRAGZIniKB--TkwozDlEt5'],
+      ['اسرة المنتزه د4 الاثنين من 2023/12/4', 'https://drive.google.com/drive/folders/16PLPYc3Kq5TRAGZIniKB--TkwozDlEt5'],
+      ['أسرة المنتزه د41 الثلاثاء - الاربعاء', 'https://drive.google.com/drive/u/0/mobile/folders/1_l2Uf4OGjbcu586eBmMzht_EL8AF2Gxl'],
+      ['أسرة المنتزه د41 الخميس', 'https://drive.google.com/drive/u/0/mobile/folders/18P91IZR1R0j0yFHYO-SP-Th9noU6esNj'],
+      ['اسرة الرمل - تليجرام', 'https://t.me/osraRaml'],
+      ['أسرة الرمل د14 السبت', 'https://drive.google.com/drive/u/0/mobile/folders/1DEozmdUkoX9Ndctq76BMduf45Jy342De'],
+      ['أسرة الرمل د14 السبت، الاثنين من 2022/9/12', 'https://drive.google.com/drive/folders/1-17Uy1VrFFhh-zgyM0JIgyr1u91qqD9b'],
+      ['أسرة الرمل د56 الأربعاء ما قبل 2022/9/11', 'https://drive.google.com/drive/u/0/mobile/folders/1B7ozWmsJ7p-bPkcMyT1bYDB3s0jUMZ_s'],
+      ['أسرة الرمل د14 الاحد، د56 الاربعاء من 2022/9/11', 'https://drive.google.com/drive/folders/1--kr8Y80Rt6HwnNjWxYOO1kLuANgpoRx'],
+      ['أسرة الرمل د19 الاحد', 'https://drive.google.com/drive/folders/16EX3yyLCY_qrezJO3V6-8JiXTlsSOFZH'],
+      ['أسرة الرمل د14 الاثنين', 'https://drive.google.com/drive/folders/18PaJbren3MsePa32groXfQ4R2YSJ3sDG'],
+      ['اسرة الرمل د56 الثلاثاء', 'https://drive.google.com/drive/folders/18aCnmpcLILLkP0qnxiM9IgBpgv8sojcT'],
+      ['اسرة الرمل د56 الخميس', 'https://drive.google.com/drive/folders/1BUfos7pPE0MVbDILOze8eb3QRAZo2BmL'],
+    ]
+  },
+  {
+    title: 'محكمة غرب الإسكندرية الكلية وجزئياتها ونيابات غرب الإسكندرية',
+    region: 'west',
+    items: [
+      ['جنح مستأنف مينا البصل', 'https://drive.google.com/drive/u/0/mobile/folders/1--MM32NtDnDB8xIpyX2x0djRDrB6FOIX'],
+      ['جنح مستأنف الجمرك', 'https://drive.google.com/drive/u/0/mobile/folders/1-1Mp8Z8fjeFd7E5WBAncs5w_kwTziALf'],
+      ['جنح مستأنف الدخيلة', 'https://drive.google.com/drive/folders/1-lRZEaJCOUCpPuH2aIP01xHTvSkezyui?usp=sharing'],
+      ['جنح مستأنف العامرية', 'https://drive.google.com/drive/u/0/mobile/folders/1-oJChE3zGHkLckkQMhU-IpJDMkOlAzEX?usp=sharing'],
+      ['جنح مستأنف برج العرب', 'https://drive.google.com/drive/u/0/mobile/folders/1-pjUPwKGHIb7lujwRAqWN6cATXM4nFiE?usp=sharing'],
+      ['جنح مستأنف اللبان - المينا - المباني', 'https://drive.google.com/drive/u/0/mobile/folders/1-1bFKNv3AMwXfxtEQC9dOLfoRH2L_cpo'],
+      ['جنح مستأنف الاحداث غرب وشرق د11 الاثنين', 'https://drive.google.com/drive/u/0/mobile/folders/1-HrBKQT3lT3EtMeJ5zzf6Fj5t-sSHcWu'],
+      ['جنح مستأنف المرور', 'https://drive.google.com/drive/folders/1-HrBKQT3lT3EtMeJ5zzf6Fj5t-sSHcWu'],
+      ['جنح مستأنف كرموز', 'https://drive.google.com/drive/u/0/mobile/folders/1-9R5xSius2r3pEmrIMH0ljPRhQ2r_yyt'],
+      ['جنح الدخيلة', 'https://drive.google.com/drive/folders/1-r9xWfPZbOP9PLgYkQHYkz0YcfX6kh6Q?usp=sharing'],
+      ['جنح الدخيلة (مباني)', 'https://drive.google.com/drive/folders/1ytaiFl8XsU4s7dXY14_iVzAc6l7HtoXZ?usp=sharing'],
+      ['جنح العامرية اول - واتساب', 'https://whatsapp.com/channel/0029Vb6XZWdGU3BIp7FXFg3F'],
+      ['جنح العامرية اول', 'https://drive.google.com/drive/folders/1-sxm5QPomtOYMwRHxezFRYAG-Qmj-Hx7?usp=sharing'],
+      ['جنح العامرية ثان', 'https://drive.google.com/drive/u/0/mobile/folders/1-t4eWx1DbFH8mi43ZmR1NH8g365tYhLK?usp=sharing'],
+      ['جنح برج العرب', 'https://drive.google.com/drive/u/0/mobile/folders/10-1Boo9fvOkw3W9QSlV7C3avFt5iN50H?usp=sharing'],
+      ['جنح كرموز (السبت - الاثنين - الثلاثاء)', 'https://drive.google.com/drive/u/0/mobile/folders/1k2yQGQrRd8JtcRvAKZrz0CMaXW_jRzqb'],
+    ]
+  },
+  {
+    title: 'نيابات غرب الإسكندرية لشئون الأسرة',
+    region: 'west',
+    items: [
+      ['اسرة الجمرك - تليجرام', 'https://t.me/osragomrok'],
+      ['أسرة الجمرك', 'https://drive.google.com/drive/u/0/mobile/folders/1-8HDNPdmqY3zAzwh8dfc4-ryYHi36zU6'],
+      ['أسرة الجمرك 2023', 'https://drive.google.com/drive/folders/1gasCiiazNvqwgbZ8-aGJ3ARzfhy2tr60'],
+      ['أسرة الجمرك 2024', 'https://drive.google.com/drive/folders/1-GO45cvql7Z2ofZ-PX3RD1dPcB4cULUz'],
+      ['اسرة اللبان - تليجرام', 'https://t.me/osraellaban'],
+      ['اسرة كرموز - تليجرام', 'https://t.me/asrakarmoze'],
+      ['أسرة كرموز واللبان 2025 واشكالات غرب', 'https://drive.google.com/drive/u/0/mobile/folders/1-BTJSwRotfchgy9HO2DjEzKmvN8Up_xI'],
+      ['أسرة كرموز واللبان', 'https://drive.google.com/drive/folders/1-72zLOZ1shD70znaV8jGw7DKYedl9Iu1'],
+      ['اسرة مينا البصل - تليجرام', 'https://t.me/MinaAlBasalOsra'],
+      ['اسرة مينا البصل', 'https://drive.google.com/drive/folders/113EDInAoSZMEmRPzIKdkrFbqfI8GRrfZ'],
+      ['أسرة مينا البصل د13 (الأحد - الاثنين) من 2023/10/1', 'https://drive.google.com/drive/folders/1--9St4i0k9vJ1VRAZdyWuj5ONpz-R5qA'],
+      ['اسرة العامرية - تليجرام', 'https://t.me/ElAmeriyaOsra'],
+      ['أسرة العامرية (السبت - الأحد - الإثنين)', 'https://drive.google.com/drive/u/0/mobile/folders/1XsO9sRwjIHFtaZ5XpuUlCmp4NH53nnS_'],
+      ['اسرة الدخيلة - تليجرام', 'https://t.me/AlDakhilaOsra'],
+      ['أسرة الدخيلة (الثلاثاء)', 'https://drive.google.com/drive/folders/1AhJhSf8LeMTJv-aT5KFIw74SbRWxMgOo'],
+      ['أسرة الدخيلة (الاربعاء - الخميس)', 'https://drive.google.com/drive/u/0/mobile/folders/10_dN9lLhLU6fzfw6EwdMGqq62D0VrRLE'],
+      ['اسرة برج العرب - تليجرام', 'https://t.me/BurjElArabOsra'],
+      ['أسرة برج العرب', 'https://drive.google.com/drive/folders/1-1_rsRomOl-r4IP0O3z_QllbYP24rmC7'],
+    ]
+  },
+  {
+    title: 'مجلس الدولة',
+    region: 'other',
+    items: [
+      ['مجلس الدولة', 'https://drive.google.com/drive/folders/19U31SsRA-G1Tv54FYLlQ56RAsXbiN7c7'],
+    ]
+  },
+  {
+    title: 'محكمة جنوب الجيزة الابتدائية',
+    region: 'giza',
+    items: [
+      ['محكمة جنوب الجيزة الابتدائية - تليجرام', 'https://t.me/SyRWB4kk_lMwYjg0'],
+    ]
+  },
+  {
+    title: 'جلسات أسرة القاهرة والجيزة',
+    region: 'cairo',
+    items: [
+      ['جلسات أسرة بولاق الدكرور', 'https://t.me/galsabolakeldakrornfs'],
+      ['قناة جلسات عامة', 'https://t.me/Law20220'],
+      ['جلسات أسرة مركز الجيزة', 'https://t.me/galsamarkzelgiza'],
+      ['جلسات أسرة الهرم', 'https://t.me/galsaelharam'],
+      ['جلسات أسرة باب الشعرية', 'https://t.me/babsherya'],
+      ['جلسات أسرة الساحل', 'https://t.me/NyabetElSahel'],
+      ['جلسات أسرة الشرابية', 'https://t.me/NyabetElSHorabya'],
+      ['جلسات أسرة الزاوية', 'https://t.me/NyabetElZawya'],
+      ['جلسات أسرة شبرا مصر', 'https://t.me/shobraosra'],
+      ['جلسات أسرة السيدة زينب', 'https://t.me/sayedazainb'],
+      ['جلسات أسرة السلام', 'https://t.me/NyabetElSalam'],
+      ['جلسات أسرة البساتين', 'https://t.me/basatinosra'],
+      ['جلسات أسرة مصر القديمة', 'https://t.me/Masrelqadeema'],
+      ['جلسات أسرة بولاق أبو العلا', 'https://t.me/NyabetBolaq'],
+      ['جلسات أسرة الزيتون', 'https://t.me/nyabetElzayton'],
+      ['جلسات أسرة النزهة', 'https://t.me/ElNozhaAgenda'],
+      ['جلسات أسرة حلوان', 'https://t.me/Agendethelwan'],
+      ['جلسات أسرة المعادي', 'https://t.me/MaadyOsra'],
+      ['جلسات أسرة مايو والتبين', 'https://t.me/mayoweltbeen'],
+      ['جلسات أسرة القاهرة الجديدة', 'https://t.me/NewCairoAgenda'],
+      ['جلسات أسرة المطرية', 'https://t.me/ElmataryaAgenga'],
+      ['جلسات أسرة الخليفة', 'https://t.me/Khaleefaosra'],
+      ['جلسات أسرة الدرب الأحمر', 'https://t.me/darbahmar'],
+      ['جلسات أسرة الموسكي', 'https://t.me/moskyosra'],
+      ['جلسات أسرة عابدين', 'https://t.me/abdeenosra'],
+    ]
+  },
+];
+
+
+function iconFor(url) {
+  if (url.includes('t.me')) return { cls: 'telegram', emoji: '📨' };
+  if (url.includes('whatsapp.com') || url.includes('wa.me')) return { cls: 'whatsapp', emoji: '💬' };
+  if (url.includes('drive.google.com') || url.includes('folderview')) return { cls: 'drive', emoji: '📁' };
+  return { cls: 'other', emoji: '🔗' };
+}
+
+let currentRegion = 'all';
+
+function renderGroups(filterText) {
+  const wrap = document.getElementById('groupsWrap');
+  wrap.innerHTML = '';
+  let totalShown = 0;
+  let totalAll = 0;
+
+  GROUPS.forEach(group => {
+    if (currentRegion !== 'all' && group.region !== currentRegion) return;
+
+    const matched = group.items.filter(([name]) =>
+      !filterText || name.toLowerCase().includes(filterText) || group.title.toLowerCase().includes(filterText)
+    );
+    totalAll += group.items.length;
+    if (matched.length === 0) return;
+    totalShown += matched.length;
+
+    const block = document.createElement('div');
+    block.className = 'group-block';
+    block.innerHTML = `
+      <div class="group-head">
+        <div class="group-title">${group.title}</div>
+        <div class="group-line"></div>
+        <div class="group-count">${matched.length} رابط</div>
+      </div>
+      <div class="links-grid"></div>
+    `;
+    const grid = block.querySelector('.links-grid');
+    matched.forEach(([name, url]) => {
+      const icon = iconFor(url);
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'link-card';
+      a.innerHTML = `
+        <div class="link-icon ${icon.cls}">${icon.emoji}</div>
+        <div class="link-name">${name}</div>
+        <div class="link-arrow">←</div>
+      `;
+      grid.appendChild(a);
+    });
+    wrap.appendChild(block);
+  });
+
+  document.getElementById('noResults').style.display = totalShown === 0 ? 'block' : 'none';
+  const countEl = document.getElementById('resultCount');
+  if (filterText) {
+    countEl.textContent = `${totalShown} نتيجة مطابقة`;
+  } else {
+    countEl.textContent = '';
+  }
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => { cur.style.width='24px'; cur.style.height='24px'; cur.style.opacity='0.7'; });
+    el.addEventListener('mouseleave', () => { cur.style.width='12px'; cur.style.height='12px'; cur.style.opacity='1'; });
+  });
+}
+
+function filterLinks() {
+  const val = document.getElementById('searchInput').value.trim().toLowerCase();
+  renderGroups(val);
+}
+
+function setRegion(region, btn) {
+  currentRegion = region;
+  document.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  filterLinks();
+}
+
+const cur = document.getElementById('cursor');
+const curGlow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  curGlow.style.left = e.clientX + 'px'; curGlow.style.top = e.clientY + 'px';
+});
+
+window.addEventListener('scroll', () => { document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 60); });
+
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const streams = Array.from({length: 12}, () => ({
+  x: Math.random()*1200, y: Math.random()*-800,
+  speed: 0.3+Math.random()*0.4,
+  chars: Array.from({length:18}, ()=>String.fromCharCode(0x600+Math.floor(Math.random()*100))),
+  opacity: 0.02+Math.random()*0.03
+}));
+function drawBG() {
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(212,175,55,0.025)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.font='11px Cairo';
+  streams.forEach(s=>{
+    ctx.fillStyle=`rgba(0,229,255,${s.opacity})`;
+    s.chars.forEach((c,i)=>{if(s.y+i*16>0&&s.y+i*16<H)ctx.fillText(c,s.x%W,s.y+i*16);});
+    s.y+=s.speed; if(s.y>H+200){s.y=-300;s.x=Math.random()*W;}
+  });
+  requestAnimationFrame(drawBG);
+}
+drawBG();
+
+renderGroups('');
+</script>
+</body>
+</html>

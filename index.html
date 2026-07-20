@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGISTA — المحرك القانوني الذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --bg2: #121217;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --success: #00FFB2;
+  --surface: #1A1A22;
+  --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; max-width: 100%; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--white); overflow-x: hidden; width: 100%; max-width: 100%; cursor: none; direction: rtl; }
+
+#cursor { position: fixed; width: 12px; height: 12px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform .1s, width .2s, height .2s, background .2s; mix-blend-mode: screen; }
+#cursor-glow { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .08s; }
+
+#loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+.loader-logo { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: 12px; background: linear-gradient(90deg, var(--gold), #fff8dc, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; opacity: 0; animation: fadeInLogo 0.8s 0.3s forwards; }
+.loader-status { font-size: 11px; letter-spacing: 4px; color: var(--gray); font-weight: 600; opacity: 0; animation: fadeInLogo 0.5s 1s forwards; }
+.loader-bar-wrap { width: 200px; height: 1px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; opacity: 0; animation: fadeInLogo 0.5s 1s forwards; }
+.loader-bar { height: 100%; background: var(--gold); animation: loadBar 1.5s 1s ease-out forwards; width: 0; }
+.loader-ready { font-size: 13px; letter-spacing: 6px; color: var(--success); font-weight: 700; opacity: 0; }
+@keyframes fadeInLogo { to { opacity: 1; } }
+@keyframes loadBar { to { width: 100%; } }
+
+#bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 1; animation: floatParticle linear infinite; }
+@keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.6; } 100% { transform: translateY(-100px) rotate(360deg); opacity: 0; } }
+
+nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 48px); max-width: 1100px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(10,10,13,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; transition: padding .3s, box-shadow .3s; direction: rtl; }
+nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 5px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; flex-shrink: 0; }
+.nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-inline-start: auto; }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a { font-size: 12px; color: var(--gray); text-decoration: none; letter-spacing: 1px; font-weight: 600; transition: color .2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { background: transparent; border: 1px solid rgba(212,175,55,0.5); color: var(--gold); padding: 9px 20px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: none; letter-spacing: 1px; position: relative; overflow: hidden; transition: color .25s; text-decoration: none; display: inline-block; }
+.nav-cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--gold), #a8891f); transform: scaleX(0); transform-origin: right; transition: transform .3s; z-index: -1; }
+.nav-cta:hover { color: #0A0A0D; }
+.nav-cta:hover::before { transform: scaleX(1); }
+/* ══ Google Sign-In Button ══ */
+.google-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  color: #3c4043;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: box-shadow .2s, transform .15s;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 160px;
+}
+.google-signin-btn:hover {
+  box-shadow: 0 4px 16px rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+}
+.google-signin-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.google-signin-btn.signed-in {
+  background: rgba(255,255,255,0.08);
+  color: var(--white);
+  border-color: rgba(212,175,55,0.4);
+  max-width: 160px;
+  overflow: hidden;
+}
+.google-signin-btn.signed-in #googleSignInText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 768px) {
+  .google-signin-btn {
+    max-width: 120px;
+    padding: 7px 10px;
+    font-size: 11px;
+    gap: 5px;
+  }
+  .google-signin-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .google-signin-btn #googleSignInText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+#googleBtnHidden {
+  position: fixed !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  z-index: -1 !important;
+}
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 24px 80px; text-align: center; position: relative; z-index: 2; }
+.hero-eyebrow { font-size: 10px; letter-spacing: 6px; color: var(--cyber); font-weight: 700; margin-bottom: 28px; opacity: 0.8; animation: fadeUp 0.8s 2.2s both; }
+.hero-h1 { font-size: clamp(36px, 7vw, 80px); font-weight: 900; line-height: 1.05; margin-bottom: 24px; animation: fadeUp 0.8s 2.4s both; }
+.hero-h1 .line2 { background: linear-gradient(90deg, var(--gold), var(--gold-soft), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: block; }
+.hero-sub { font-size: clamp(14px, 2vw, 17px); color: var(--gray); max-width: 520px; line-height: 1.9; margin-bottom: 52px; animation: fadeUp 0.8s 2.6s both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.8s 2.8s both; }
+.btn-primary { background: linear-gradient(135deg, var(--gold), #b8941a); border: none; color: #0A0A0D; padding: 16px 36px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; cursor: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform .15s, box-shadow .2s; }
+.btn-primary:hover { transform: scale(1.04); box-shadow: 0 4px 32px rgba(212,175,55,0.4); }
+.btn-secondary { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--white); padding: 16px 36px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; cursor: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: border-color .2s, background .2s; }
+.btn-secondary:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
+
+.stats-band { position: relative; z-index: 2; padding: 80px 24px; text-align: center; background: linear-gradient(0deg, rgba(0,229,255,0.02), transparent); }
+.stats-grid { display: flex; justify-content: center; gap: 80px; flex-wrap: wrap; max-width: 800px; margin: 0 auto; }
+.stat-item { text-align: center; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: clamp(40px,6vw,64px); font-weight: 800; line-height: 1; background: linear-gradient(135deg, var(--white), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-num .suffix { font-size: .55em; opacity: .7; }
+.stat-lbl { font-size: 11px; letter-spacing: 3px; color: var(--gray); margin-top: 8px; font-weight: 600; }
+
+.section-wrap { position: relative; z-index: 2; padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+.section-label { font-size: 10px; letter-spacing: 5px; color: var(--gold); font-weight: 700; margin-bottom: 12px; opacity: .8; }
+.section-h2 { font-size: clamp(28px,4vw,44px); font-weight: 900; margin-bottom: 48px; line-height: 1.15; }
+
+.modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; }
+.module-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; transition: border-color .2s, transform .2s; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
+.module-card::before { content: ''; position: absolute; inset: 0; border-radius: 16px; background: radial-gradient(ellipse at top left, rgba(212,175,55,0.04), transparent 60%); pointer-events: none; }
+.module-card:hover { border-color: rgba(212,175,55,0.35); transform: translateY(-4px); }
+.module-card.active-card { border-color: rgba(212,175,55,0.4); }
+.module-card.active-card::before { background: radial-gradient(ellipse at top left, rgba(212,175,55,0.08), transparent 60%); }
+.module-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(212,175,55,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.module-icon.cy { background: rgba(0,229,255,0.08); }
+.module-name { font-size: 16px; font-weight: 700; }
+.module-count { font-size: 12px; color: var(--gray); }
+.module-badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; background: rgba(0,255,178,0.1); color: var(--success); font-weight: 700; letter-spacing: 1px; width: fit-content; }
+.module-badge.soon { background: rgba(212,175,55,0.1); color: var(--gold); }
+
+/* DASHBOARD PREVIEW */
+.dashboard-frame { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; overflow: hidden; display: grid; grid-template-columns: 220px 1fr 280px; min-height: 500px; }
+.sidebar { background: rgba(10,10,13,0.8); border-left: 1px solid rgba(255,255,255,0.05); padding: 24px 0; }
+.sidebar-logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 3px; color: var(--gold); padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 16px; }
+.sidebar-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; font-size: 13px; color: var(--gray); cursor: none; transition: all .15s; border-right: 2px solid transparent; direction: rtl; }
+.sidebar-item:hover, .sidebar-item.active { color: var(--white); background: rgba(255,255,255,0.04); }
+.sidebar-item.active { border-right-color: var(--gold); color: var(--gold); }
+.sidebar-icon { font-size: 16px; opacity: .7; }
+.workspace { padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+.ws-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ws-title { font-size: 18px; font-weight: 700; }
+.doc-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; direction: rtl; }
+.doc-icon { font-size: 18px; opacity: .7; }
+.doc-name { font-size: 13px; font-weight: 600; flex: 1; }
+.doc-date { font-size: 11px; color: var(--gray); }
+.doc-status { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700; letter-spacing: 1px; }
+.st-done { background: rgba(0,255,178,0.1); color: var(--success); }
+.st-pending { background: rgba(212,175,55,0.1); color: var(--gold); }
+.ai-dock { background: rgba(10,10,13,0.95); border-right: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column; direction: rtl; }
+.ai-dock-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.ai-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,229,255,0.2)); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--gold); font-weight: 700; }
+.ai-name { font-size: 13px; font-weight: 700; }
+.ai-status { font-size: 10px; color: var(--success); letter-spacing: 1px; }
+.ai-msg { font-size: 12px; line-height: 1.8; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px; margin-bottom: 12px; direction: rtl; border-right: 2px solid var(--gold); }
+.ai-suggestion { font-size: 11px; color: var(--cyber); padding: 8px 12px; border: 1px solid rgba(0,229,255,0.15); border-radius: 8px; margin-bottom: 8px; cursor: none; transition: background .15s; direction: rtl; }
+.ai-suggestion:hover { background: rgba(0,229,255,0.05); }
+
+footer { position: relative; z-index: 2; padding: 48px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+.footer-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 6px; color: var(--gold); margin-bottom: 12px; }
+.footer-sub { font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+
+.reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s, transform .7s; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* إخفاء كل عناصر Google اللي بتكسر الـ RTL على الموبايل */
+#credential_picker_container,
+#credential_picker_iframe,
+.credential_picker_container,
+iframe[src*="accounts.google.com"],
+iframe[src*="google.com/gsi"],
+div[id^="credential_picker"],
+div[id*="g_id_onload"],
+.g_id_signin {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  border: none !important;
+}
+
+/* ══ DEFENSE CARDS ══ */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+@media (max-width: 700px) { .pricing-grid { grid-template-columns: 1fr; } }
+.pricing-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 36px 28px;
+  text-align: center;
+  transition: transform .25s, box-shadow .25s;
+}
+.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.35); }
+.pricing-card.featured { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.pricing-badge { display:inline-block; font-size:11px; font-weight:800; padding:5px 14px; border-radius:20px; background:rgba(0,229,255,0.1); color:var(--cyber); margin-bottom:14px; }
+.pricing-badge.gold { background:rgba(212,175,55,0.12); color:var(--gold-soft); }
+.pricing-name { font-size:16px; font-weight:800; margin-bottom:10px; }
+.pricing-price { font-family:'Syne',sans-serif; font-size:40px; font-weight:800; color:var(--gold); margin-bottom:22px; }
+.pricing-price span { font-size:13px; font-family:'Cairo',sans-serif; font-weight:700; color:var(--gray); }
+.pricing-features { list-style:none; text-align:right; margin-bottom:26px; }
+.pricing-features li { font-size:13px; color:var(--gray); margin-bottom:12px; line-height:1.7; }
+.pricing-cta { width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--white); font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:all .2s; }
+.pricing-cta:hover { border-color:var(--cyber); color:var(--cyber); }
+.pricing-cta.gold { background:linear-gradient(135deg,var(--gold),#96700e); color:#fff; border:none; }
+.pricing-cta.gold:hover { opacity:0.9; }
+
+.dafou-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.dafou-card {
+  position: relative;
+  border-radius: 24px;
+  padding: 40px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  cursor: none;
+  transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 420px;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.dafou-card:hover { transform: translateY(-8px) scale(1.01); }
+
+/* جنائية — cyber accent */
+.dafou-card.jinaiya {
+  background: linear-gradient(145deg, #0e0e18 0%, #0a131f 60%, #090d17 100%);
+  box-shadow: 0 0 0 0 rgba(0,229,255,0);
+}
+.dafou-card.jinaiya:hover {
+  box-shadow: 0 24px 64px rgba(0,229,255,0.12), 0 0 0 1px rgba(0,229,255,0.2);
+  border-color: rgba(0,229,255,0.3);
+}
+.dafou-card.jinaiya::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 80% 10%, rgba(0,229,255,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 90%, rgba(0,229,255,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  border-radius: 24px;
+}
+
+/* مدنية — gold accent */
+.dafou-card.madaniya {
+  background: linear-gradient(145deg, #130f07 0%, #1a1408 60%, #100e05 100%);
+  box-shadow: 0 0 0 0 rgba(212,175,55,0);
+}
+.dafou-card.madaniya:hover {
+  box-shadow: 0 24px 64px rgba(212,175,55,0.14), 0 0 0 1px rgba(212,175,55,0.3);
+  border-color: rgba(212,175,55,0.4);
+}
+.dafou-card.madaniya::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 80% 10%, rgba(212,175,55,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 90%, rgba(212,175,55,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  border-radius: 24px;
+}
+
+/* animated corner glow on hover */
+.dafou-card::after {
+  content: '';
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 120px; height: 120px;
+  border-radius: 0 24px 0 0;
+  opacity: 0;
+  transition: opacity .4s;
+  pointer-events: none;
+}
+.dafou-card.jinaiya::after {
+  background: radial-gradient(circle at top right, rgba(0,229,255,0.25), transparent 70%);
+}
+.dafou-card.madaniya::after {
+  background: radial-gradient(circle at top right, rgba(212,175,55,0.3), transparent 70%);
+}
+.dafou-card:hover::after { opacity: 1; }
+
+.dafou-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+.dafou-icon-wrap {
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  position: relative;
+}
+.jinaiya .dafou-icon-wrap {
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  box-shadow: 0 0 24px rgba(0,229,255,0.1);
+}
+.madaniya .dafou-icon-wrap {
+  background: rgba(212,175,55,0.08);
+  border: 1px solid rgba(212,175,55,0.25);
+  box-shadow: 0 0 24px rgba(212,175,55,0.1);
+}
+.dafou-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+.jinaiya .dafou-badge {
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  color: var(--cyber);
+}
+.madaniya .dafou-badge {
+  background: rgba(212,175,55,0.08);
+  border: 1px solid rgba(212,175,55,0.25);
+  color: var(--gold);
+}
+.dafou-title {
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 900;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+.jinaiya .dafou-title { color: var(--white); }
+.madaniya .dafou-title { color: var(--white); }
+
+.dafou-subtitle {
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+.jinaiya .dafou-subtitle { color: rgba(0,229,255,0.6); }
+.madaniya .dafou-subtitle { color: rgba(212,175,55,0.6); }
+
+.dafou-divider {
+  height: 1px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+.jinaiya .dafou-divider { background: linear-gradient(90deg, rgba(0,229,255,0.25), transparent); }
+.madaniya .dafou-divider { background: linear-gradient(90deg, rgba(212,175,55,0.3), transparent); }
+
+.dafou-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.dafou-list li {
+  font-size: 13px;
+  color: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: color .2s;
+}
+.dafou-card:hover .dafou-list li { color: rgba(255,255,255,0.45); }
+.dafou-list li::before {
+  content: '—';
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.jinaiya .dafou-list li::before { color: rgba(0,229,255,0.4); }
+.madaniya .dafou-list li::before { color: rgba(212,175,55,0.4); }
+
+.dafou-footer {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+.dafou-count {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.3);
+}
+.dafou-count span {
+  font-size: 32px;
+  font-weight: 800;
+  display: block;
+  line-height: 1;
+}
+.jinaiya .dafou-count span { color: var(--cyber); }
+.madaniya .dafou-count span { color: var(--gold); }
+
+.dafou-arrow {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: transform .3s, box-shadow .3s;
+}
+.jinaiya .dafou-arrow {
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  color: var(--cyber);
+}
+.madaniya .dafou-arrow {
+  background: rgba(212,175,55,0.08);
+  border: 1px solid rgba(212,175,55,0.25);
+  color: var(--gold);
+}
+.dafou-card:hover .dafou-arrow {
+  transform: translateX(-6px);
+  box-shadow: 0 0 20px rgba(0,229,255,0.2);
+}
+.madaniya:hover .dafou-arrow {
+  box-shadow: 0 0 20px rgba(212,175,55,0.2);
+}
+
+/* scan line effect */
+.dafou-card .scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  top: 0;
+}
+.jinaiya .scan-line { background: linear-gradient(90deg, transparent, rgba(0,229,255,0.4), transparent); }
+.madaniya .scan-line { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent); }
+.dafou-card:hover .scan-line {
+  animation: scanAnim 2s ease-in-out infinite;
+  opacity: 1;
+}
+@keyframes scanAnim {
+  0%   { top: 0%; }
+  100% { top: 100%; }
+}
+
+@media (max-width: 768px) {
+  .dafou-grid { grid-template-columns: 1fr; }
+  .dafou-card { min-height: 360px; padding: 28px; }
+}
+
+.bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.bcard { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; transition: border-color .2s, transform .2s; position: relative; overflow: hidden; }
+.bcard:hover { border-color: rgba(212,175,55,0.25); transform: translateY(-4px); }
+.bcard::before { content: ''; position: absolute; inset: 0; border-radius: 16px; background: radial-gradient(ellipse at top left, rgba(212,175,55,0.04), transparent 60%); pointer-events: none; }
+.bcard-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+.icon-gold { background: rgba(212,175,55,0.1); }
+.icon-cyber { background: rgba(0,229,255,0.08); }
+.icon-green { background: rgba(0,255,178,0.08); }
+.bcard h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.bcard p { font-size: 13px; color: var(--gray); line-height: 1.8; }
+.bcard-wide { grid-column: span 2; }
+.bcard-cyber::before { background: radial-gradient(ellipse at top right, rgba(0,229,255,0.05), transparent 60%); }
+.big-counter { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; background: linear-gradient(90deg, var(--cyber), #7fffea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+.speed-num { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--gold); line-height: 1; }
+.speed-unit { font-size: 16px; color: var(--gray); font-weight: 400; }
+.progress-bar-wrap { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-top: 16px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--cyber)); animation: progressAnim 2s ease-out forwards; width: 0; }
+@keyframes progressAnim { to { width: 92%; } }
+/* ══ CONSULT SECTION ══ */
+.consult-card {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+  background: var(--surface); border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 24px; overflow: hidden;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.3);
+}
+.consult-lawyer-side {
+  padding: 36px; display: flex; align-items: flex-start; gap: 20px; direction: rtl;
+}
+.consult-avatar {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
+  border: 2px solid var(--gold); display: flex; align-items: center;
+  justify-content: center; font-size: 28px;
+}
+.consult-name { font-size: 18px; font-weight: 900; color: var(--white); margin-bottom: 4px; }
+.consult-title { font-size: 11px; color: var(--gold); letter-spacing: 1px; margin-bottom: 12px; }
+.consult-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.consult-tag {
+  font-size: 10px; padding: 4px 10px; border-radius: 20px;
+  background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2);
+  color: var(--gold-soft); font-weight: 600;
+}
+.consult-quote {
+  font-size: 12px; color: var(--gray); line-height: 1.8;
+  border-right: 2px solid rgba(212,175,55,0.3); padding-right: 12px;
+  font-style: italic;
+}
+.consult-divider {
+  width: 1px; background: rgba(255,255,255,0.06); margin: 24px 0;
+}
+.consult-prices-side {
+  padding: 36px; display: flex; flex-direction: column; gap: 12px; direction: rtl;
+}
+.consult-price-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 14px 18px; gap: 20px;
+  transition: border-color .2s;
+}
+.consult-price-row:hover { border-color: rgba(212,175,55,0.25); }
+.urgent-row { border-color: rgba(212,175,55,0.15); }
+.call-row { border-color: rgba(0,229,255,0.12); }
+.consult-price-type { font-size: 13px; font-weight: 700; color: var(--white); }
+.consult-price-desc { font-size: 11px; color: var(--gray); margin-top: 2px; }
+.consult-price-val {
+  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+  color: var(--gold); white-space: nowrap; flex-shrink: 0;
+}
+.consult-price-val span { font-size: 13px; color: var(--gray); font-weight: 400; }
+.consult-cta {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gold), #b8941a);
+  color: #0A0A0D; padding: 15px; border-radius: 12px;
+  font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900;
+  text-decoration: none; margin-top: 8px;
+  transition: transform .15s, box-shadow .2s;
+}
+.consult-cta:hover { transform: scale(1.02); box-shadow: 0 4px 24px rgba(212,175,55,0.4); }
+/* ══ FEEDBACK / COMPLAINTS SECTION ══ */
+.complaint-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 40px; max-width: 640px; }
+.complaint-type-toggle { display: flex; gap: 10px; margin-bottom: 22px; }
+.complaint-type-btn { flex: 1; padding: 13px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700; color: var(--gray); cursor: none; transition: all .2s; }
+.complaint-type-btn.active { border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.08); color: var(--gold); }
+.complaint-field { margin-bottom: 18px; }
+.complaint-label { font-size: 12px; color: var(--gray); margin-bottom: 8px; display: block; font-weight: 600; }
+.complaint-input, .complaint-textarea { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--white); font-family: 'Cairo', sans-serif; font-size: 13px; outline: none; transition: border-color .2s; cursor: text; }
+.complaint-input:focus, .complaint-textarea:focus { border-color: rgba(212,175,55,0.4); }
+.complaint-textarea { resize: vertical; min-height: 110px; line-height: 1.8; }
+.complaint-upload { border: 2px dashed rgba(212,175,55,0.3); border-radius: 14px; padding: 24px; text-align: center; cursor: none; transition: border-color .2s, background .2s; position: relative; }
+.complaint-upload:hover { border-color: rgba(212,175,55,0.5); background: rgba(212,175,55,0.03); }
+.complaint-upload input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.complaint-upload-icon { font-size: 24px; margin-bottom: 8px; }
+.complaint-upload-text { font-size: 12px; color: var(--gray); }
+.complaint-preview { margin-top: 14px; position: relative; display: inline-block; }
+.complaint-preview img { max-width: 160px; max-height: 160px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); display: block; }
+.complaint-preview-remove { position: absolute; top: -8px; left: -8px; width: 24px; height: 24px; border-radius: 50%; background: var(--white); color: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: none; border: none; }
+.complaint-submit { width: 100%; margin-top: 8px; justify-content: center; }
+.complaint-success { display: none; text-align: center; padding: 20px; }
+.complaint-success.show { display: block; }
+@media (max-width: 768px) {
+  .complaint-card { padding: 24px; }
+}
+
+/* ══ ESTESHARA PAYMENT MODAL ══ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 5000;
+  background: rgba(26,26,46,0.45); backdrop-filter: blur(4px);
+  align-items: flex-start; justify-content: center;
+  padding: 60px 16px; overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  position: relative; width: 100%; max-width: 560px;
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px; padding: 32px; direction: rtl;
+}
+.modal-close {
+  position: absolute; top: 16px; left: 16px; width: 32px; height: 32px;
+  border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
+  color: var(--white); font-size: 14px; cursor: none;
+}
+.modal-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--cyber); font-weight: 700; margin-bottom: 8px; }
+.modal-title { font-size: 19px; font-weight: 900; margin-bottom: 22px; }
+.modal-section-label { font-size: 12.5px; font-weight: 800; color: var(--gold-soft); margin: 20px 0 12px; }
+
+.m-packages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.m-package {
+  position: relative; cursor: none; text-align: center;
+  background: rgba(255,255,255,0.02); border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 14px 8px; transition: border-color .2s;
+}
+.m-package.selected { border-color: var(--gold); background: rgba(184,134,11,0.06); }
+.m-package-check { position: absolute; top: 8px; left: 8px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); font-size: 9px; display: flex; align-items: center; justify-content: center; color: transparent; }
+.m-package.selected .m-package-check { border-color: var(--gold); background: var(--gold); color: #fff; }
+.m-package-icon { font-size: 17px; margin-bottom: 6px; }
+.m-package-name { font-size: 12px; font-weight: 800; margin-bottom: 2px; }
+.m-package-desc { font-size: 10px; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
+.m-package-price { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: var(--gold); }
+.m-package-price span { font-size: 10px; color: var(--gray); font-weight: 400; }
+
+.m-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.m-field { margin-bottom: 14px; }
+.m-field label { font-size: 12px; color: var(--gray); margin-bottom: 6px; display: block; font-weight: 600; }
+.m-field input, .m-field textarea {
+  width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: var(--white);
+  font-family: 'Cairo', sans-serif; font-size: 13px; outline: none; transition: border-color .2s; cursor: text;
+}
+.m-field input:focus, .m-field textarea:focus { border-color: rgba(184,134,11,0.4); }
+.m-field textarea { resize: vertical; min-height: 90px; line-height: 1.7; }
+
+.wallets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wallet-card {
+  position: relative; cursor: none; text-align: center;
+  background: rgba(255,255,255,0.02); border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 16px 10px; transition: border-color .2s;
+}
+.wallet-card.selected { border-color: var(--gold); background: rgba(184,134,11,0.06); }
+.wallet-check { position: absolute; top: 10px; left: 10px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); font-size: 10px; display: flex; align-items: center; justify-content: center; color: transparent; }
+.wallet-card.selected .wallet-check { border-color: var(--gold); background: var(--gold); color: #fff; }
+.wallet-logo { width: 40px; height: 40px; object-fit: contain; margin: 0 auto 8px; display: block; }
+.wallet-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+.wallet-number { font-size: 12px; color: var(--gold-soft); font-weight: 700; }
+
+.m-upload {
+  position: relative; border: 2px dashed rgba(184,134,11,0.3); border-radius: 10px;
+  padding: 12px; text-align: center; cursor: none; font-size: 12px; color: var(--gray);
+  transition: border-color .2s, background .2s;
+}
+.m-upload:hover { border-color: rgba(184,134,11,0.5); background: rgba(184,134,11,0.03); }
+.m-upload input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#mScreenshotPreviewWrap { margin-top: 10px; }
+#mScreenshotPreviewWrap img { max-width: 140px; max-height: 140px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+
+.m-submit {
+  width: 100%; margin-top: 8px;
+  background: linear-gradient(135deg, var(--gold), #96700e); color: #FFFDF8;
+  border: none; padding: 15px; border-radius: 12px; font-family: 'Cairo', sans-serif;
+  font-size: 14px; font-weight: 900; cursor: none; transition: transform .15s, box-shadow .2s;
+}
+.m-submit:hover { transform: scale(1.01); box-shadow: 0 8px 28px rgba(184,134,11,0.3); }
+
+.modal-success { display: none; text-align: center; padding: 20px 10px; }
+.modal-success.show { display: block; }
+.modal-success .success-icon { font-size: 42px; margin-bottom: 14px; }
+.modal-success .success-title { font-size: 18px; font-weight: 900; margin-bottom: 10px; }
+.modal-success .success-sub { font-size: 13px; color: var(--gray); line-height: 1.9; }
+
+@media (max-width: 520px) {
+  .m-packages { grid-template-columns: 1fr; }
+  .m-field-row { grid-template-columns: 1fr; }
+  .wallets-grid { grid-template-columns: 1fr; }
+}
+/* ══ NAV RESPONSIVE ══ */
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+.nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--gold); border-radius: 2px; transition: all .3s; }
+@media (max-width: 768px) {
+  nav { width: calc(100% - 24px); padding: 12px 16px; left: 12px; right: 12px; transform: none; flex-wrap: wrap; gap: 8px; }
+  .nav-actions { gap: 6px; }
+  .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; background: rgba(10,10,13,0.97); border: 1px solid var(--border); border-radius: 12px; margin-top: 8px; padding: 16px; flex-direction: column; gap: 0; width: 100%; }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+  .nav-links a:last-child { border-bottom: none; }
+  .nav-cta { font-size: 11px; padding: 7px 14px; }
+  .nav-hamburger { display: flex; }
+}
+@media (max-width: 900px) {
+  .dashboard-frame { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .ai-dock { border-right: none; border-top: 1px solid rgba(255,255,255,0.05); }
+}
+@media (max-width: 768px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .bcard-wide { grid-column: span 1; }
+}
+@media (max-width: 768px) {
+  .consult-card { grid-template-columns: 1fr; }
+  .consult-divider { width: 100%; height: 1px; margin: 0 24px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { gap: 32px; }
+  .hero { padding: 100px 16px 60px; }
+  .hero-ctas { flex-direction: column; align-items: center; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .loader-logo { font-size: 28px; letter-spacing: 6px; }
+  .loader-status { font-size: 9px; letter-spacing: 2px; text-align: center; padding: 0 16px; }
+  .loader-bar-wrap { width: 160px; }
+  .loader-ready { font-size: 11px; letter-spacing: 4px; }
+}
+@media (max-width: 768px) {
+  /* Hero - تبقى في المنتصف زي الديسكتوب */
+  .hero {
+    padding: 100px 20px 60px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero-h1 {
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero-sub {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Stats */
+  .stats-grid {
+    gap: 32px;
+    justify-content: center;
+  }
+
+  /* Sections */
+  .section-wrap {
+    padding: 48px 16px;
+  }
+
+  .section-h2 {
+    font-size: clamp(22px, 6vw, 32px);
+  }
+
+  /* Modules */
+  .modules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Google Sign-In Button على الموبايل */
+  .google-signin-btn {
+    padding: 7px 12px;
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .google-signin-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+/* تنسيق الـ Navbar للموبايل لمنع الإزاحة */
+@media (max-width: 768px) {
+  nav {
+    position: fixed !important;
+    top: 16px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    transform: none !important;
+    padding: 12px 16px !important;
+    direction: rtl !important;
+  }
+}
+.rol-portal-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 40px;
+  border-radius: 24px;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(145deg, #0e0e18 0%, #0a0f1a 100%);
+  border: 1px solid rgba(0,229,255,0.15);
+  overflow: hidden;
+  cursor: none;
+  transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .35s;
+}
+.rol-portal-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0,229,255,0.4);
+  box-shadow: 0 24px 64px rgba(0,229,255,0.14), 0 0 0 1px rgba(0,229,255,0.25);
+}
+
+.rol-radar { position: relative; width: 110px; height: 110px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.rol-radar-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(0,229,255,0.3); }
+.rol-radar-ring.r1 { width: 110px; height: 110px; }
+.rol-radar-ring.r2 { width: 74px; height: 74px; }
+.rol-radar-ring.r3 { width: 40px; height: 40px; animation: rolPulse 2.4s ease-out infinite; }
+.rol-radar-core { position: relative; z-index: 2; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,229,255,0.14); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+.rol-radar-sweep {
+  position: absolute; width: 55px; height: 55px; top: 0; left: 0;
+  background: conic-gradient(from 0deg, rgba(0,229,255,0.55), transparent 45%);
+  border-radius: 50% 0 0 0;
+  transform-origin: bottom right;
+  animation: rolSweep 3s linear infinite;
+  opacity: .7;
+}
+@keyframes rolSweep { to { transform: rotate(360deg); } }
+@keyframes rolPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0,229,255,0.35); }
+  70%  { box-shadow: 0 0 0 22px rgba(0,229,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,229,255,0); }
+}
+
+.rol-portal-body { flex: 1; position: relative; z-index: 1; }
+.rol-eyebrow { font-size: 11px; letter-spacing: 3px; color: var(--cyber); font-weight: 700; margin-bottom: 8px; }
+.rol-portal-title { font-size: 22px; font-weight: 900; color: var(--white); margin-bottom: 8px; }
+.rol-portal-sub { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.8; margin-bottom: 18px; max-width: 480px; }
+.rol-stats { display: flex; gap: 28px; flex-wrap: wrap; }
+.rol-stat { font-size: 11px; color: rgba(255,255,255,0.4); display: flex; align-items: baseline; gap: 6px; }
+.rol-stat span { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--gold-soft); }
+
+.rol-portal-arrow {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--cyber);
+  transition: transform .3s, box-shadow .3s;
+}
+.rol-portal-card:hover .rol-portal-arrow { transform: translateX(-6px); box-shadow: 0 0 20px rgba(0,229,255,0.25); }
+
+@media (max-width: 768px) {
+  .rol-portal-card { flex-direction: column; text-align: center; padding: 32px 24px; }
+  .rol-stats { justify-content: center; }
+}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-glow"></div>
+
+<div id="loader">
+  <div class="loader-logo">LEGISTA</div>
+  <div class="loader-status">INITIALIZING LEGAL INTELLIGENCE...</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-ready" id="loaderReady">READY.</div>
+</div>
+
+<canvas id="bg-canvas"></canvas>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">LEGISTA</a>
+  <div class="nav-links">
+    <a href="#modules">الأقسام</a>
+    <a href="#dafou">الدفوع</a>
+    <a href="#esteshara">استشارة</a>
+    <a href="rol.html">رول الجلسات</a>
+    <a href="#">API</a>
+  </div>
+  <div class="nav-actions">
+    <button type="button" class="google-signin-btn" id="googleSignInBtn">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span id="googleSignInText">تسجيل بجوجل</span>
+    </button>
+    <button class="nav-hamburger" id="navHamburger" aria-label="القائمة">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div id="googleBtnHidden" aria-hidden="true"></div>
+
+<section class="hero">
+  <p class="hero-eyebrow">LEGAL OPERATING SYSTEM · GEN 2035</p>
+  <h1 class="hero-h1">
+    صياغة قانونية.<br>
+    <span class="line2">بدقة لا تعرف الخطأ.</span>
+  </h1>
+  <p class="hero-sub">
+    منصة قانونية ذكية تقوم بإنشاء العقود والمذكرات والإنذارات والعرائض في ثوانٍ معدودة — بمعايير تتخطى أعرق المكاتب القانونية.
+  </p>
+  <div class="hero-ctas">
+    <a href="inzarat.html" class="btn-primary">⚡ ابدأ التوليد الآن</a>
+    <a href="#modules" class="btn-secondary">← استكشف الأقسام</a>
+  </div>
+</section>
+
+<div class="stats-band reveal">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-num"><span id="stat1">0</span><span class="suffix">%</span></div>
+      <div class="stat-lbl">ACCURACY RATE</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span id="stat2">0</span><span class="suffix">+</span></div>
+      <div class="stat-lbl">LEGAL TEMPLATES</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">24<span class="suffix">/7</span></div>
+      <div class="stat-lbl">AVAILABILITY</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-wrap reveal" id="modules">
+  <p class="section-label">الأقسام القانونية</p>
+  <h2 class="section-h2">اختر قسمك.<br>ابدأ التوليد فوراً.</h2>
+  <div class="modules-grid">
+    <a href="3oqood.html" class="module-card active-card" onclick="return handleToolClick(event, '3oqood.html', true)">
+    <div class="module-icon cy">📄</div>
+      <div class="module-name">العقود</div>
+      <div class="module-count">+40 نوع</div>
+      <div class="module-badge">متاح الآن</div>
+    </a>
+    <a href="#" class="module-card">
+      <div class="module-icon">⚖️</div>
+      <div class="module-name">المذكرات</div>
+      <div class="module-count">+30 نوع</div>
+      <div class="module-badge soon">قريباً</div>
+    </a>
+    <a href="inzarat.html" class="module-card active-card" onclick="return handleToolClick(event, 'inzarat.html', true)">
+      <div class="module-icon cy">📨</div>
+      <div class="module-name">الإنذارات</div>
+      <div class="module-count">33 صيغة</div>
+      <div class="module-badge">متاح الآن</div>
+    </a>
+    <a href="junah.html" class="module-card active-card" onclick="return handleToolClick(event, 'junah.html', true)">
+      <div class="module-icon cy">⚖️</div>
+      <div class="module-name">الجنح المباشرة</div>
+      <div class="module-count">20 صيغة</div>
+      <div class="module-badge">متاح الآن</div>
+    </a>
+    <a href="dawawi.html" class="module-card active-card" onclick="return handleToolClick(event, 'dawawi.html', true)">
+  <div class="module-icon cy">📋</div>
+  <div class="module-name">صيغ الدعاوى</div>
+  <div class="module-count">20 صيغة</div>
+  <div class="module-badge">متاح الآن</div>
+</a>
+    <a href="#" class="module-card">
+      <div class="module-icon">🤝</div>
+      <div class="module-name">التوكيلات</div>
+      <div class="module-count">أنواع متعددة</div>
+      <div class="module-badge soon">قريباً</div>
+    </a>
+  </div>
+</div>
+<!-- ══ SECTION: الاشتراكات والأسعار ══ -->
+<div class="section-wrap reveal" id="pricing">
+  <p class="section-label">خطط الاشتراك</p>
+  <h2 class="section-h2">اشترك مرة واحدة.<br>استخدم كل حاجة من غير حدود.</h2>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-badge">الأكثر مرونة</div>
+      <div class="pricing-name">الاشتراك الشهري</div>
+      <div class="pricing-price">250<span> ج / شهريًا</span></div>
+      <ul class="pricing-features">
+        <li>✔ توليد غير محدود لكل العقود والصيغ</li>
+        <li>✔ الوصول لكل الأقسام (عقود، إنذارات، جنح، دعاوى، دفوع)</li>
+        <li>✔ حاسبة المواريث كاملة بدون حد استخدام</li>
+        <li>✔ تحديثات وصيغ جديدة أول بأول</li>
+        <li>✔ دعم فني بالأولوية</li>
+      </ul>
+      <button class="pricing-cta" onclick="openSubscribeModal('شهري', 250)">اشترك الآن ←</button>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-badge gold">وفّر أكتر</div>
+      <div class="pricing-name">الاشتراك السنوي</div>
+      <div class="pricing-price">500<span> ج / سنويًا</span></div>
+      <ul class="pricing-features">
+        <li>✔ كل مميزات الاشتراك الشهري</li>
+        <li>✔ بدل 3000 جنيه في السنة، بتدفع 500 بس</li>
+        <li>✔ أولوية في أي مميزات جديدة تتضاف</li>
+        <li>✔ دعم فني مباشر على مدار السنة</li>
+        <li>✔ سعر ثابت من غير زيادة طول مدة الاشتراك</li>
+      </ul>
+      <button class="pricing-cta gold" onclick="openSubscribeModal('سنوي', 500)">اشترك الآن ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION: الدفوع القانونية ══ -->
+<div class="section-wrap reveal" id="dafou">
+  <p class="section-label">مكتبة الدفوع القانونية</p>
+  <h2 class="section-h2">دفوعك القانونية.<br><span style="background:linear-gradient(90deg,var(--cyber),#0a6b53);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">جاهزة للمعركة.</span></h2>
+  <div class="dafou-grid">
+
+    <!-- كرت دفوع جنائية -->
+    <a href="dafou.html#jinai" class="dafou-card jinaiya" onclick="return handleToolClick(event, 'dafou.html#jinai', true)">
+      <div class="scan-line"></div>
+      <div class="dafou-top">
+        <div class="dafou-icon-wrap">⚔️</div>
+        <div class="dafou-badge">CRIMINAL · جنائي</div>
+      </div>
+      <div class="dafou-title">الدفوع الجنائية</div>
+      <div class="dafou-subtitle">CRIMINAL DEFENSE LIBRARY</div>
+      <div class="dafou-divider"></div>
+      <ul class="dafou-list">
+        <li>الدفع بانتفاء القصد الجنائي</li>
+        <li>الدفع بعدم الاختصاص الولائي</li>
+        <li>الدفع ببطلان إجراءات القبض</li>
+        <li>الدفع بانقضاء الدعوى الجنائية بالتقادم</li>
+        <li>الدفع بعدم جواز نظر الدعوى لسبق الفصل فيها</li>
+        <li>الدفع ببطلان الاعتراف لعيب في الإرادة</li>
+        <li>الدفع بانعدام الدليل أو قصوره</li>
+      </ul>
+      <div class="dafou-footer">
+        <div class="dafou-count">
+          <span>٢٤+</span>
+          دفع جنائي
+        </div>
+        <div class="dafou-arrow">←</div>
+      </div>
+    </a>
+
+    <!-- كرت دفوع مدنية -->
+    <a href="dafou.html#madani" class="dafou-card madaniya" onclick="return handleToolClick(event, 'dafou.html#madani', true)">
+      <div class="scan-line"></div>
+      <div class="dafou-top">
+        <div class="dafou-icon-wrap">🛡️</div>
+        <div class="dafou-badge">CIVIL · مدني</div>
+      </div>
+      <div class="dafou-title">الدفوع المدنية</div>
+      <div class="dafou-subtitle">CIVIL DEFENSE LIBRARY</div>
+      <div class="dafou-divider"></div>
+      <ul class="dafou-list">
+        <li>الدفع بعدم الاختصاص النوعي أو المحلي</li>
+        <li>الدفع بعدم القبول لانعدام الصفة</li>
+        <li>الدفع بسقوط الحق بالتقادم</li>
+        <li>الدفع بانعدام الأهلية القانونية</li>
+        <li>الدفع ببطلان صحيفة الدعوى</li>
+        <li>الدفع بإحالة الدعوى إلى محكمة مختصة</li>
+        <li>الدفع بوجود شرط التحكيم</li>
+      </ul>
+      <div class="dafou-footer">
+        <div class="dafou-count">
+          <span>٣٠+</span>
+          دفع مدني
+        </div>
+        <div class="dafou-arrow">←</div>
+      </div>
+    </a>
+
+  </div>
+</div>
+<!-- ══ SECTION: تحليل القضايا بالذكاء الاصطناعي ══ -->
+<div class="section-wrap reveal" id="tahlil">
+  <p class="section-label">تحليل ذكي فوري</p>
+  <h2 class="section-h2">اكتب وقايع قضيتك.<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">هيديك خطة دفاع كاملة.</span></h2>
+
+  <a href="tahlil.html" class="rol-portal-card" onclick="return handleToolClick(event, 'tahlil.html', false)">
+    <div class="rol-radar">
+      <div class="rol-radar-ring r1"></div>
+      <div class="rol-radar-ring r2"></div>
+      <div class="rol-radar-ring r3"></div>
+      <div class="rol-radar-sweep"></div>
+      <div class="rol-radar-core">🧠</div>
+    </div>
+    <div class="rol-portal-body">
+      <p class="rol-eyebrow">AI CASE ANALYSIS · تحليل القضايا</p>
+      <div class="rol-portal-title">تحليل القضية بالذكاء الاصطناعي</div>
+      <p class="rol-portal-sub">اكتبي أو احكيلي وقايع القضية بصوتك، وهيطلعلك ملخص الموقف القانوني، نقاط القوة والضعف، أقوى الدفوع المرتبطة بمكتبتنا القانونية، وسيناريوهات محتملة لمسار القضية.</p>
+      <div class="rol-stats">
+        <div class="rol-stat"><span>٢٣</span>قسم دفوع</div>
+        <div class="rol-stat"><span>ثواني</span>وقت التحليل</div>
+        <div class="rol-stat"><span>🎙️</span>إدخال صوتي</div>
+      </div>
+    </div>
+    <div class="rol-portal-arrow">←</div>
+  </a>
+</div>
+<!-- ══ SECTION: بوابة رول الجلسات ══ -->
+<div class="section-wrap reveal" id="rol">
+  <p class="section-label">استعلام سريع</p>
+  <h2 class="section-h2">استعلم عن رول جلستك.<br><span style="background:linear-gradient(90deg,var(--cyber),#0a6b53);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">في ثانية واحدة.</span></h2>
+
+  <a href="rol.html" class="rol-portal-card" onclick="return handleToolClick(event, 'rol.html', false)">
+    <div class="rol-radar">
+      <div class="rol-radar-ring r1"></div>
+      <div class="rol-radar-ring r2"></div>
+      <div class="rol-radar-ring r3"></div>
+      <div class="rol-radar-sweep"></div>
+      <div class="rol-radar-core">📡</div>
+    </div>
+    <div class="rol-portal-body">
+      <p class="rol-eyebrow">QUICK LOOKUP · استعلام سريع</p>
+      <div class="rol-portal-title">روابط رول الجلسات والنيابات</div>
+      <p class="rol-portal-sub">روابط مباشرة لكل دوائر ونيابات شرق وغرب الإسكندرية — تليجرام ودرايف في مكان واحد.</p>
+      <div class="rol-stats">
+        <div class="rol-stat"><span>٩٩</span>رابط</div>
+        <div class="rol-stat"><span>٥</span>نيابات ومحاكم</div>
+        <div class="rol-stat"><span>٢</span>منطقة</div>
+      </div>
+    </div>
+    <div class="rol-portal-arrow">←</div>
+  </a>
+</div>
+<!-- ══ SECTION: المواعيد والمدد القانونية ══ -->
+<div class="section-wrap reveal" id="mawaeed">
+  <p class="section-label">مرجع سريع لكل محامٍ</p>
+  <h2 class="section-h2">مش فاكر الميعاد؟<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">دوّر عليه واحسبه في ثواني.</span></h2>
+
+  <a href="mawaeed.html" class="rol-portal-card" onclick="return handleToolClick(event, 'mawaeed.html', false)">
+    <div class="rol-radar">
+      <div class="rol-radar-ring r1"></div>
+      <div class="rol-radar-ring r2"></div>
+      <div class="rol-radar-ring r3"></div>
+      <div class="rol-radar-sweep"></div>
+      <div class="rol-radar-core">⏱️</div>
+    </div>
+    <div class="rol-portal-body">
+      <p class="rol-eyebrow">LEGAL DEADLINES · المواعيد والمدد</p>
+      <div class="rol-portal-title">مرجع وحاسبة المواعيد القانونية</div>
+      <p class="rol-portal-sub">أكتر من 48 ميعادًا ومدة قانونية موزّعة على المدني، المرافعات، الإثبات، الأحوال الشخصية، ومحكمة الأسرة — دوّري بالكلمة أو رقم المادة، وفيه حاسبة بتحدد تاريخ انتهاء الميعاد تلقائيًا بمجرد ما تختاري تاريخ البداية.</p>
+      <div class="rol-stats">
+        <div class="rol-stat"><span>٤٨+</span>ميعاد ومدة</div>
+        <div class="rol-stat"><span>٥</span>أبواب قانونية</div>
+        <div class="rol-stat"><span>⏱️</span>حاسبة فورية</div>
+      </div>
+    </div>
+    <div class="rol-portal-arrow">←</div>
+  </a>
+</div>
+<!-- ══ SECTION: حاسبة المواريث الشرعية ══ -->
+<div class="section-wrap reveal" id="mawareeth">
+  <p class="section-label">فرائض شرعية دقيقة</p>
+  <h2 class="section-h2">اقسم التركة صح.<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">من غير ما تحسب على الورقة.</span></h2>
+
+  <a href="mawareeth.html" class="rol-portal-card" onclick="return handleToolClick(event, 'mawareeth.html', true)">
+    <div class="rol-radar">
+      <div class="rol-radar-ring r1"></div>
+      <div class="rol-radar-ring r2"></div>
+      <div class="rol-radar-ring r3"></div>
+      <div class="rol-radar-sweep"></div>
+      <div class="rol-radar-core">📜</div>
+    </div>
+    <div class="rol-portal-body">
+      <p class="rol-eyebrow">INHERITANCE ENGINE · حاسبة المواريث</p>
+      <div class="rol-portal-title">حاسبة المواريث الشرعية</div>
+      <p class="rol-portal-sub">محرك حساب دقيق يطبّق أحكام علم الفرائض (الحجب، الفروض، التعصيب، العول، الرد) على أكثر حالات الميراث شيوعًا، ويشرح لك سبب كل نصيب بالتفصيل، بما يتوافق مع الشريعة الإسلامية والقانون المصري رقم 77 لسنة 1943.</p>
+      <div class="rol-stats">
+        <div class="rol-stat"><span>١٢</span>وارث أساسي</div>
+        <div class="rol-stat"><span>ثواني</span>وقت الحساب</div>
+        <div class="rol-stat"><span>⚖️</span>عول ورد تلقائي</div>
+      </div>
+    </div>
+    <div class="rol-portal-arrow">←</div>
+  </a>
+</div>
+<!-- ══ SECTION: خريطة الجلسات والقاعات ══ -->
+<div class="section-wrap reveal" id="qaat">
+  <p class="section-label">دليل القاعات</p>
+  <h2 class="section-h2">مش عارف قاعتك فين؟<br><span style="background:linear-gradient(90deg,var(--cyber),#0a6b53);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">دوّر عليها في ثانية.</span></h2>
+
+  <a href="qaat.html" class="rol-portal-card" onclick="return handleToolClick(event, 'qaat.html', false)">
+    <div class="rol-radar">
+      <div class="rol-radar-ring r1"></div>
+      <div class="rol-radar-ring r2"></div>
+      <div class="rol-radar-ring r3"></div>
+      <div class="rol-radar-sweep"></div>
+      <div class="rol-radar-core">🏛️</div>
+    </div>
+    <div class="rol-portal-body">
+      <p class="rol-eyebrow">COURTROOM MAP · خريطة الجلسات</p>
+      <div class="rol-portal-title">خريطة قاعات وأدوار الجلسات</div>
+      <p class="rol-portal-sub">توزيع كامل لقاعات مجمع السيد كريم (المحكمة البحرية) ومجمع المحاكم الجديد — دوّري برقم الدائرة أو نوع القضية ولاقي القاعة والدور في ثانية واحدة.</p>
+      <div class="rol-stats">
+        <div class="rol-stat"><span>٢</span>مجمع محاكم</div>
+        <div class="rol-stat"><span>٢٩</span>قاعة</div>
+        <div class="rol-stat"><span>٦</span>أيام الأسبوع</div>
+      </div>
+    </div>
+    <div class="rol-portal-arrow">←</div>
+  </a>
+</div>
+<!-- ══ SECTION: الاستشارة مع أ. هدى خميس ══ -->
+<div class="section-wrap reveal" id="esteshara">
+  <p class="section-label">استشارة قانونية متخصصة</p>
+  <h2 class="section-h2">مش بس قوالب.<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">محامية حقيقية بتجاوبك.</span></h2>
+
+  <div class="consult-card">
+    <div class="consult-lawyer-side">
+      <div class="consult-avatar">⚖️</div>
+      <div class="consult-lawyer-info">
+        <div class="consult-name">أ. / هدى خميس</div>
+        <div class="consult-title">محامية بالنقض · دبلوم علوم جنائية</div>
+        <div class="consult-tags">
+          <span class="consult-tag">+25 سنة خبرة</span>
+          <span class="consult-tag">+1000 قضية</span>
+        </div>
+        <div class="consult-quote">"كل سؤال قانوني يستحق إجابة دقيقة من متخصص حقيقي."</div>
+      </div>
+    </div>
+
+    <div class="consult-divider"></div>
+
+    <div class="consult-prices-side">
+      <div class="consult-price-row">
+        <div class="consult-price-info">
+          <div class="consult-price-type">💬 استشارة كتابية</div>
+          <div class="consult-price-desc">رد مفصّل خلال 24 ساعة</div>
+        </div>
+        <div class="consult-price-val">150 <span>ج</span></div>
+      </div>
+      <div class="consult-price-row urgent-row">
+        <div class="consult-price-info">
+          <div class="consult-price-type">⚡ استشارة عاجلة</div>
+          <div class="consult-price-desc">رد خلال 3 ساعات</div>
+        </div>
+        <div class="consult-price-val">200 <span>ج</span></div>
+      </div>
+      <div class="consult-price-row call-row">
+        <div class="consult-price-info">
+          <div class="consult-price-type">📞 مكالمة هاتفية</div>
+          <div class="consult-price-desc">30 دقيقة مباشرة معها</div>
+        </div>
+        <div class="consult-price-val">300 <span>ج</span></div>
+      </div>
+      <a href="#" class="consult-cta" onclick="openEstesharaModal();return false;">ابدأ استشارتك الآن ←</a>
+    </div>
+  </div>
+</div>
+<div class="section-wrap reveal">
+  <p class="section-label">المميزات الجوهرية</p>
+  <h2 class="section-h2">نظام تشغيل قانوني.<br>لا مجرد قوالب.</h2>
+  <div class="bento-grid">
+    <div class="bcard bcard-wide bcard-cyber" style="display:flex;align-items:center;justify-content:space-between;gap:32px">
+      <div>
+        <div class="bcard-icon icon-cyber">⚡</div>
+        <h3>محرك التوليد الفوري</h3>
+        <p>من طلبك إلى محرر قانوني مكتمل بكل بنوده — في ثوانٍ معدودة. محرك مُدرَّب على أكثر من مليون محرر قانوني معتمد.</p>
+        <div class="progress-bar-wrap" style="margin-top:16px"><div class="progress-bar-fill"></div></div>
+        <p style="font-size:11px;color:var(--gray);margin-top:6px;letter-spacing:1px">كفاءة التوليد ٩٢٪</p>
+      </div>
+      <div style="text-align:center;min-width:150px">
+        <div class="speed-num">4.2<span class="speed-unit">ث</span></div>
+        <div style="font-size:11px;color:var(--gray);margin-top:6px;letter-spacing:2px">متوسط التوليد</div>
+      </div>
+    </div>
+    <div class="bcard">
+      <div class="bcard-icon icon-gold">🛡️</div>
+      <h3>تشفير عسكري</h3>
+      <p>حماية بمعيار AES-256. بياناتك لا تُخزَّن ولا تُشارَك أبداً.</p>
+    </div>
+    <div class="bcard" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div class="big-counter" id="mainCounter">0</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:8px;letter-spacing:3px">DOCUMENT GENERATED</div>
+    </div>
+    <div class="bcard bcard-cyber">
+      <div class="bcard-icon icon-cyber">🔍</div>
+      <h3>مراجعة ثغرات صفرية</h3>
+      <p>الذكاء الاصطناعي يفحص كل بند ويكتشف الغموض والثغرات القانونية قبل التوقيع.</p>
+    </div>
+    <div class="bcard bcard-wide">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:20px">
+        <div style="flex:1">
+          <div class="bcard-icon icon-green">✦</div>
+          <h3>مكتبة +5000 قالب قانوني</h3>
+          <p>عقود شراكة، عمل، إيجار، بيع، سرية، وكالة، إنذارات، عرائض — وأكثر من 200 فئة قانونية متخصصة.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:170px">
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--gray);display:flex;justify-content:space-between;align-items:center"><span>الإنذارات</span><span style="color:var(--success);font-size:10px">● نشط الآن</span></div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--gray);display:flex;justify-content:space-between;align-items:center"><span>عقود الشراكة</span><span style="color:var(--gold);font-size:10px">○ قريباً</span></div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--gray);display:flex;justify-content:space-between;align-items:center"><span>المذكرات القضائية</span><span style="color:var(--gold);font-size:10px">○ قريباً</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-wrap reveal" id="feedback">
+  <p class="section-label">شاركنا رأيك</p>
+  <h2 class="section-h2">واجهتك مشكلة أو عندك اقتراح؟<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">قوللنا وهنسمعك.</span></h2>
+
+  <div class="complaint-card">
+    <form id="feedbackForm">
+      <div class="complaint-type-toggle">
+        <button type="button" class="complaint-type-btn active" data-type="شكوى" onclick="setFeedbackType('شكوى', this)">⚠️ شكوى</button>
+        <button type="button" class="complaint-type-btn" data-type="اقتراح" onclick="setFeedbackType('اقتراح', this)">💡 اقتراح</button>
+      </div>
+
+      <div class="complaint-field">
+        <label class="complaint-label">اسمك (اختياري)</label>
+        <input type="text" class="complaint-input" id="fbName" placeholder="اكتب اسمك">
+      </div>
+
+      <div class="complaint-field">
+        <label class="complaint-label">تفاصيل الشكوى أو الاقتراح</label>
+        <textarea class="complaint-textarea" id="fbMessage" placeholder="احكيلنا المشكلة اللي واجهتك أو الفكرة اللي عندك بالتفصيل..." required></textarea>
+      </div>
+
+      <div class="complaint-field">
+        <label class="complaint-label">إرفاق صورة للمشكلة (اختياري)</label>
+        <div class="complaint-upload" id="uploadBox">
+          <div class="complaint-upload-icon">📎</div>
+          <div class="complaint-upload-text">اضغط هنا أو اسحب الصورة عشان ترفعها</div>
+          <input type="file" id="fbImage" accept="image/*">
+        </div>
+        <div id="previewWrap"></div>
+      </div>
+
+      <button type="submit" class="btn-primary complaint-submit">إرسال ←</button>
+    </form>
+
+    <div class="complaint-success" id="fbSuccess">
+      <div style="font-size:36px;margin-bottom:12px">✅</div>
+      <h3 style="font-size:17px;font-weight:900;color:var(--white);margin-bottom:8px">تم استلام رسالتك</h3>
+      <p style="font-size:13px;color:var(--gray);line-height:1.8">شكراً لتواصلك معانا — فريقنا هيراجع الـ<span id="fbTypeEcho">شكوى</span> بتاعتك ويرد عليك في أقرب وقت.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">LEGISTA</div>
+  <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
+</footer>
+
+<!-- ══ FLOATING CTA ══ -->
+<a href="#" class="float-cta" id="floatCta" onclick="openEstesharaModal();return false;">
+  <span class="float-cta-icon">⚖️</span>
+  <span class="float-cta-text">استشارة قانونية</span>
+</a>
+
+<!-- ══ ESTESHARA PAYMENT MODAL ══ -->
+<div class="modal-overlay" id="estesharaModal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="closeEstesharaModal()">✕</button>
+
+    <form id="modalFormWrap">
+      <p class="modal-eyebrow">استشارة قانونية متخصصة</p>
+      <h3 class="modal-title">احجز استشارتك مع أ. هدى خميس</h3>
+
+      <p class="modal-section-label">1) اختار نوع الاستشارة</p>
+      <div class="m-packages" id="mPackagesWrap">
+        <div class="m-package selected" data-type="كتابية" data-price="150" onclick="selectMPackage(this)">
+          <div class="m-package-check">✓</div>
+          <div class="m-package-icon">💬</div>
+          <div class="m-package-name">كتابية</div>
+          <div class="m-package-desc">رد خلال 24 ساعة</div>
+          <div class="m-package-price">150 <span>ج</span></div>
+        </div>
+        <div class="m-package" data-type="عاجلة" data-price="200" onclick="selectMPackage(this)">
+          <div class="m-package-check">✓</div>
+          <div class="m-package-icon">⚡</div>
+          <div class="m-package-name">عاجلة</div>
+          <div class="m-package-desc">رد خلال 3 ساعات</div>
+          <div class="m-package-price">200 <span>ج</span></div>
+        </div>
+        <div class="m-package" data-type="مكالمة هاتفية" data-price="300" onclick="selectMPackage(this)">
+          <div class="m-package-check">✓</div>
+          <div class="m-package-icon">📞</div>
+          <div class="m-package-name">مكالمة</div>
+          <div class="m-package-desc">30 دقيقة مباشرة</div>
+          <div class="m-package-price">300 <span>ج</span></div>
+        </div>
+      </div>
+
+      <p class="modal-section-label">2) بياناتك</p>
+      <div class="m-field-row">
+        <div class="m-field">
+          <label>الاسم الكامل</label>
+          <input type="text" id="mName" required placeholder="اكتب اسمك">
+        </div>
+        <div class="m-field">
+          <label>رقم الموبايل (واتساب)</label>
+          <input type="tel" id="mPhone" required placeholder="01xxxxxxxxx">
+        </div>
+      </div>
+      <div class="m-field">
+        <label>تفاصيل الاستشارة</label>
+        <textarea id="mMessage" required placeholder="احكيلها وقايع المشكلة أو السؤال القانوني اللي عندك..."></textarea>
+      </div>
+
+      <p class="modal-section-label">3) الدفع — حوّل قيمة الاستشارة (<span id="mPriceEcho">150</span> ج) على أي محفظة</p>
+      <div class="wallets-grid">
+        <div class="wallet-card selected" data-wallet="orange" onclick="selectWallet(this)">
+          <div class="wallet-check">✓</div>
+          <div class="wallet-logo" style="display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,102,0,0.12);border-radius:10px;">🟠</div>
+          <div class="wallet-name">أورنج كاش</div>
+          <div class="wallet-number" dir="ltr">01287750049</div>
+        </div>
+        <div class="wallet-card" data-wallet="vodafone" onclick="selectWallet(this)">
+          <div class="wallet-check">✓</div>
+          <div class="wallet-logo" style="display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(229,0,0,0.12);border-radius:10px;">🔴</div>
+          <div class="wallet-name">فودافون كاش</div>
+          <div class="wallet-number" dir="ltr">01021472439</div>
+        </div>
+      </div>
+
+      <div class="m-field-row" style="margin-top:16px">
+        <div class="m-field">
+          <label>حوّلت من رقم إيه؟</label>
+          <input type="tel" id="mSenderNumber" required placeholder="01xxxxxxxxx">
+        </div>
+        <div class="m-field">
+          <label>إرفاق سكرين شوت التحويل</label>
+          <div class="m-upload" id="mUploadBox">
+            <span id="mUploadLabel">📎 اضغط لرفع صورة التحويل</span>
+            <input type="file" id="mScreenshot" accept="image/*" required>
+          </div>
+        </div>
+      </div>
+      <div id="mScreenshotPreviewWrap"></div>
+
+      <button type="submit" class="m-submit">تأكيد الدفع وإرسال الطلب ←</button>
+    </form>
+
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-icon">✅</div>
+      <div class="success-title">تم استلام طلبك</div>
+      <p class="success-sub">شكراً <strong id="mSuccessName"></strong> — طلب الاستشارة (<span id="mSuccessType"></span>) ومعاه إثبات التحويل وصلوا، وهنراجع التحويل ونتواصل معاك على <span id="mSuccessPhone"></span> في أقرب وقت.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUBSCRIBE PAYMENT MODAL ══ -->
+<div class="modal-overlay" id="subscribeModal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="closeSubscribeModal()">✕</button>
+
+    <form id="subscribeFormWrap">
+      <p class="modal-eyebrow">الاشتراك في LEGISTA</p>
+      <h3 class="modal-title">اشترك في الباقة <span id="subPlanEcho">الشهرية</span></h3>
+
+      <p class="modal-section-label">1) قيمة الاشتراك — <span id="subPriceEcho">250</span> جنيه</p>
+
+      <p class="modal-section-label">2) الدفع — حوّل قيمة الاشتراك على أي محفظة</p>
+      <div class="wallets-grid">
+        <div class="wallet-card selected" data-wallet="orange" onclick="selectSubWallet(this)">
+          <div class="wallet-check">✓</div>
+          <div class="wallet-logo" style="display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,102,0,0.12);border-radius:10px;">🟠</div>
+          <div class="wallet-name">أورنج كاش</div>
+          <div class="wallet-number" dir="ltr">01287750049</div>
+        </div>
+        <div class="wallet-card" data-wallet="vodafone" onclick="selectSubWallet(this)">
+          <div class="wallet-check">✓</div>
+          <div class="wallet-logo" style="display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(229,0,0,0.12);border-radius:10px;">🔴</div>
+          <div class="wallet-name">فودافون كاش</div>
+          <div class="wallet-number" dir="ltr">01021472439</div>
+        </div>
+      </div>
+
+      <div class="m-field-row" style="margin-top:16px">
+        <div class="m-field">
+          <label>حوّلت من رقم إيه؟</label>
+          <input type="tel" id="subSenderNumber" required placeholder="01xxxxxxxxx">
+        </div>
+        <div class="m-field">
+          <label>إرفاق سكرين شوت التحويل</label>
+          <div class="m-upload" id="subUploadBox">
+            <span id="subUploadLabel">📎 اضغط لرفع صورة التحويل</span>
+            <input type="file" id="subScreenshot" accept="image/*" required>
+          </div>
+        </div>
+      </div>
+      <div id="subScreenshotPreviewWrap"></div>
+
+      <button type="submit" class="m-submit">تأكيد الدفع وإرسال طلب الاشتراك ←</button>
+    </form>
+
+    <div class="modal-success" id="subModalSuccess">
+      <div class="success-icon">✅</div>
+      <div class="success-title">تم استلام طلب الاشتراك</div>
+      <p class="success-sub">هنراجع التحويل ونفعّل اشتراكك خلال وقت قصير. هتوصلك رسالة على واتساب أو تلاقي اشتراكك اتفعّل تلقائي لما تدخل الموقع تاني.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  // Hamburger menu
+document.getElementById('navHamburger').addEventListener('click', () => {
+  document.querySelector('.nav-links').classList.toggle('open');
+});
+
+// ══ Feedback / Complaints form ══
+let fbCurrentType = 'شكوى';
+function setFeedbackType(type, btn) {
+  fbCurrentType = type;
+  document.querySelectorAll('.complaint-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+const fbImageInput = document.getElementById('fbImage');
+const previewWrap = document.getElementById('previewWrap');
+let fbImageData = null;
+fbImageInput.addEventListener('change', () => {
+  const file = fbImageInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    fbImageData = e.target.result;
+    previewWrap.innerHTML = `
+      <div class="complaint-preview">
+        <img src="${fbImageData}" alt="معاينة الصورة المرفقة">
+        <button type="button" class="complaint-preview-remove" onclick="removeFbImage()">✕</button>
+      </div>`;
+  };
+  reader.readAsDataURL(file);
+});
+function removeFbImage() {
+  fbImageData = null;
+  fbImageInput.value = '';
+  previewWrap.innerHTML = '';
+}
+
+// ══ Esteshara payment modal ══
+function openEstesharaModal() {
+  document.getElementById('estesharaModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeEstesharaModal() {
+  document.getElementById('estesharaModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('estesharaModal').addEventListener('click', e => {
+  if (e.target.id === 'estesharaModal') closeEstesharaModal();
+});
+
+function selectMPackage(card) {
+  document.querySelectorAll('.m-package').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('mPriceEcho').textContent = card.dataset.price;
+}
+function selectWallet(card) {
+  document.querySelectorAll('.wallet-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+let mScreenshotData = null;
+const mScreenshotInput = document.getElementById('mScreenshot');
+mScreenshotInput.addEventListener('change', () => {
+  const file = mScreenshotInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    mScreenshotData = e.target.result;
+    document.getElementById('mUploadLabel').textContent = '✅ ' + file.name;
+    document.getElementById('mScreenshotPreviewWrap').innerHTML = `<img src="${mScreenshotData}" alt="سكرين شوت التحويل">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('modalFormWrap').addEventListener('submit', e => {
+  e.preventDefault();
+  const pkg = document.querySelector('.m-package.selected');
+  const wallet = document.querySelector('.wallet-card.selected');
+  const payload = {
+    package: pkg.dataset.type,
+    price: pkg.dataset.price,
+    name: document.getElementById('mName').value.trim(),
+    phone: document.getElementById('mPhone').value.trim(),
+    message: document.getElementById('mMessage').value.trim(),
+    wallet: wallet.dataset.wallet,
+    senderNumber: document.getElementById('mSenderNumber').value.trim(),
+    screenshot: mScreenshotData
+  };
+  // ملاحظة: الصفحة دي static فمفيش سيرفر يستقبل البيانات فعليًا —
+  // لازم تربط الفورم ده بباك-إند حقيقي (زي Firebase الموجود بالفعل في المشروع) عشان طلبات الدفع توصل فعلاً.
+  console.log('Esteshara payment request submitted:', payload);
+
+  document.getElementById('mSuccessName').textContent = payload.name;
+  document.getElementById('mSuccessType').textContent = payload.package;
+  document.getElementById('mSuccessPhone').textContent = payload.phone;
+  document.getElementById('modalFormWrap').style.display = 'none';
+  document.getElementById('modalSuccess').classList.add('show');
+});
+
+document.getElementById('feedbackForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const payload = {
+    type: fbCurrentType,
+    name: document.getElementById('fbName').value.trim(),
+    message: document.getElementById('fbMessage').value.trim(),
+    image: fbImageData
+  };
+  // ملاحظة: الصفحة دي static فمفيش سيرفر يستقبل البيانات فعليًا —
+  // لازم تربط الفورم ده بخدمة زي Formspree أو EmailJS أو الباك-إند بتاعك عشان الرسائل توصلّك فعلاً.
+  console.log('Feedback submitted:', payload);
+  document.getElementById('fbTypeEcho').textContent = fbCurrentType;
+  document.getElementById('feedbackForm').style.display = 'none';
+  document.getElementById('fbSuccess').classList.add('show');
+});
+const cur = document.getElementById('cursor');
+const curGlow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  curGlow.style.left = e.clientX + 'px'; curGlow.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('button, a, .bcard, .sidebar-item, .ai-suggestion, .doc-row, .module-card, .dafou-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width='24px'; cur.style.height='24px'; cur.style.opacity='0.7'; });
+  el.addEventListener('mouseleave', () => { cur.style.width='12px'; cur.style.height='12px'; cur.style.opacity='1'; });
+});
+
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('loaderReady').style.opacity='1'; document.getElementById('loaderReady').style.animation='fadeInLogo .4s forwards'; }, 2500);
+  setTimeout(() => {
+    const loader = document.getElementById('loader');
+    loader.style.transition = 'opacity .6s'; loader.style.opacity = '0';
+    setTimeout(() => loader.style.display = 'none', 600);
+  }, 3200);
+});
+
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const streams = Array.from({length: 16}, () => ({ x: Math.random()*1200, y: Math.random()*-800, speed: 0.3+Math.random()*0.5, chars: Array.from({length:20}, ()=>String.fromCharCode(0x600+Math.floor(Math.random()*100))), opacity: 0.03+Math.random()*0.04 }));
+function drawBG() {
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(212,175,55,0.03)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const grad=ctx.createRadialGradient(W/2,H*0.35,0,W/2,H*0.35,W*0.4);
+  grad.addColorStop(0,'rgba(0,229,255,0.025)'); grad.addColorStop(1,'transparent');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+  ctx.font='11px Cairo';
+  streams.forEach(s=>{
+    ctx.fillStyle=`rgba(0,229,255,${s.opacity})`;
+    s.chars.forEach((c,i)=>{if(s.y+i*16>0&&s.y+i*16<H)ctx.fillText(c,s.x%W,s.y+i*16);});
+    s.y+=s.speed; if(s.y>H+200){s.y=-300;s.x=Math.random()*W;}
+    s.chars=s.chars.map(()=>Math.random()>0.98?String.fromCharCode(0x600+Math.floor(Math.random()*100)):s.chars[Math.floor(Math.random()*s.chars.length)]);
+  });
+  requestAnimationFrame(drawBG);
+}
+drawBG();
+
+function createParticle() {
+  const p=document.createElement('div'); p.className='particle';
+  const size=1+Math.random()*2;
+  p.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}vw;background:rgba(212,175,55,${0.2+Math.random()*0.4});animation-duration:${10+Math.random()*20}s;animation-delay:${Math.random()*10}s;`;
+  document.body.appendChild(p); setTimeout(()=>p.remove(),30000);
+}
+setInterval(createParticle, 800);
+
+window.addEventListener('scroll', ()=>{ document.getElementById('mainNav').classList.toggle('scrolled',scrollY>60); });
+const observer=new IntersectionObserver(entries=>{ entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}); },{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+function animCount(elId,target){
+  let v=0; const el=document.getElementById(elId); const step=target/60;
+  const t=setInterval(()=>{ v=Math.min(v+step,target); el.textContent=Math.round(v).toLocaleString('ar-EG'); if(v>=target)clearInterval(t); },25);
+}
+const statsObs=new IntersectionObserver(entries=>{ if(entries[0].isIntersecting){animCount('stat1',98.9);animCount('stat2',5000);statsObs.disconnect();} },{threshold:0.5});
+statsObs.observe(document.querySelector('.stats-band'));
+
+let cVal=0,cTarget=1249312;
+function runCounter(){ cVal+=Math.ceil((cTarget-cVal)/40); if(cVal>cTarget)cVal=cTarget; document.getElementById('mainCounter').textContent=cVal.toLocaleString('ar-EG'); if(cVal<cTarget)requestAnimationFrame(runCounter); }
+const cntObs=new IntersectionObserver(e=>{if(e[0].isIntersecting){runCounter();cntObs.disconnect();}},{threshold:0.3});
+cntObs.observe(document.querySelector('.bento-grid'));
+// ══ Google Sign-In (بدون prompt — يمنع كسر الـ layout على الموبايل) ══
+const GOOGLE_CLIENT_ID = '330964633875-mbfh0ddlsdgkpcrjlvllssgqdj4ldbf1.apps.googleusercontent.com';
+let googleInitialized = false;
+
+function cleanupGoogleArtifacts() {
+  document.querySelectorAll(
+    '#credential_picker_container, #credential_picker_iframe, .credential_picker_container, ' +
+    'iframe[src*="accounts.google.com"], iframe[src*="google.com/gsi"], div[id^="credential_picker"]'
+  ).forEach(el => {
+    if (el.closest('#googleBtnHidden')) return;
+    el.remove();
+  });
+  document.body.style.removeProperty('overflow');
+  document.body.style.removeProperty('padding-right');
+  document.body.style.removeProperty('margin-right');
+  document.body.style.removeProperty('padding-left');
+  document.body.style.removeProperty('margin-left');
+  document.documentElement.style.overflowX = 'hidden';
+}
+
+function handleGoogleCredential(response) {
+  const base64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  const payload = JSON.parse(jsonPayload);
+
+  const userData = {
+    name: payload.name,
+    email: payload.email,
+    picture: payload.picture,
+    token: response.credential
+  };
+
+  localStorage.setItem('legista_user', JSON.stringify(userData));
+  updateSignInUI(userData);
+  import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js").then(({initializeApp}) => {
+  import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({getFirestore, doc, setDoc}) => {
+    const app = initializeApp({
+      apiKey: "AIzaSyC6PRK7EECoPF3qDawVSRYmMg0uufTs6Xw",
+      authDomain: "legista-o.firebaseapp.com",
+      projectId: "legista-o",
+      appId: "1:964258159036:web:a3a66d4f5ea38f9964f3b9"
+    }, "legista-save");
+    const db = getFirestore(app);
+    setDoc(doc(db, "users", userData.email), {
+      name: userData.name,
+      email: userData.email,
+      picture: userData.picture,
+      subscription: "free",
+      createdAt: Date.now()
+    }, { merge: true });
+  });
+});
+  cleanupGoogleArtifacts();
+  setTimeout(cleanupGoogleArtifacts, 300);
+  setTimeout(cleanupGoogleArtifacts, 1000);
+}
+
+function updateSignInUI(user) {
+  const btn = document.getElementById('googleSignInBtn');
+  const text = document.getElementById('googleSignInText');
+  if (!btn || !text) return;
+
+  if (user) {
+    btn.classList.add('signed-in');
+    const maxLen = window.innerWidth <= 768 ? 12 : 20;
+    text.textContent = user.name.length > maxLen ? user.name.slice(0, maxLen) + '…' : user.name;
+  } else {
+    btn.classList.remove('signed-in');
+    text.textContent = 'تسجيل بجوجل';
+  }
+}
+
+function initGoogleSignIn() {
+  if (googleInitialized || typeof google === 'undefined') return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+    use_fedcm_for_prompt: false
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('googleBtnHidden'),
+    { type: 'standard', theme: 'outline', size: 'large', width: 200, locale: 'ar' }
+  );
+  googleInitialized = true;
+}
+
+function triggerGoogleLogin() {
+  initGoogleSignIn();
+  const gBtn = document.querySelector('#googleBtnHidden div[role="button"]');
+  if (gBtn) {
+    gBtn.click();
+  } else {
+    setTimeout(() => {
+      document.querySelector('#googleBtnHidden div[role="button"]')?.click();
+    }, 200);
+  }
+}
+
+function waitForGoogle(cb) {
+  if (typeof google !== 'undefined' && google.accounts) cb();
+  else setTimeout(() => waitForGoogle(cb), 100);
+}
+
+waitForGoogle(() => {
+  initGoogleSignIn();
+  const saved = localStorage.getItem('legista_user');
+  if (saved) {
+    try { updateSignInUI(JSON.parse(saved)); } catch (e) { localStorage.removeItem('legista_user'); }
+  }
+  cleanupGoogleArtifacts();
+});
+
+let googleCleanupTimer;
+new MutationObserver(() => {
+  clearTimeout(googleCleanupTimer);
+  googleCleanupTimer = setTimeout(cleanupGoogleArtifacts, 150);
+}).observe(document.body, { childList: true, subtree: true });
+
+document.getElementById('googleSignInBtn').addEventListener('click', () => {
+  const saved = localStorage.getItem('legista_user');
+  if (saved) {
+    localStorage.removeItem('legista_user');
+    location.reload();
+  } else {
+    window.location.href = 'login.html';
+  }
+});
+</script>
+
+<!-- ══ SHARED FIREBASE INIT (visits, maintenance, feedback, payments, subscriptions) ══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC6PRK7EECoPF3qDawVSRYmMg0uufTs6Xw",
+  authDomain: "legista-o.firebaseapp.com",
+  projectId: "legista-o",
+  appId: "1:964258159036:web:a3a66d4f5ea38f9964f3b9"
+};
+const app = initializeApp(firebaseConfig, "legista-site");
+const db = getFirestore(app);
+
+window._db = db;
+window._fs = { doc, getDoc, setDoc, updateDoc, addDoc, collection, increment };
+window.dispatchEvent(new Event('legista-firebase-ready'));
+</script>
+
+<script>
+function withLegistaDb(cb) {
+  if (window._db) { cb(); return; }
+  window.addEventListener('legista-firebase-ready', cb, { once: true });
+}
+
+/* ══ RESUME PENDING ACTION AFTER RETURNING FROM LOGIN ══ */
+(function resumePendingAction() {
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get('action');
+  if (!action) return;
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) return; // not actually logged in yet, nothing to resume
+
+  if (action === 'subscribe') {
+    const plan = params.get('plan') || 'شهري';
+    const price = parseInt(params.get('price'), 10) || 250;
+    window.addEventListener('load', () => setTimeout(() => openSubscribeModal(plan, price), 300));
+  } else if (action === 'tool') {
+    const href = params.get('href');
+    const trial = params.get('trial') === '1';
+    if (href) {
+      window.addEventListener('load', () => setTimeout(() => {
+        handleToolClick({ preventDefault(){} }, href, trial);
+      }, 300));
+    }
+  }
+  // نضف الرابط من البارامترات عشان لو حد عمل ريفريش ميتكررش نفس الفعل
+  const cleanUrl = window.location.pathname;
+  window.history.replaceState({}, document.title, cleanUrl);
+})();
+
+/* ══ TOAST HELPER ══ */
+(function () {
+  const t = document.createElement('div');
+  t.id = 'legistaToast';
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:700;font-family:Cairo,sans-serif;z-index:99998;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;';
+  document.body.appendChild(t);
+})();
+function showLegistaToast(msg) {
+  const t = document.getElementById('legistaToast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(-6px)';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  }, 2800);
+}
+
+/* ══ VISIT TRACKING ══ */
+withLegistaDb(async () => {
+  const { doc, setDoc, increment } = window._fs;
+  const todayKey = new Date().toISOString().slice(0, 10);
+  try {
+    await setDoc(doc(window._db, 'visits', todayKey), { count: increment(1) }, { merge: true });
+  } catch (e) {}
+});
+
+/* ══ MAINTENANCE MODE CHECK ══ */
+withLegistaDb(async () => {
+  const { doc, getDoc } = window._fs;
+  try {
+    const snap = await getDoc(doc(window._db, 'siteSettings', 'config'));
+    if (snap.exists() && snap.data().maintenanceMode) {
+      showMaintenanceOverlay(snap.data().maintenanceMessage || 'جارٍ الآن إجراء بعض الإصلاحات');
+    }
+  } catch (e) {}
+});
+function showMaintenanceOverlay(msg) {
+  const ov = document.createElement('div');
+  ov.id = 'maintenanceOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(10,10,13,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-family:Cairo,sans-serif;padding:24px;';
+  ov.innerHTML = `<div><div style="font-size:44px;margin-bottom:18px;">🛠️</div><div style="font-size:21px;font-weight:900;max-width:420px;">${msg}</div><div style="font-size:13px;opacity:.65;margin-top:12px;">من فضلك حاول تاني بعد شوية</div></div>`;
+  document.body.appendChild(ov);
+  document.body.style.overflow = 'hidden';
+}
+
+/* ══ LOGIN + SUBSCRIPTION/TRIAL GATING FOR TOOL LINKS ══ */
+function handleToolClick(e, href, isTrialLimited) {
+  e.preventDefault();
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) {
+    showLegistaToast('سجل الدخول أولاً عشان تقدر تستخدم الأداة دي');
+    const returnUrl = window.location.pathname.split('/').pop() + '?action=tool&href=' + encodeURIComponent(href) + '&trial=' + (isTrialLimited ? '1' : '0');
+    setTimeout(() => { window.location.href = 'login.html?next=' + encodeURIComponent(returnUrl); }, 600);
+    return false;
+  }
+
+  if (!isTrialLimited) { window.location.href = href; return false; }
+
+  const user = JSON.parse(saved);
+  withLegistaDb(async () => {
+    const { doc, getDoc, setDoc } = window._fs;
+    const userRef = doc(window._db, 'users', user.email);
+    let data = {};
+    try {
+      const snap = await getDoc(userRef);
+      data = snap.exists() ? snap.data() : {};
+    } catch (e) {}
+
+    const isSubscribed = data.subscription === 'paid' && data.subscriptionExpiry && data.subscriptionExpiry > Date.now();
+    if (isSubscribed) { window.location.href = href; return; }
+
+    const toolKey = href.split('#')[0].replace('.html', '');
+    const trials = data.trials || {};
+    const used = trials[toolKey] || 0;
+
+    if (used < 2) {
+      trials[toolKey] = used + 1;
+      try { await setDoc(userRef, { trials }, { merge: true }); } catch (e) {}
+      window.location.href = href;
+      return;
+    }
+
+    showLegistaToast('خلصت المحاولات المجانية (مرتين) لقسم "' + toolKey + '" — اشترك عشان تكمل بدون حدود');
+    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+  });
+  return false;
+}
+
+/* ══ SUBSCRIBE MODAL ══ */
+let subCurrentPlan = 'شهري', subCurrentPrice = 250, subScreenshotData = null;
+
+function openSubscribeModal(plan, price) {
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) {
+    showLegistaToast('سجل الدخول أولاً عشان تقدر تشترك');
+    const returnUrl = window.location.pathname.split('/').pop() + '?action=subscribe&plan=' + encodeURIComponent(plan) + '&price=' + price;
+    setTimeout(() => { window.location.href = 'login.html?next=' + encodeURIComponent(returnUrl); }, 600);
+    return;
+  }
+  subCurrentPlan = plan;
+  subCurrentPrice = price;
+  document.getElementById('subPlanEcho').textContent = plan === 'سنوي' ? 'السنوية' : 'الشهرية';
+  document.getElementById('subPriceEcho').textContent = price;
+  document.getElementById('subscribeModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSubscribeModal() {
+  document.getElementById('subscribeModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('subscribeModal').addEventListener('click', e => {
+  if (e.target.id === 'subscribeModal') closeSubscribeModal();
+});
+function selectSubWallet(card) {
+  document.querySelectorAll('#subscribeModal .wallet-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+document.getElementById('subScreenshot').addEventListener('change', () => {
+  const file = document.getElementById('subScreenshot').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    subScreenshotData = e.target.result;
+    document.getElementById('subUploadLabel').textContent = '✅ ' + file.name;
+    document.getElementById('subScreenshotPreviewWrap').innerHTML = `<img src="${subScreenshotData}" style="max-width:140px;max-height:140px;border-radius:10px;border:1px solid rgba(255,255,255,0.1)" alt="سكرين شوت التحويل">`;
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('subscribeFormWrap').addEventListener('submit', e => {
+  e.preventDefault();
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) { showLegistaToast('سجل الدخول أولاً'); return; }
+  const user = JSON.parse(saved);
+  const wallet = document.querySelector('#subscribeModal .wallet-card.selected');
+  const payload = {
+    email: user.email,
+    name: user.name,
+    package: subCurrentPlan,
+    price: subCurrentPrice,
+    wallet: wallet.dataset.wallet,
+    senderNumber: document.getElementById('subSenderNumber').value.trim(),
+    screenshot: subScreenshotData,
+    status: 'pending',
+    createdAt: Date.now()
+  };
+  withLegistaDb(async () => {
+    const { collection, addDoc } = window._fs;
+    try {
+      await addDoc(collection(window._db, 'paymentRequests'), payload);
+    } catch (err) { console.error(err); }
+  });
+  document.getElementById('subscribeFormWrap').style.display = 'none';
+  document.getElementById('subModalSuccess').classList.add('show');
+});
+
+/* ══ CONNECT FEEDBACK FORM TO FIRESTORE ══ */
+(function () {
+  const form = document.getElementById('feedbackForm');
+  if (!form) return;
+  const existingHandler = form.onsubmit;
+  form.addEventListener('submit', function (e) {
+    withLegistaDb(async () => {
+      const { collection, addDoc } = window._fs;
+      const saved = localStorage.getItem('legista_user');
+      const user = saved ? JSON.parse(saved) : null;
+      const nameField = document.getElementById('fbName');
+      const payload = {
+        type: typeof fbCurrentType !== 'undefined' ? fbCurrentType : 'شكوى',
+        name: (nameField && nameField.value.trim()) ? nameField.value.trim() : (user ? user.name : 'زائر'),
+        email: user ? user.email : '',
+        message: document.getElementById('fbMessage') ? document.getElementById('fbMessage').value.trim() : '',
+        image: typeof fbImageData !== 'undefined' ? fbImageData : null,
+        createdAt: Date.now()
+      };
+      try { await addDoc(collection(window._db, 'feedback'), payload); } catch (err) { console.error(err); }
+    });
+  });
+})();
+
+/* ══ CONNECT ESTESHARA CONSULTATION MODAL TO FIRESTORE ══ */
+(function () {
+  const form = document.getElementById('modalFormWrap');
+  if (!form) return;
+  form.addEventListener('submit', function () {
+    withLegistaDb(async () => {
+      const { collection, addDoc } = window._fs;
+      const pkg = document.querySelector('#estesharaModal .m-package.selected');
+      const wallet = document.querySelector('#estesharaModal .wallet-card.selected');
+      const saved = localStorage.getItem('legista_user');
+      const user = saved ? JSON.parse(saved) : null;
+      const payload = {
+        kind: 'consultation',
+        package: pkg ? pkg.dataset.type : '',
+        price: pkg ? pkg.dataset.price : '',
+        name: document.getElementById('mName').value.trim(),
+        phone: document.getElementById('mPhone').value.trim(),
+        email: user ? user.email : '',
+        message: document.getElementById('mMessage').value.trim(),
+        wallet: wallet ? wallet.dataset.wallet : '',
+        senderNumber: document.getElementById('mSenderNumber').value.trim(),
+        screenshot: typeof mScreenshotData !== 'undefined' ? mScreenshotData : null,
+        status: 'pending',
+        createdAt: Date.now()
+      };
+      try { await addDoc(collection(window._db, 'consultationRequests'), payload); } catch (err) { console.error(err); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

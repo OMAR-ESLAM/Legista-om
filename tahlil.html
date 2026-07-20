@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGISTA — تحليل القضية بالذكاء الاصطناعي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+@property --mx { syntax: '<percentage>'; inherits: true; initial-value: 15%; }
+@property --my { syntax: '<percentage>'; inherits: true; initial-value: 10%; }
+:root {
+  --bg-1: #FFFFFF;
+  --bg-2: #FBF8F1;
+  --surface: #FFFFFF;
+  --surface-2: #F7F1E1;
+  --surface-3: #EFE3C4;
+  --accent: #B8860B;
+  --accent-soft: #D4AF37;
+  --accent-2: #8B6914;
+  --seal: #D8434B;
+  --seal-soft: #F2A6A6;
+  --sage: #2FA36B;
+  --amber: #C97F1E;
+  --ink: #211C12;
+  --muted: #756B57;
+  --muted-2: #A69A80;
+  --border: rgba(184,134,11,0.28);
+  --border-soft: rgba(33,28,18,0.09);
+  --shadow-sm: 0 1px 3px rgba(33,28,18,0.05), 0 1px 1px rgba(33,28,18,0.04);
+  --shadow-md: 0 10px 28px rgba(33,28,18,0.09), 0 2px 8px rgba(33,28,18,0.05);
+  --shadow-lg: 0 18px 46px rgba(33,28,18,0.12), 0 4px 14px rgba(33,28,18,0.06);
+  --shadow-gold: 0 10px 26px rgba(184,134,11,0.20);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg-1);
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(700px 480px at var(--mx,20%) var(--my,15%), rgba(184,134,11,0.10), transparent 60%),
+    radial-gradient(650px 500px at 85% 85%, rgba(184,134,11,0.07), transparent 55%);
+  animation: meshDrift 16s ease-in-out infinite;
+}
+@keyframes meshDrift {
+  0%, 100% { --mx: 15%; --my: 10%; }
+  25% { --mx: 55%; --my: 25%; }
+  50% { --mx: 30%; --my: 70%; }
+  75% { --mx: 70%; --my: 55%; }
+}
+::selection { background: rgba(184,134,11,0.25); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+ 
+/* NAV */
+/* NAV removed per request */
+.sidebar-toggle { display: none; position: fixed; top: 16px; inset-inline-start: 16px; z-index: 1000; background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-soft); color: var(--ink); width: 40px; height: 40px; border-radius: 12px; font-size: 15px; cursor: pointer; box-shadow: var(--shadow-md); transition: transform .15s; }
+.sidebar-toggle:active { transform: scale(0.92); }
+ 
+/* LAYOUT */
+.app { display: grid; grid-template-columns: 272px 1fr; gap: 18px; max-width: 1180px; margin: 0 auto; padding: 16px; height: 100vh; height: 100dvh; }
+ 
+/* SIDEBAR */
+.sidebar { background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-soft); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 14px; height: calc(100vh - 32px); height: calc(100dvh - 32px); overflow: hidden; box-shadow: var(--shadow-sm); }
+.new-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 30px; border: none; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .15s, box-shadow .2s; box-shadow: var(--shadow-gold); }
+.new-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(184,134,11,0.28); }
+.new-btn:active { transform: scale(0.97); }
+.sidebar-label { font-size: 10px; letter-spacing: 2px; color: var(--muted-2); font-weight: 700; padding: 0 4px; }
+.history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.history-empty { font-size: 11.5px; color: var(--muted-2); line-height: 1.9; padding: 14px 8px; text-align: center; }
+.history-item { text-align: right; padding: 11px 12px; border-radius: 12px; background: transparent; border-inline-end: 3px solid transparent; cursor: pointer; transition: background .15s, border-color .15s, transform .12s; }
+.history-item:hover { background: var(--surface-2); }
+.history-item:active { transform: scale(0.98); }
+.history-item.active { background: var(--surface-2); border-inline-end-color: var(--accent); }
+.history-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.history-item-type { font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 20px; letter-spacing: .5px; }
+.history-item-type.criminal { background: var(--ink); color: var(--bg-1); }
+.history-item-type.civil { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+.history-item-date { font-size: 9.5px; color: var(--muted-2); }
+.history-item-snippet { font-size: 12px; color: var(--muted); line-height: 1.6; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.history-item-del { position: absolute; }
+ 
+/* CHAT COLUMN */
+.chat-col { display: flex; flex-direction: column; height: calc(100vh - 32px); height: calc(100dvh - 32px); background: rgba(255,255,255,0.7); border: 1px solid var(--border-soft); border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.chat-scroll { flex: 1; overflow-y: auto; padding: 28px 24px 12px; display: flex; flex-direction: column; gap: 18px; }
+ 
+/* MESSAGE BASE */
+.msg { display: flex; gap: 10px; max-width: 88%; opacity: 0; animation: msgIn .45s ease forwards; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.msg-ai { margin-inline-end: auto; }
+.msg-user { margin-inline-start: auto; flex-direction: row-reverse; }
+ 
+.avatar { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--shadow-sm); }
+.avatar-ai { background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 70%); box-shadow: 0 0 0 3px rgba(184,134,11,0.18), var(--shadow-sm); animation: stampIn .5s cubic-bezier(.2,1.4,.4,1); }
+.avatar-ai::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; background: conic-gradient(from 0deg, transparent, rgba(212,175,55,0.65), transparent 30%); animation: haloSpin 3.4s linear infinite; opacity: .55; }
+.avatar-ai::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid rgba(184,134,11,0.4); animation: avatarPulse 2.6s ease-in-out infinite; }
+@keyframes haloSpin { to { transform: rotate(360deg); } }
+@keyframes avatarPulse { 0% { transform: scale(0.9); opacity: .7; } 70%,100% { transform: scale(1.35); opacity: 0; } }
+@keyframes stampIn { from { transform: scale(1.6) rotate(-18deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+.avatar-ai svg { width: 18px; height: 18px; position: relative; z-index: 1; animation: sparkTwinkle 2.6s ease-in-out infinite; }
+@keyframes sparkTwinkle { 0%,100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(12deg) scale(1.08); } }
+.avatar-user { background: linear-gradient(135deg, var(--surface-3), var(--surface-2)); color: var(--ink); font-size: 13px; font-weight: 800; }
+ 
+.bubble { padding: 15px 17px; border-radius: 18px; font-size: 13.5px; line-height: 1.95; }
+.msg-ai .bubble { background: var(--surface); border: 1px solid var(--border-soft); border-top-right-radius: 6px; color: rgba(33,28,18,0.88); transition: border-color .2s, box-shadow .2s; box-shadow: var(--shadow-sm); }
+.msg-ai .bubble:hover { border-color: var(--border); box-shadow: var(--shadow-md); }
+.msg-user .bubble { background: linear-gradient(135deg, rgba(184,134,11,0.16), rgba(184,134,11,0.08)); border: 1px solid var(--border); border-top-left-radius: 6px; box-shadow: var(--shadow-sm); }
+ 
+/* INTAKE CARD (inside first AI bubble) */
+.intake { display: flex; flex-direction: column; gap: 14px; min-width: 280px; }
+.intake-row label { display: block; font-size: 11px; font-weight: 700; color: var(--accent-soft); margin-bottom: 8px; letter-spacing: .3px; }
+.pill-toggle { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { padding: 9px 16px; border-radius: 30px; border: 1px solid var(--border-soft); background: var(--bg-2); color: var(--muted); font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .18s, transform .12s; }
+.pill:hover { color: var(--ink); border-color: var(--border); }
+.pill:active { transform: scale(0.94); }
+.pill.active { color: var(--bg-1); background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(184,134,11,0.18); }
+.pill.active[data-stage="urgent"] { background: var(--seal); border-color: var(--seal); color: #fff; box-shadow: 0 0 0 4px rgba(240,85,90,0.14); }
+.extra-toggle { font-size: 11.5px; color: var(--muted-2); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; width: fit-content; }
+.extra-fields { display: none; gap: 10px; }
+.extra-fields.show { display: grid; grid-template-columns: 1fr 1fr; }
+.extra-fields input { padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 10px; color: var(--ink); font-family: 'Cairo', sans-serif; font-size: 12.5px; outline: none; }
+.extra-fields input:focus { border-color: var(--border); }
+ 
+/* THINKING */
+.thinking .bubble { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.dot-flow { display: flex; gap: 4px; }
+.dot-flow span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: dotPulse 1.1s infinite ease-in-out; }
+.dot-flow span:nth-child(2) { animation-delay: .15s; }
+.dot-flow span:nth-child(3) { animation-delay: .3s; }
+@keyframes dotPulse { 0%,80%,100% { opacity: .25; transform: scale(.8); } 40% { opacity: 1; transform: scale(1.1); } }
+.stage-text { font-size: 12.5px; transition: opacity .25s; }
+ 
+/* RESULT BLOCKS */
+.result-title { font-size: 12px; font-weight: 800; color: var(--accent-soft); letter-spacing: .5px; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+.result-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.result-list li { font-size: 13px; line-height: 1.8; color: rgba(33,28,18,0.82); padding-inline-start: 16px; position: relative; }
+.result-list li::before { content: '›'; position: absolute; inset-inline-start: 0; color: var(--sage); font-weight: 900; }
+ 
+.defense-card { padding: 13px 14px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 14px; margin-bottom: 9px; box-shadow: var(--shadow-sm); transition: box-shadow .2s, transform .15s; }
+.defense-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.defense-card:last-child { margin-bottom: 0; }
+.defense-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.defense-name { font-size: 13.5px; font-weight: 700; }
+.priority-badge { font-size: 9.5px; font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: .3px; flex-shrink: 0; }
+.priority-badge.قوي { background: rgba(192,70,60,0.16); color: var(--seal-soft); border: 1px solid rgba(192,70,60,0.3); }
+.priority-badge.متوسط { background: rgba(232,163,61,0.14); color: var(--amber); border: 1px solid rgba(232,163,61,0.3); }
+.priority-badge.ضعيف { background: rgba(179,166,201,0.1); color: var(--muted); border: 1px solid var(--border-soft); }
+.confidence-badge { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; letter-spacing: .3px; }
+.confidence-badge.confidence-مرتفعة { background: rgba(47,163,107,0.14); color: var(--sage); border: 1px solid rgba(47,163,107,0.3); }
+.confidence-badge.confidence-متوسطة { background: rgba(232,163,61,0.14); color: var(--amber); border: 1px solid rgba(232,163,61,0.3); }
+.confidence-badge.confidence-منخفضة { background: rgba(216,67,75,0.12); color: var(--seal); border: 1px solid rgba(216,67,75,0.3); }
+.missing-info-list li { color: var(--seal); }
+.missing-info-list li::before { content: '!'; color: var(--seal); }
+.defense-why { font-size: 12px; color: var(--muted); line-height: 1.75; margin-bottom: 10px; }
+.defense-link { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--accent); text-decoration: none; }
+.defense-link:hover { text-decoration: underline; }
+ 
+.disclaimer-line { font-size: 11px; color: var(--muted-2); line-height: 1.8; padding-top: 8px; border-top: 1px dashed var(--border-soft); margin-top: 4px; }
+ 
+.msg-actions { display: flex; gap: 8px; margin-top: 4px; }
+.action-btn { display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 9px; border: 1px solid var(--border-soft); background: var(--bg-2); color: var(--muted); font-family: 'Cairo', sans-serif; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all .18s; }
+.action-btn:hover { color: var(--ink); border-color: var(--border); background: var(--surface-2); }
+.action-btn svg { width: 13px; height: 13px; }
+ 
+.error-bubble .bubble { border-color: rgba(240,85,90,0.35); background: rgba(240,85,90,0.08); color: var(--seal-soft); animation: msgIn .45s ease forwards, shakeX .4s ease .45s; }
+@keyframes shakeX { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.retry-btn { margin-top: 8px; font-size: 11.5px; font-weight: 700; color: var(--seal-soft); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-family: 'Cairo', sans-serif; transition: opacity .15s; }
+.retry-btn:hover { opacity: .75; }
+ 
+/* COMPOSER */
+.composer-wrap { padding: 10px 18px 18px; }
+.composer { display: flex; align-items: flex-end; gap: 8px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 26px; padding: 11px 11px 11px 16px; transition: border-color .2s, box-shadow .2s, transform .15s; box-shadow: var(--shadow-md); }
+.composer:focus-within { border-color: var(--border); box-shadow: var(--shadow-gold); transform: translateY(-1px); }
+.composer textarea { flex: 1; resize: none; background: none; border: none; outline: none; color: var(--ink); font-family: 'Cairo', sans-serif; font-size: 13.5px; line-height: 1.8; max-height: 140px; min-height: 26px; padding: 6px 2px; }
+.composer textarea::placeholder { color: var(--muted-2); }
+.mic-btn, .send-btn { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; }
+.mic-btn { background: var(--bg-2); color: var(--muted); }
+.mic-btn:hover { background: var(--surface-3); color: var(--ink); }
+.mic-btn.recording { background: var(--seal); color: #fff; animation: micPulse 1.2s infinite; }
+@keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(192,70,60,0.45); } 50% { box-shadow: 0 0 0 8px rgba(192,70,60,0); } }
+.send-btn { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--bg-1); transition: transform .12s, box-shadow .2s; box-shadow: 0 2px 14px rgba(184,134,11,0.35); }
+.send-btn:not(:disabled):hover { box-shadow: 0 2px 18px rgba(184,134,11,0.5); }
+.send-btn:not(:disabled):active { transform: scale(0.88); }
+.send-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+.send-btn svg, .mic-btn svg { width: 16px; height: 16px; }
+.mic-btn { transition: all .2s, transform .12s; }
+.mic-btn:active { transform: scale(0.88); }
+.composer-meta { display: flex; justify-content: space-between; align-items: center; padding: 7px 6px 0; font-size: 11px; }
+.word-counter { color: var(--muted-2); transition: color .2s; }
+.word-counter.low { color: var(--seal-soft); }
+.word-counter.mid { color: var(--amber); }
+.word-counter.good { color: var(--sage); }
+.composer-hint { color: var(--muted-2); }
+ 
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* THINKING shimmer */
+.thinking .bubble { position: relative; overflow: hidden; }
+.thinking .bubble::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(184,134,11,0.14), transparent); animation: shimmer 1.8s infinite; }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* MOBILE */
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; padding: 68px 10px 10px; height: 100vh; height: 100dvh; }
+  .sidebar { position: fixed; inset-inline-start: -100%; top: 16px; width: 82%; max-width: 320px; height: calc(100vh - 32px); height: calc(100dvh - 32px); z-index: 900; transition: inset-inline-start .3s ease; box-shadow: 24px 0 50px rgba(33,28,18,0.18); }
+  .sidebar.open { inset-inline-start: 8px; }
+  .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+  .chat-col { height: calc(100vh - 78px); height: calc(100dvh - 78px); }
+  .msg { max-width: 96%; }
+  .extra-fields.show { grid-template-columns: 1fr; }
+  .composer-wrap { padding: 12px 12px calc(14px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (max-width: 420px) {
+  .chat-scroll { padding: 20px 14px 8px; }
+  .bubble { font-size: 13px; padding: 12px 14px; }
+  .composer-hint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+</style>
+</head>
+<body>
+ 
+   
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="فتح السجل">☰</button>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <button class="new-btn" id="newChatBtn">
+      <span>＋</span><span>تحليل جديد</span>
+    </button>
+    <div class="sidebar-label">سجل التحليلات</div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty" id="historyEmpty">لسه معملتش أي تحليل.<br>أول تحليل هيظهر هنا.</div>
+    </div>
+  </aside>
+ 
+  <main class="chat-col">
+    <div class="chat-scroll" id="chatScroll">
+      <!-- intake message injected by JS -->
+    </div>
+ 
+    <div class="composer-wrap">
+      <div class="composer">
+        <button class="mic-btn" id="micBtn" title="سجّل وقائع القضية بصوتك">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <textarea id="factsInput" rows="1" placeholder="اكتب وقائع القضية هنا... أو دوس على المايك واحكيها بصوتك"></textarea>
+        <button class="send-btn" id="sendBtn" disabled title="ابعت للتحليل">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="composer-meta">
+        <span class="word-counter" id="wordCounter">0 كلمة</span>
+        <span class="composer-hint">Ctrl + Enter للإرسال السريع</span>
+      </div>
+    </div>
+  </main>
+</div>
+ 
+<script>
+/* ==========================================================
+   ⚠️ ضعي مفتاح Groq بتاعك هنا فقط (بين علامتي التنصيص) ⚠️
+   حل سريع للتجربة المحلية فقط — المفتاح هيبقى ظاهر لأي حد
+   يعمل View Source للصفحة. للاستخدام الفعلي والآمن انشري
+   المشروع على Vercel وحطي المفتاح في Environment Variables.
+   ========================================================== */
+const GROQ_KEY = "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";
+
+/* ---------- مكتبة الدفوع (نفس الـ keys الموجودة في dafou-detail.html) ---------- */
+/* قاعدة معرفة حقيقية: نصوص مبادئ الدفوع الفعلية من dafou-detail.html — تُستخدم لتغذية الموديل بمرجع نصي حقيقي بدل الاعتماد على ذاكرته */
+const DEFENSE_TEXTS = {
+  butlan: ['البطلان جزاء إغفال البيانات الجوهرية.', 'البطلان جزاء توقعه المحكمة الاستئنافية على حكم محكمة الدرجة الأولى.', 'البطلان لا يحول دون تصحيح الإجراء والفصل من جديد على نحو صحيح.', 'الأصل في الإجراءات الصحة والاستثناء هو البطلان.', 'بطلان تشكيل المحكمة لا يؤدي إلى انعدام الحكم.', 'البطلان لا يجوز أن يمس قوة الأمر المقضي للأحكام.', 'ليس معنى عدم ذكر الإجراء بأوراق الدعوى أنه وقع بطلاً فالمفروض أنه تم صحيحاً.', 'إثبات أن الإجراءات وقعت باطلة يجوز بكافة طرق الإثبات.', 'يسقط الحق في التمسك بالبطلان إذا كان للمتهم محامٍ وتم الإجراء بحضوره دون اعتراض.', 'لا يصح التمسك ببطلان خاص بمتهم آخر.', 'التخفيف من عبء الاتهام لا يصلح سبباً للبطلان.', 'حتى يتحقق البطلان لابد من توافر سببية.', 'من يقوم بإجراء باطل لا تُقبل منه شهادة عليه.', 'الطلب اللاحق من الجهة المختصة لا يصحح البطلان الذي لحق بحكم محكمة الدرجة الأولى.', 'لا يجوز الدفع بالبطلان لأول مرة أمام محكمة النقض.', 'لكي يكون الدفع ببطلان الاستجواب مقبولاً يتعين على المتهم أن يعلن اسم محاميه.', 'ما بُنِيَ على الباطل فهو باطل، فإذا كان القبض باطلاً بطلت كل الإجراءات اللاحقة المتصلة به.', 'البطلان النسبي هو البطلان المقرر لمصلحة المتهم ويسقط الحق فيه بالتنازل عنه صراحةً أو ضمناً.', 'الدفع ببطلان التفتيش هو بطلان نسبي، إذا لم يتمسك به المتهم أثناء المحاكمة فلا تجوز إثارته أمام محكمة النقض.', 'البطلان المتعلق بأوراق التكليف بالحضور نسبي غير متعلق بالنظام العام.', 'بطلان التفتيش ليس من النظام العام فإذا لم يتمسك به المتهم أمام محكمة الموضوع فليس له إثارته أمام محكمة النقض.', 'حضور المتهم يصحح أي بطلان بإعلان التكليف بالحضور.', 'بطلان التفتيش لا يحول دون الأخذ بالأدلة الأخرى المستقلة عنه.', 'قيود التفتيش الواردة بقانون الإجراءات الجنائية غير مطلوبة بالنسبة لقانون الجمارك فيكفي ارتباك صاحب البضاعة لتفتيشه وتفتيش أمتعته.', 'الدفع ببطلان القبض والتفتيش يعني بطلان إذن النيابة لعدم جدية التحريات.', 'لا يجوز الدفع لأول مرة أمام محكمة النقض ببطلان الضبط والتفتيش.', 'يكتفى في رفض الدفع ببطلان التفتيش أن ترد المحكمة على هذا الدفع رداً سائغاً.', 'محكمة الموضوع هي صاحبة الشأن في تقدير جدية التحريات وسلامة إذن التفتيش.', 'بطلان الحكم الذي يصدر بناءً على إعلان باطل لإغفال بيان جوهري.', 'بطلان الحكم إذا اشترك القاضي في نظر دعوى سبق له أن فصل فيها أمام الدرجة الأولى.', 'بطلان تقرير النيابة بالطعن بالنقض إذا خلا من توقيع رئيس النيابة ولا يصحح البطلان إجراء آخر مكمل.', 'حرمان الدفاع من حقه في مناقشة شاهد الإثبات يؤدي إلى بطلان الإجراءات.', 'لا يجوز لضابط الشرطة استجواب المتهم وإن فعل يكون الإجراء باطلاً وإن جاز له سؤاله عن التهمة.', 'بطلان الحكم الذي يحيل على حكم آخر باطل لعدم اشتماله على بيان جوهري.', 'بطلان الحكم إذا لم يحمل تاريخ صدوره.', 'بطلان الحكم لعدم اتصال المحكمة بالدعوى على نحو صحيح إذا رُفعت إليها ممن لا يملك ذلك قانوناً.', 'عدم إثبات سكرتير الجلسة محضره ودفاعه وملخص دفاعه لا يؤدي إلى البطلان.', 'لا بطلان إذا لم يكن المتهم من يتكلم إذا كان لم يتمسك أمام المحكمة بهذا الحق.', 'لا بطلان عند مخالفة الإجراءات غير الجوهرية.', 'لا بطلان إذ حصل الاستجواب بحضور الدفاع ودون اعتراض منه.', 'عدم سماع المجني عليه استئنافياً لا يرتب البطلان.', 'لا بطلان للحكم رغم بطلان الإعلان إذا كان المتهم قد حضر بالفعل.', 'عدم سماع شاهد النفي لا يؤدي إلى البطلان.', 'عدم سماع الشهود أمام محكمة الجنح المستأنفة لا يرتب البطلان.', 'لا بطلان في الإجراءات أمام محكمة الجنح الجزئية إذا تداركت ذلك محكمة الجنح المستأنفة، فالعبرة أمام محكمة النقض بالإجراءات الأخيرة.', 'لا بطلان إذا فقد محضر الجلسة بعد تمام الإجراءات وصدور الحكم إذ يُفترض أن الإجراءات تمت صحيحة.', 'الأخطاء اللفظية لا ترتب بطلاناً.', 'لا بطلان إذا تنازل الدفاع عن سماع شهود النفي ثم طلب سماعهم فلم تستجب المحكمة.', 'لا بطلان إذا لم تتل شهادة الشاهد بالجلسة.', 'لا بطلان إذا خلا محضر الجلسة من توقيع القاضي.', 'لا بطلان إذا لم تسند المحكمة في حكمها إلى الإجراء الباطل.', 'الخطأ المادي لا يرتب بطلاناً ولا يجوز التمسك ببطلان الإجراءات لأول مرة أمام محكمة النقض.'],
+  cheque: ['الدفع بانقضاء الدعوى الجنائية بالتقادم.', 'الدفع بانعدام القصد الجنائي لعدم علم الساحب بعدم كفاية الرصيد.', 'الدفع بعدم توافر أركان جريمة إصدار شيك بدون رصيد.', 'الدفع بوجود رصيد كافٍ وقت إصدار الشيك.', 'الدفع بأن الشيك صُرف جزئياً مما ينفي انعدام الرصيد الكلي.', 'الدفع بوجود اتفاق على عدم تقديم الشيك للصرف في الميعاد.', 'الدفع بأن الشيك مُحرَّر كضمان وليس وسيلة وفاء.', 'الدفع بانقضاء الدعوى بالتصالح والوفاء بقيمة الشيك.', 'الدفع بعدم صحة التوقيع على الشيك.', 'الدفع بعدم اكتمال البيانات الجوهرية للشيك.', 'الدفع بصدور الشيك من شخص غير مرخص له بالتوقيع.', 'الدفع بتزوير الشيك.', 'الدفع بأن قيمة الشيك دُفعت بطريق آخر قبل تقديمه للبنك.', 'الدفع بسقوط الحق في المطالبة بالتقادم الثلاثي.', 'الدفع بعدم إخطار الساحب بعدم الصرف خلال الميعاد القانوني.', 'الدفع بإغلاق الحساب قبل تحرير الشيك بمعرفة المستفيد.', 'الدفع بعدم تقديم الشيك خلال مواعيد التقديم القانونية.', 'الدفع بانتفاء علاقة التبعية بين محرر الشيك والشركة.', 'الدفع بأن الشيك صدر وفاءً لدَيْن مدني لا جنائي.', 'الدفع بعدم اختصاص المحكمة النوعية بنظر الدعوى.', 'الدفع بصدور حكم سابق في ذات الشيك.', 'الدفع بتنازل المجني عليه عن الشكوى.', 'الدفع بزوال الصفة الجنائية لإتمام التسوية.', 'الدفع بأن الشيك صدر بتاريخ لاحق (شيك مؤجل) وهو خلاف طبيعته القانونية.'],
+  jnayat: ['الدفع باستحالة وقوع جريمة القتل لأن الجاني كان ميتاً وقت ارتكاب الفعل.', 'الدفع بانتفاء نية القتل وأن الفعل لا يعدو ضرباً أفضى إلى الوفاة.', 'الدفع بانقطاع العلاقة السببية بين فعل المتهم ووفاة المجني عليه.', 'الدفع بأن الوفاة نتيجة مرض سابق لا صلة له بفعل المتهم.', 'الدفع باستحالة وقوع الجريمة المستحيلة استحالة مطلقة.', 'الدفع باستحالة وقوع الجريمة المستحيلة استحالة نسبية.', 'الدفع بانتفاء القصد الجنائي لعدم توافر نية إزهاق الروح.', 'الدفع بأن الجاني في حالة دفاع شرعي.', 'الدفع بوقوع الفعل تحت تأثير قوة قاهرة أو حادث مفاجئ.', 'الدفع بانعدام الأهلية الجنائية وقت ارتكاب الفعل.', 'الدفع بأن الجاني كان في حالة جنون أو عاهة عقلية.', 'الدفع بعدم ثبوت الاشتراك في الجريمة.', 'الدفع بعدم توافر ظرف سبق الإصرار والترصد.', 'الدفع بعدم توافر ظرف استخدام طريق من طرق التعذيب.'],
+  jonah: ['الدفع بانقضاء الدعوى الجنائية بالتقادم الثلاثي.', 'الدفع بعدم جدية التحريات وبطلان إذن التفتيش المبني عليها.', 'الدفع ببطلان صحيفة الجنحة المباشرة لخلوها من البيانات اللازمة للنظام العام.', 'الدفع بعدم اختصاص المحكمة النوعية أو المكانية بنظر الدعوى.', 'الدفع بانقضاء الدعوى الجنائية بالتصالح أو بالوفاء.', 'الدفع بعدم قبول الدعوى لرفعها من غير ذي صفة.', 'الدفع بسبق الفصل في موضوع الدعوى بحكم بات.', 'الدفع بعدم توافر القصد الجنائي الخاص اللازم للجريمة.', 'الدفع بانتفاء الركن المادي للجريمة.', 'الدفع بعدم إعلان المتهم إعلاناً صحيحاً بالتكليف بالحضور.'],
+  tashriaat: ['الدفع ببطلان التلبس لعدم توافر حالة التلبس المنصوص عليها على سبيل الحصر.', 'الدفع ببطلان التلبس للتحريض على خلق الجريمة.', 'الدفع ببطلان التلبس لعدم توافر المظاهر الخارجية التي تبنأ عن توافرها.', 'الدفع ببطلان التلبس لعدم تحقق الضابط من كنه وماهية المادة المخدرة قبل الضبط.', 'الدفع ببطلان القبض لعدم توافر الدلائل الكائنة على جدية الاتهام.', 'الدفع ببطلان القبض لبطلان الاستيقاف.', 'الدفع ببطلان القبض لبطلان إجراءات التحريز.', 'الدفع ببطلان الإذن لعدم جدية التحريات.', 'الدفع ببطلان الإذن لصدوره بعد الضبط والتفتيش.', 'الدفع ببطلان الإذن لعدم تنفيذه خلال الأجل المحدد ولانقضائه أو زواله.', 'الدفع ببطلان الإذن لعدم التسبيب.', 'الدفع ببطلان الإذن للتعسف وقبض.', 'الدفع ببطلان الإذن لعدم تخويل المأذون له غيره للإمساك.', 'الدفع ببطلان الإذن لعدم تحديد نوع الجريمة في الإذن.', 'الدفع ببطلان الإذن لعدم الاختصاص بإصداره.'],
+  taaan: ['بطلان الحكم إذا لم يذكر أسباباً للإدانة.', 'بطلان الحكم إذا لم يستظهر أركان الجريمة.', 'بطلان الحكم إذا شابه التضارب في الأسباب.', 'بطلان الحكم إذا بُنِيَ على دليل ظني احتمالي.', 'بطلان الحكم إذا خالف الثابت بالأوراق.', 'بطلان الحكم إذا لم تستقر الواقعة في ذهن المحكمة.', 'بطلان الحكم إذا بُنِيَ على تقرير غير سائغ لسلامة إجراءات التحريز.', 'بطلان الحكم إذا لم يمحص ركن العلة.', 'بطلان الحكم إذا عوَّلت الإدانة فقط على مجرد تواجد المتهم بمسرح الحدث.', 'بطلان الحكم إذا تهاترت الأسباب فكشفت عن استقرار الوقائع في ذهن المحكمة.', 'بطلان الحكم إذا عوَّل على حكم آخر لم يصدر في نفس الدعوى.', 'بطلان الحكم إذا لم تحط المحكمة بالدعوى بصر وبصيرة.', 'بطلان الحكم إذا شابه قصور في بيان الوقائع.', 'بطلان الحكم إذا تناقضت أسبابه فتماحت.', 'بطلان الحكم إذا تخاذلت أسبابه.', 'بطلان الحكم إذا رفض الأخذ بشهادة مرضية دون ذكر الأسباب.', 'بطلان الحكم إذا لم يتعرض لمستند جوهري تقدم به المتهم.', 'بطلان الحكم إذا أساء تطبيق مادة الاتهام.', 'بطلان الحكم إذا أغفل التعرض لأركان الجريمة.', 'بطلان الحكم إذا قطع في مسألة هي مسألة فنية ولا دليل فني لها.', 'بطلان الحكم إذا لم يُشِر إلى مادة القانون التي أُدين المتهم بها.', 'بطلان الحكم الصادر بالإدانة إذا خلا من مادة العقاب.', 'يبطل الحكم الغيابي الصادر من محكمة الجنايات إذا حضر المتهم بالجلسة.', 'بطلان الحكم الاستئنافي إذا تعدى لموضوع الدعوى رغم عدم الفصل فيها حرماناً للمتهم من إحدى درجتي التقاضي.', 'بطلان الحكم إذا لم يوقع عليه رئيس المحكمة خلال ثلاثين يوماً من تاريخ صدوره إلا إذا كان صادراً بالبراءة.', 'بطلان الحكم إذا أغفل الرد على الدفع من النظام العام كالدفع بالتقادم.', 'بطلان الحكم إذا أخل بدفاع المتهم جوهرياً كالتناقض بين الدليلين القولي والفني.', 'بطلان الحكم إذا خلا من توقيع رئيس المحكمة سواء قُدِّمت شهادة من الجدول أو لم تقدم، فالبطلان من النظام العام والشهادة دليل إثبات فقط.', 'لا يجوز أن يشترك في المداولة غير القضاة الذين سمعوا المرافعة وإلا كان الحكم باطلاً.', 'بطلان الحكم الصادر بالإلزام في الدعوى المدنية من محكمة الجنح المستأنفة إثر البراءة والرفض من أول درجة.', 'بطلان الحكم إذا كان خالياً من التوقيع.', 'بطلان الحكم إذا كان خالياً من الوقائع والأدلة ومؤداها.', 'بطلان الحكم الصادر من محكمة الجنايات إذا كان من بين أعضائها أكثر من رئيس محكمة.', 'بطلان الحكم الاستئنافي إذا فصل في استئناف النيابة حالة نظر المعارضة أمام محكمة الدرجة الأولى.', 'بطلان الحكم الغيابي الصادر في جناية بالقبض على المتهم أو حضوره أمام المحكمة من تلقاء نفسه.', 'ما بُنِيَ على الباطل فهو باطل، وبالتالي يبطل الحكم الاستئنافي الذي يعول في أسبابه على حكم باطل.', 'بطلان الحكم في الدعوى المدنية التبعية إذا لم يودع خلال ثلاثين يوماً ولو كان قد قضى ببراءة المتهم أسوة بالحكم بالحكم الجنائية.', 'بطلان الحكم الاستئنافي إذا ألغى حكم رفض التعويض دون الإشارة إلى إجماع الآراء.', 'بطلان الحكم إذا لم يُشِر في أسبابه إلى أن الدعوى الجنائية حُرِّكت بناءً على إذن من الجهة المختصة.', 'يكون الحكم متعدداً إذا عُرضت الدعوى على المحكمة ممن لا يملك رفعها.', 'بطلان القبض يعني بطلان الدليل المستمد منه.', 'بطلان الحكم إذ لم يذكر أسباباً للإدانة.', 'بطلان الحكم إذا لم تحط المحكمة بالدعوى بصر وبصيرة.', 'بطلان الحكم إذا قضى بغير ما طلبه الخصم في الدعوى المدنية التبعية.', 'بطلان الحكم إذا أغفل الفصل في أحد الطلبات المطروحة.', 'بطلان الحكم إذا تضارب مع الثابت بمحضر الجلسة.', 'فقد الحكم الصادر من محكمة الدرجة الأولى وإحالة الحكم عليه من الدرجة الثانية يكون باطلاً لأنه لا تعرف بعد ماهية أسباب الإدانة.', 'بطلان الحكم إذا لم يودع أسبابه في الميعاد.', 'صدور الحكم الاستئنافي من أربعة قضاء باطل مطلقاً لتعلقه بالنظام العام.', 'بطلان الحكم الصادر من دائرة لم يشترك أحد أعضائها في سماع المرافعة.', 'بطلان حكم محكمة أمن الدولة العليا إذا كان رئيسها ليس بدرجة رئيس استئناف.', 'بطلان الحكم الصادر بالإدانة إذا خلا من مادة العقاب.', 'يبطل الحكم الغيابي الصادر من محكمة الجنايات إذا حضر المتهم بالجلسة.', 'بطلان الحكم الاستئنافي إذا تعدى لموضوع الدعوى رغم عدم الفصل فيها حرماناً للمتهم من إحدى درجتي التقاضي.', 'بطلان الحكم إذا لم يوقع عليه رئيس المحكمة خلال ثلاثين يوماً من تاريخ صدوره إلا إذا كان صادراً بالبراءة.'],
+  ettiraf: ['الدفع بأن ما صدر عن المتهم لا يعد اعترافاً لعدم توافر أحد أركانه.', 'الدفع بأن ما صدر عن المتهم يعد اعترافاً جزئياً وليس كلياً.', 'الدفع بأن ما صدر عن المتهم مجرد اعتراف مدني وليس اعترافاً جنائياً.', 'الدفع بصدور الاعتراف تحت تأثير الإكراه أو الخداع.', 'الدفع ببطلان الاعتراف الحاصل وليد إجراء باطل.', 'الدفع ببطلان الاعتراف لعدم صراحة الاعتراف.', 'الدفع ببطلان الاعتراف لأنه اعتراف غير قضائي.', 'الدفع بعدم مطابقة الاعتراف للحقيقة.', 'الدفع ببطلان الاعتراف لانتقاء الأهلية الإجرائية للمعترف.', 'الدفع بوجوب تجزئة الاعتراف.', 'الدفع بعدول المتهم عن اعترافه.', 'الدفع بتجاوز سلطة المحكمة في تقدير الاعتراف.', 'الدفع بوجوب تسبيب أخذ المحكمة بالاعتراف أو طرحه.', 'الدفع بتوافر أثر لاعتراف على العقوبة.', 'الدفع بتوافر أثر بواعث الاعتراف في تحديد قيمته.', 'الدفع بالحق في الصمت.'],
+  mabani: ['الدفع بانعدام الصفة الجنائية لأن النزاع مدني بحت.', 'الدفع بعدم الاختصاص الولائي لمحاكم الجنح.', 'الدفع بحسن النية وعدم العلم بمخالفة قواعد البناء.', 'الدفع بعدم توافر القصد الجنائي.', 'الدفع بأن البناء سابق على قرار التخطيط.', 'الدفع بعدم صدور قرار هدم أو إزالة نهائي.', 'الدفع بانقضاء الدعوى الجنائية بالتقادم.', 'الدفع بأن التصرف تم بموجب ترخيص صحيح.', 'الدفع بانتفاء العلاقة السببية بين الفعل والضرر.', 'الدفع بعدم سريان قانون البناء على المنطقة محل الاتهام.', 'الدفع بصدور أمر من الجهة الإدارية المختصة.', 'الدفع بعدم اختصاص جهة الإدانة بتحريك الدعوى.', 'الدفع بوجود نزاع مدني مطروح أمام القضاء المدني.', 'الدفع بانعدام الضرر الذي يوجب المسئولية الجنائية.', 'الدفع بأن الفعل مشروع وفقاً لعقد الإيجار أو الملكية.', 'الدفع بانقضاء الدعوى بصدور عفو شامل.', 'الدفع بعدم جدية التحريات المقدمة.', 'الدفع بالتناقض بين الدليل القولي والدليل الفني.', 'الدفع بعدم مطابقة وصف الجريمة للواقعة.', 'الدفع بأن الإزالة تمت فعلياً قبل المحاكمة.'],
+  ikhtisas: ['الدفع بعدم الاختصاص لأن الواقعة جناية.', 'الدفع بعدم الاختصاص لأن الضرر ليس شخصياً.', 'الدفع بعدم الاختصاص لأن الضرر ليس مباشراً.', 'الدفع بعدم الاختصاص لأن الضرر ليس محققاً.', 'الدفع بعدم الاختصاص لأن موضوع الدعوى المدنية ليس تعويض الضرر.', 'الدفع بعدم الاختصاص لعدم وجود ضرر مادي أو أدبي.', 'الدفع بعدم قبول الدعوى ضد بعض الأشخاص.', 'الدفع بعدم قبول الدعوى أمام المحاكم العسكرية.', 'الدفع بعدم قبول الدعوى المدنية أمام محاكم أمن الدولة.', 'الدفع بعدم قبول الدعوى المدنية أمام محكمة القيم.', 'الدفع بعدم قبول الدعوى المدنية أمام النيابة العامة أو قاضي التحقيق.', 'الدفع بعدم قبول الدعوى المدنية أمام محكمة الأحداث.'],
+  qabool: ['الدفع بعدم قبول الدعوى ضد الموظف العام.', 'الدفع بعدم قبول الدعوى على مرتكب الجريمة في الخارج.', 'الدفع بعدم قبول الدعوى ضد أحد القضاة أو أحد أعضاء مجلس الشعب والشورى أو أحد أعضاء النيابة العامة.', 'الدفع بعدم قبول الدعوى ضد رئيس الجمهورية.', 'الدفع بعدم قبول الدعوى ضد أحد الوزراء.', 'الدفع بعدم قبول الدعوى لرفعها من غير المضرور من الجريمة.', 'الدفع بعدم قبول الدعوى لرفعها من غير ذي صفة.', 'الدفع بعدم قبول الدعوى المدنية لمخالفة أحكام التكليف بالحضور.', 'الدفع بعدم قبول الدعوى المدنية لأن التحقيق ما زال مفتوحاً.', 'الدفع بعدم قبول الدعوى المدنية لإساءة استعمال الحق في الادعاء المباشر.', 'الدفع بعدم قبول الدعوى المدنية لانتفاء علاقة السببية بين الجريمة والضرر.', 'الدفع بعدم قبول الدعوى المدنية لأن العلاقة بين الطرفين مدنية.', 'الدفع بعدم قبول الدعوى المدنية لتأخير الفص في الدعوى الجنائية.', 'الدفع بعدم جواز نظر الدعوى لسابقة الفصل فيها بقرار نهائي بألا وجه لإقامة الدعوى.', 'الدفع بسقوط الحق في اختيار الطريق الجنائي.'],
+  motanawia: ['الدفع بانقضاء الدعوى المدنية بمضي المدة.', 'الدفع بانقضاء الدعوى الجنائية بالتصالح.', 'الدفع بوقف دعوى البلاغ الكاذب لحين الفصل في موضوع الجنحة المباشرة.', 'الدفع باعتبار المدعي المدني تاركاً لدعواه المدنية.', 'الدفع بعدم إحاطة الحكم بعناصر المسئولية المدنية عند تقدير التعويض.', 'الدفع بانتفاء العلاقة السببية لانقطاع العلاقة بين الجريمة والضرر.', 'الدفع بعدم اختصاص المحكمة بتقدير التعويض في غياب المضرور.'],
+  katl: ['الدفع بانتفاء القصد الجنائي', 'الدفع بتوافر الدفاع الشرعي في القتل', 'الدفع بانتفاء علاقة السببية', 'الدفع بتناقض الدليلين القولي والفني', 'الدفع بانتفاء سبق الإصرار في القتل', 'الدفع بانتفاء الترصد في القتل', 'الدفع بانتفاء القتل بالسم', 'الدفع بعدم اقتران القتل بجناية', 'الدفع بعدم العقاب على القتل بالانتحار', 'الدفع باستفزاز المجني عليه', 'الدفع بعدم العثور على جثة المجني عليه', 'الدفع بعدم لزوم أخذ رأي المفتي عند الحكم بالإعدام للمرة الثانية', 'الدفع باستعمال السلطة', 'الدفع بأن القتل العمد كان أثناء الحرب كسبب إباحة في القتل'],
+  darb: ['الدفع بانتفاء العلاقة السببية', 'الدفع بانتفاء القصد الجنائي', 'الدفع بشيوع الاتهام عند تعدد الجناة'],
+  aaha: ['الدفع بعدم حدوث العاهة المستديمة', 'الدفع بالقابلية للشفاء', 'الدفع بانتفاء العلاقة السببية', 'الدفع بانتفاء القصد الجنائي', 'الدفع بأن حالة المجني عليه لم تصبح نهائية ولم تستقر بعد'],
+  masalha: ['الدفع بأن المتهم ليس موظفاً عاماً', 'الدفع بأن المتهم ليس موظفاً فعلياً', 'الدفع بانتفاء الركن المادي', 'الدفع بعدم توافر الطلب', 'الدفع بانتفاء القصد الجنائي في الرشوة', 'الدفع بعدم تنفيذ العمل الوظيفي', 'الدفع بعدم توافر الاختصاص', 'الدفع بعدم توافر الزعم بالاختصاص', 'الدفع بالاعتقاد الخاطئ بالاختصاص', 'الدفع بتوافر الإعفاء من العقاب', 'الدفع باستحالة وقوع الجريمة', 'الدفع ببطلان التسجيلات'],
+  ikhtilas: ['الدفع بانتفاء فعل الاختلاس', 'الدفع بانتفاء القصد الجنائي', 'الدفع بعدم توافر صفة الموظف العام', 'الدفع بتخفيف العقاب', 'الدفع بتوافر العذر المخفف من العقاب', 'الدفع بتقادم الدعوى الجنائية', 'الدفع بأن حيازة الموظف العام للمال لم تكن بسبب وظيفته', 'الدفع بأن وجود المال في الحيازة الناقصة للجاني لم يكن بسبب وظيفته'],
+  erd: ['الدفع بانتفاء القصد الجنائي في الاغتصاب', 'الدفع بانتفاء القوة وتوافر الرضا'],
+  hatk: ['الدفع بانتفاء الركن المادي في هتك العرض وعدم الإخلال بالعورة', 'الدفع بعدم توافر أي صورة من صور الفعل الفاضح التي تقوم بها جريمة هتك العرض', 'الدفع بالتناقض بين أقوال المجني عليها والمشاهدين', 'الدفع برضاء المجني عليها', 'الدفع ببلوغ المجني عليها', 'الدفع بانتفاء الركن المعنوي في جريمة هتك العرض'],
+  khatf: ['الدفع بانتفاء التحايل والقصد الجنائي في جريمة الخطف وعدم توافر أركانها', 'الدفع ببطلان أقوال المجني عليها بتحقيقات النيابة العامة لحصولها تحت إكراه وتهديد ووعد ووعيد وتلفيق الاتهام', 'الدفع بانتفاء الركن المادي', 'الدفع بانتفاء القصد الجنائي', 'الدفع ببطلان الاعتراف لأنه كان وليد إكراه من قبل الشرطة'],
+  ijhad: ['الدفع بعدم توافر محل الاعتداء', 'الدفع بتوافر رضاء الحامل بالإجهاض', 'الدفع بإباحة الإجهاض لأسباب طبية', 'الدفع بإباحة الإجهاض لأسباب أخلاقية', 'الدفع بإباحة الإجهاض لأسباب اجتماعية', 'الدفع بإباحة الإجهاض استناداً إلى حالة الضرورة', 'الدفع بانتفاء الركن المادي لعدم توافر فعل الإسقاط', 'الدفع بانتفاء الركن المادي لموت الجنين أو خروجه من الرحم قبل الموعد الطبيعي لولادته', 'الدفع بانتفاء الركن المادي لانتفاء علاقة السببية', 'الدفع بعدم العقاب على الشروع في الإجهاض', 'الدفع بانتفاء الركن المعنوي للإجهاض'],
+  amwal: ['الدفع بانتفاء ركن الإكراه', 'الدفع بعدم توافر التهديد باستعمال سلاح', 'الدفع بعدم معاصرة الإكراه للسرقة', 'الدفع ببطلان استجواب المتهم بمحضر جمع الاستدلالات لمخالفته نص المادتين ٢٩ و٧٠ إجراءات جنائية', 'الدفع ببطلان الاعتراف لأنه كان وليد الإكراه', 'الدفع بوجود التعارض بين أقوال الشهود بتحقيقات النيابة وتلفيق الاتهام'],
+  sanadat: ['الدفع بانتفاء الركن المادي', 'الدفع بانتفاء علاقة السببية بين القوة أو التهديد وبين التسليم أو التوقيع', 'الدفع بانتفاء القصد الجنائي'],
+  nasb: ['الدفع بأن ما صدر من المتهم كذب مجرد.', 'الدفع بأن ما صدر من المتهم مجرد تدليس مدني.', 'الدفع بأن ما صدر من المتهم مجرد الكتمان.', 'الدفع بعدم توافر المظاهر الخارجية.', 'الدفع بعدم تحقق الغاية من الاحتيال.', 'الدفع بعدم ثبوت الاستعانة بالغير.', 'الدفع بعدم ثبوت الاستعانة بالأشياء.', 'الدفع بعدم توافر عنصر استغلال الصفة.', 'الدفع بانتفاء الركن المادي لعدم توافر شرطي أن المتصرف ليس مالكاً للمال وليس له حق التصرف فيه.', 'الدفع بملكية المتهم للمال.', 'الدفع بالحق في التصرف في المال ولو لم يكن مالكاً.', 'الدفع بعدم توافر الاسم الكاذب.', 'الدفع بعدم توافر الصفة غير الصحيحة.', 'الدفع بأن موضوع النصب ليس ذا صفة مادية.', 'الدفع بأن موضوع النصب ليس مملوكاً للغير.', 'الدفع بأن موضوع النصب ليس منقولاً.', 'الدفع بعدم توافر الضرر.', 'الدفع بتوافر الجريمة لاستصدار الأحكام بطريق الاحتيال.', 'الدفع بانتفاء علاقة السببية.', 'الدفع بانتفاء فعل التسليم.', 'الدفع بانتفاء القصد الجنائي العام في النصب.', 'الدفع بانتفاء القصد الجنائي الخاص في النصب.', 'الدفع بتوافر الباعث النبيل.', 'الدفع بعدم استطاعة سلطة الاتهام إثبات القصد الجنائي.', 'الدفع بأن سعي المجني عليه إلى غرض غير مشروع لا ينفي وقوع الجريمة.', 'الدفع بالتخالص والتنازل عن العقاب.', 'الدفع بتوافر الشروع في النصب.', 'الدفع بتوافر الجريمة المستحيلة.', 'الدفع بالإعفاء من العقوبة في جريمة النصب.', 'الدفع بانقضاء الدعوى بمضي المدة.', 'الدفع بانقضاء الدعوى بالوفاة.', 'الدفع بانقضاء الدعوى بالحكم البات.', 'الدفع بعدم الاختصاص.', 'الدفع ببطلان الحكم.', 'الدفع ببطلان إجراءات المحاكمة.', 'الدفع بالإخلال بحق الدفاع.'],
+};
+
+const DEFENSE_LIBRARY = [
+  { key: 'butlan',     type: 'criminal', title: 'الدفع بالبطلان والجنحة المباشرة' },
+  { key: 'cheque',     type: 'criminal', title: 'الدفوع في الشيك' },
+  { key: 'jnayat',     type: 'criminal', title: 'الدفوع في الجنايات' },
+  { key: 'jonah',      type: 'criminal', title: 'الدفوع في الجنح' },
+  { key: 'tashriaat',  type: 'criminal', title: 'الدفوع في التشريعات الجنائية الخاصة (قبض / تلبس / تفتيش)' },
+  { key: 'taaan',      type: 'criminal', title: 'الدفوع في طرق الطعن في الأحكام' },
+  { key: 'ettiraf',    type: 'criminal', title: 'الدفوع في الاعتراف' },
+  { key: 'mabani',     type: 'criminal', title: 'الدفوع في جرائم المباني' },
+  { key: 'katl',       type: 'criminal', title: 'دفوع القتل العمد' },
+  { key: 'darb',       type: 'criminal', title: 'دفوع الضرب المفضي إلى الموت' },
+  { key: 'aaha',       type: 'criminal', title: 'دفوع الضرب المفضي إلى عاهة مستديمة' },
+  { key: 'masalha',    type: 'criminal', title: 'دفوع الجرائم المضرة بالمصلحة العامة' },
+  { key: 'ikhtilas',   type: 'criminal', title: 'دفوع الاختلاس' },
+  { key: 'erd',        type: 'criminal', title: 'دفوع الاعتداء على العرض' },
+  { key: 'hatk',       type: 'criminal', title: 'دفوع هتك العرض' },
+  { key: 'khatf',      type: 'criminal', title: 'دفوع خطف الإناث' },
+  { key: 'ijhad',      type: 'criminal', title: 'دفوع جرائم الإجهاض' },
+  { key: 'amwal',      type: 'criminal', title: 'دفوع جنايات الاعتداء على الأموال' },
+  { key: 'sanadat',    type: 'criminal', title: 'دفوع اغتصاب السندات والتوقيعات' },
+  { key: 'nasb',       type: 'criminal', title: 'الدفوع في النصب' },
+  { key: 'ikhtisas',   type: 'civil',    title: 'الدفوع المتعلقة بعدم الاختصاص' },
+  { key: 'qabool',     type: 'civil',    title: 'الدفوع المتعلقة بعدم القبول' },
+  { key: 'motanawia',  type: 'civil',    title: 'الدفوع المدنية المتنوعة' },
+];
+const CASE_TYPE_LABELS = { criminal: 'جنائي', civil: 'مدني' };
+const CASE_STAGE_LABELS = { investigation: 'تحقيق', trial: 'محاكمة', appeal: 'استئناف' };
+
+function buildLibraryPrompt(caseType, selectedKeys) {
+  const keys = selectedKeys && selectedKeys.length ? new Set(selectedKeys) : null;
+  return DEFENSE_LIBRARY.filter(d => d.type === caseType && (!keys || keys.has(d.key))).map(d => {
+    const texts = DEFENSE_TEXTS[d.key] || [];
+    // مكتبة مختصرة (أهم الأقسام المرتبطة بالوقائع فقط) — عشان نفضل مركزين ونفضل جوه حدود التوكنز
+    const sample = texts.slice(0, 18).map((t, i) => `    ${i + 1}. ${t}`).join('\n');
+    return `- key: "${d.key}" | ${d.title}\n  مبادئ ونصوص فعلية مرجعية لهذا القسم (استرشد بها حرفيًا، ولا تخترع مبدأ مشابهًا من عندك):\n${sample}`;
+  }).join('\n\n');
+}
+function buildSystemPrompt(caseType, isComplex, selectedKeys) {
+  const library = buildLibraryPrompt(caseType, selectedKeys);
+  return `أنت مستشار قانوني مصري خبير (بخبرة قاضٍ ومحامي ترافع)، تابع لمنصة LEGISTA. مهمتك تحليل وقائع قضية وصفها محامٍ تحليلًا استرشاديًا دقيقًا واحترافيًا.
+
+منهج العمل (فكّر بالترتيب ده قبل ما تكتب الناتج النهائي، حتى لو محدش شايف تفكيرك):
+أ) اقرأ الوقائع كلمة كلمة وحدد: الأطراف، التكييف القانوني المحتمل للواقعة، الأدلة المذكورة (اعتراف، شهود، تحريات، ضبط، تسجيلات...)، وأي إجراء أو تصرف من جهة التحقيق/الاتهام ورد ذكره.
+ب) افحص كل إجراء اتخذته جهة التحقيق أو الاتهام: هل حصل بطريقة سليمة قانونًا؟ (إذن التفتيش، حالة التلبس، ميعاد العرض على النيابة، سلامة الاعتراف، تسبيب القبض... إلخ) — أي خلل في الإجراءات هو أقوى مصدر للدفوع.
+ج) ميّز بوضوح بين: (1) وقائع مؤكدة صرّح بها المحامي، (2) استنتاجات منطقية مبنية عليها، (3) احتمالات تحتاج تأكيد. لا تخلط بينهم في الصياغة.
+د) قبل ما تختار أي دفع من المكتبة، ارجع للمبادئ والنصوص الفعلية المرجعية المذكورة تحت كل قسم في المكتبة، وتأكد إن فيه مبدأ منها بالفعل ينطبق على تفصيلة حقيقية في الوقائع المذكورة — مش مجرد دفع عام شائع في هذا النوع من القضايا. لو مش لاقي مبدأ مرجعي فعلي ينطبق فعلاً، متختارش الدفع ده حتى لو شكله مناسب نظريًا. ممنوع تخترع مبدأ قانوني شبيه من عندك؛ استخدم فقط المبادئ المذكورة صراحة في المكتبة.
+هـ) راجع نفسك قبل الإخراج النهائي: هل كل نقطة قوة/ضعف وكل دفع مرتبط صراحة بجزء محدد من الوقائع؟ هل في تناقض بين أجزاء التحليل؟
+
+قواعد دقة صارمة (أولوية قصوى لتقليل الأخطاء):
+- ممنوع اختراع أرقام مواد قانونية أو نصوص تشريعية بالتحديد إلا لو كنت متأكد تمامًا منها. لو مش متأكد من رقم مادة بعينه، اذكر اسم القانون أو الجريمة بدون رقم مادة، ولا تخترع رقمًا تقريبيًا أبدًا — رقم مادة خاطئ أخطر من عدم ذكره.
+- لا تفترض وقائع غير مذكورة (زي وجود شهود أو أدلة لم يرد ذكرها) لتبرير دفع معين.
+- لو الوقائع المذكورة ناقصة لدرجة تمنع تحليل دقيق لنقطة قانونية مهمة، سجّل ده صراحة في حقل "missing_info" بدل ما تخمّن أو تفتي بثقة زايفة.
+- حدد في حقل "confidence" مدى ثقتك العامة في التحليل ده ("مرتفعة" / "متوسطة" / "منخفضة") بناءً على مدى تفصيل ووضوح الوقائع المقدمة.
+
+قواعد الإخراج:
+1. لازم ترجع الرد بصيغة JSON فقط بدون أي نص إضافي قبله أو بعده، وبدون علامات \`\`\`.
+2. حقل "defenses" لازم يحتوي فقط على دفوع من القائمة دي (استخدم قيمة "key" بالظبط زي ما هي، من غير تعديل). القائمة دي مُختارة مسبقًا كأقرب الأقسام لوقائع القضية، لكن لو محدش منها فعلاً منطبق، اترك "defenses" فاضية بدل ما تفرض دفع مش مناسب:
+${library}
+3. اختر من الدفوع المعروضة دي اللي فعلاً مبنية على الوقائع تحديدًا (عادة 2 إلى 5)، ومتضيفش دفع لمجرد ملء العدد.
+4. لكل دفع حدد "priority" واحدة من: "قوي" أو "متوسط" أو "ضعيف" حسب قوة سنده الفعلي في الوقائع المذكورة (مش حسب شيوعه في هذا النوع من القضايا).
+5. الشكل المطلوب بالظبط:
+{
+  "summary": "نص تحليل الموقف القانوني العام، يوضح التكييف المحتمل وأهم زاوية في القضية (فقرة أو فقرتين)",
+  "confidence": "مرتفعة",
+  "points": ["نقطة قوة أو ضعف 1 مرتبطة بجزء محدد من الوقائع", "..."],
+  "defenses": [
+    { "key": "butlan", "title": "اسم الدفع بالتحديد", "reason": "اذكر أولًا المبدأ المرجعي الفعلي من المكتبة اللي بيسنده، ثم اربطه بتفصيلة محددة من وقائع القضية", "priority": "قوي" }
+  ],
+  "scenarios": ["سيناريو محتمل 1 لمسار القضية مبني على التحليل أعلاه", "سيناريو محتمل 2", "..."],
+  "missing_info": ["معلومة أساسية ناقصة تؤثر على دقة التحليل لو وجدت، وإلا اترك المصفوفة فاضية"]
+}
+6. اكتب كل المحتوى بالعربية الفصحى المبسطة المناسبة لمحامٍ محترف، بدون حشو أو عبارات عامة لا تضيف قيمة.
+7. لا تفتِ بشكل قاطع نهائي؛ التحليل استرشادي أولي فقط ولا يغني عن تقدير المحامي المهني.${isComplex ? '\n8. هذه قضية معقدة أو حساسة (وقائع طويلة/جناية/استئناف) — خصص وقت تفكير أطول وتحليل أعمق للتفاصيل الدقيقة والإجراءات قبل الإخراج النهائي.' : ''}`;
+}
+function buildUserPrompt({ type, stage, caseNumber, parties, facts }) {
+  let out = `نوع القضية: ${CASE_TYPE_LABELS[type] || type}\n`;
+  out += `مرحلة القضية: ${CASE_STAGE_LABELS[stage] || stage}\n`;
+  if (caseNumber) out += `رقم القضية: ${caseNumber}\n`;
+  if (parties) out += `الأطراف: ${parties}\n`;
+  out += `\nوقائع القضية كما وصفها المحامي:\n${facts}`;
+  return out;
+}
+/* ---------- كشف صعوبة القضية: يحدد قوة التفكير وحجم التوكنز المطلوبين ---------- */
+const COMPLEX_SIGNALS = /جناية|جنايات|إعدام|مؤبد|أشغال شاقة|قتل عمد|تفتيش|بطلان|تلبس|إعادة محاكمة|نقض|طعن|شهاده الزور|شهادة الزور|تناقض أقوال|بصمة|تحليل حمض|DNA|تحريات/;
+function assessComplexity({ facts, type, stage }) {
+  const words = countWords(facts);
+  let score = 0;
+  if (words > 120) score += 1;
+  if (words > 250) score += 1;
+  if (stage === 'appeal') score += 1;
+  if (type === 'criminal') score += 1;
+  if (COMPLEX_SIGNALS.test(facts)) score += 2;
+  return score >= 3;
+}
+/* ---------- اختيار الأقسام الأقرب للوقائع محليًا (بدون أي استدعاء API) ---------- */
+/* ده بيقلل حجم الـ prompt جدًا (مهم لحسابات Groq المحدودة بـ tokens-per-minute)
+   وكمان بيحسن التركيز: الموديل بياخد مبادئ الأقسام المرتبطة فعلاً بدل ما يتوه بين 23 قسم */
+const AR_STOPWORDS = new Set(['من','في','على','الى','إلى','عن','مع','هذا','هذه','ذلك','التي','الذي','كان','كانت','قد','لم','لن','ما','لا','إن','أن','او','أو','ثم','كل','بين','عند','بعد','قبل','هو','هي','انا','أنا','نحن','هم','له','لها','لهم','كما','حتى','غير','دون','بها','به','فيه','فيها','أيضا','ايضا']);
+function tokenizeAr(text) {
+  return (text || '')
+    .replace(/[\u064B-\u065F]/g, '') // إزالة التشكيل
+    .split(/[^\u0621-\u064A\u0660-\u0669a-zA-Z0-9]+/)
+    .filter(w => w.length >= 3 && !AR_STOPWORDS.has(w));
+}
+const DEFAULT_KEYS_BY_TYPE = {
+  criminal: ['butlan', 'tashriaat', 'ettiraf'],
+  civil: ['qabool', 'ikhtisas'],
+};
+function selectRelevantDefenseKeys(facts, caseType, maxKeys = 6) {
+  const candidates = DEFENSE_LIBRARY.filter(d => d.type === caseType);
+  const factWords = new Set(tokenizeAr(facts));
+  if (factWords.size === 0) return DEFAULT_KEYS_BY_TYPE[caseType] || candidates.slice(0, maxKeys).map(d => d.key);
+
+  const scored = candidates.map(d => {
+    const bagText = (d.title + ' ' + (DEFENSE_TEXTS[d.key] || []).join(' '));
+    const bagWords = tokenizeAr(bagText);
+    let score = 0;
+    for (const w of bagWords) if (factWords.has(w)) score++;
+    return { key: d.key, score };
+  }).sort((a, b) => b.score - a.score);
+
+  let selected = scored.filter(s => s.score > 0).slice(0, maxKeys).map(s => s.key);
+  if (selected.length < 2) {
+    // مفيش تطابق كافي (وقائع مقتضبة جدًا) — نرجع لمجموعة افتراضية بدل ما نسيب الموديل من غير أي مرجع
+    const defaults = DEFAULT_KEYS_BY_TYPE[caseType] || [];
+    selected = Array.from(new Set([...selected, ...defaults])).slice(0, maxKeys);
+  }
+  return selected;
+}
+
+function extractJSON(text) {
+  const cleaned = text.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(cleaned); }
+  catch (e) {
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]);
+    throw e;
+  }
+}
+function sanitizeDefenses(defenses, caseType) {
+  if (!Array.isArray(defenses)) return [];
+  const validKeys = new Set(DEFENSE_LIBRARY.filter(d => d.type === caseType).map(d => d.key));
+  const validPriorities = new Set(['قوي', 'متوسط', 'ضعيف']);
+  return defenses
+    .filter(d => d && typeof d === 'object' && validKeys.has(d.key))
+    .map(d => ({
+      key: d.key,
+      title: typeof d.title === 'string' ? d.title.slice(0, 200) : '',
+      reason: typeof d.reason === 'string' ? d.reason.slice(0, 800) : '',
+      priority: validPriorities.has(d.priority) ? d.priority : 'متوسط',
+    }));
+}
+const GROQ_MODEL = 'openai/gpt-oss-120b'; // reasoning model: يفكر قبل ما يجاوب (llama-3.3-70b-versatile اتشالت من Groq)
+
+async function groqChatJSON(messages, { reasoningEffort = 'medium', maxTokens = 1800 } = {}) {
+  const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${GROQ_KEY}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.2,
+      max_completion_tokens: maxTokens,
+      reasoning_effort: reasoningEffort,
+      include_reasoning: false,
+      response_format: { type: 'json_object' },
+      messages,
+    }),
+  });
+  if (!groqRes.ok) {
+    const errText = await groqRes.text();
+    console.error('Groq API error:', groqRes.status, errText);
+    const err = new Error('groq error');
+    err.isTooLarge = groqRes.status === 413 || /too large|rate_limit_exceeded|tokens per minute/i.test(errText);
+    throw err;
+  }
+  const groqData = await groqRes.json();
+  const rawText = groqData?.choices?.[0]?.message?.content || '';
+  return extractJSON(rawText);
+}
+
+function normalizeAnalysis(parsed, caseType) {
+  const validConfidence = new Set(['مرتفعة', 'متوسطة', 'منخفضة']);
+  return {
+    summary: typeof parsed.summary === 'string' ? parsed.summary : '',
+    confidence: validConfidence.has(parsed.confidence) ? parsed.confidence : '',
+    points: Array.isArray(parsed.points) ? parsed.points.filter(p => typeof p === 'string').slice(0, 10) : [],
+    defenses: sanitizeDefenses(parsed.defenses, caseType),
+    scenarios: Array.isArray(parsed.scenarios) ? parsed.scenarios.filter(s => typeof s === 'string').slice(0, 6) : [],
+    missing_info: Array.isArray(parsed.missing_info) ? parsed.missing_info.filter(m => typeof m === 'string').slice(0, 6) : [],
+  };
+}
+
+async function callGroqDirect({ type, stage, caseNumber, parties, facts }, onStageChange) {
+  const caseType = type === 'civil' ? 'civil' : 'criminal';
+  const caseStage = ['investigation', 'trial', 'appeal'].includes(stage) ? stage : 'investigation';
+  // حد أقصى أقل من قبل (3500 بدل 6000 حرف) — مهم لحسابات Groq المحدودة، وغالبًا كافي جدًا لوصف وقائع قضية
+  const trimmedFacts = facts.slice(0, 3500);
+  const isComplex = assessComplexity({ facts: trimmedFacts, type: caseType, stage: caseStage });
+  // اختيار محلي (بدون تكلفة API) لأقرب أقسام الدفوع لوقائع القضية — بيقلل حجم الطلب جدًا ويركّز التحليل
+  const selectedKeys = selectRelevantDefenseKeys(trimmedFacts, caseType, isComplex ? 7 : 5);
+
+  const systemPrompt = buildSystemPrompt(caseType, isComplex, selectedKeys);
+  const userPrompt = buildUserPrompt({ type: caseType, stage: caseStage, caseNumber, parties, facts: trimmedFacts });
+
+  async function runFirstPass(effort, maxTokens, keys) {
+    const sys = keys === selectedKeys ? systemPrompt : buildSystemPrompt(caseType, isComplex, keys);
+    return groqChatJSON(
+      [
+        { role: 'system', content: sys },
+        { role: 'user', content: userPrompt },
+      ],
+      { reasoningEffort: effort, maxTokens }
+    );
+  }
+
+  let firstPass;
+  try {
+    // ميزانية توكنز محافظة عشان تشتغل حتى على حسابات Groq المجانية (محدودة بتوكنز/الدقيقة)
+    firstPass = await runFirstPass(isComplex ? 'high' : 'medium', isComplex ? 2600 : 1600, selectedKeys);
+  } catch (e) {
+    if (!e.isTooLarge) throw e;
+    // الطلب لسه كبير على حساب المستخدم — نحاول تاني بنسخة مصغّرة جدًا (أقسام أقل + توكنز أقل) بدل ما نفشل بالكامل
+    const fewerKeys = selectedKeys.slice(0, 3);
+    firstPass = await runFirstPass('low', 1000, fewerKeys);
+  }
+  let result = normalizeAnalysis(firstPass, caseType);
+
+  // مراجعة ذاتية خفيفة: بس للقضايا المعقدة وبس للأقسام اللي فعلاً استخدمها في المسودة (مش المكتبة كاملة) — عشان تفضل رخيصة وسريعة
+  if (isComplex && result.defenses.length) {
+    if (onStageChange) onStageChange('review');
+    try {
+      const usedKeys = Array.from(new Set(result.defenses.map(d => d.key)));
+      const lightLibrary = buildLibraryPrompt(caseType, usedKeys);
+      const critiquePrompt = `الوقائع الأصلية:\n${userPrompt}\n\nمسودة التحليل (JSON):\n${JSON.stringify(result)}\n\nمرجع الدفوع المستخدمة في المسودة:\n${lightLibrary}\n\nراجع المسودة دي ضد الوقائع بدقة:\n- احذف أي دفع مش له سند واضح في الوقائع أو في المرجع أعلاه.\n- صحح أي "priority" مبالغ فيها.\n- احذف أي رقم مادة قانونية غير متأكد منه 100%.\n- أضف أي معلومة ناقصة مهمة في "missing_info".\nأرجع نفس بنية الـ JSON بالضبط، مصححة، بدون أي شرح إضافي.`;
+      const revised = await groqChatJSON(
+        [
+          { role: 'system', content: 'أنت مستشار قانوني مصري خبير تراجع تحليلك السابق بدقة شديدة وترجع JSON فقط بنفس البنية.' },
+          { role: 'user', content: critiquePrompt },
+        ],
+        { reasoningEffort: 'medium', maxTokens: 1800 }
+      );
+      result = normalizeAnalysis(revised, caseType);
+    } catch (e) {
+      // لو المراجعة فشلت (حتى بسبب حجم الطلب)، نكتفي بنتيجة الممر الأول بدل ما نفشل التحليل كله
+      console.error('critique pass failed, falling back to first pass', e);
+    }
+  }
+
+  return result;
+}
+
+
+/* ---------- state ---------- */
+let currentType = 'criminal';
+let currentStage = 'investigation';
+let isRecording = false;
+let recognition = null;
+let history = JSON.parse(localStorage.getItem('legista_tahlil_history') || '[]');
+let activeHistoryId = null;
+ 
+const chatScroll = document.getElementById('chatScroll');
+const factsInput = document.getElementById('factsInput');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const wordCounter = document.getElementById('wordCounter');
+const historyList = document.getElementById('historyList');
+const historyEmpty = document.getElementById('historyEmpty');
+const sidebar = document.getElementById('sidebar');
+ 
+const STAGE_LABELS = { investigation: 'مرحلة التحقيق', trial: 'مرحلة المحاكمة', appeal: 'مرحلة الاستئناف' };
+const TYPE_LABELS = { criminal: 'جنائي', civil: 'مدني' };
+const PRIORITY_ORDER = { 'قوي': 0, 'متوسط': 1, 'ضعيف': 2 };
+ 
+/* ---------- intake bubble ---------- */
+function renderIntake() {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai';
+  el.innerHTML = `
+    ${aiAvatarSVG()}
+    <div class="bubble">
+      <div class="intake">
+        <p style="font-size:13.5px;line-height:1.9;">أهلاً 👋 قولّي تفاصيل قضيتك في المربع تحت، وقبلها حدد:</p>
+        <div class="intake-row">
+          <label>نوع القضية</label>
+          <div class="pill-toggle" id="typeToggle">
+            <button type="button" class="pill active" data-val="criminal">جنائي</button>
+            <button type="button" class="pill" data-val="civil">مدني</button>
+          </div>
+        </div>
+        <div class="intake-row">
+          <label>مرحلة القضية</label>
+          <div class="pill-toggle" id="stageToggle">
+            <button type="button" class="pill active" data-val="investigation">تحقيق</button>
+            <button type="button" class="pill" data-val="trial">محاكمة</button>
+            <button type="button" class="pill" data-val="appeal">استئناف</button>
+          </div>
+        </div>
+        <div class="extra-toggle" id="extraToggle">+ تفاصيل إضافية (اختياري)</div>
+        <div class="extra-fields" id="extraFields">
+          <input type="text" id="caseNumberInput" placeholder="رقم القضية">
+          <input type="text" id="partiesInput" placeholder="أسماء الأطراف">
+        </div>
+      </div>
+    </div>`;
+  chatScroll.appendChild(el);
+ 
+  el.querySelector('#typeToggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('.pill'); if (!btn) return;
+    el.querySelectorAll('#typeToggle .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); currentType = btn.dataset.val;
+  });
+  el.querySelector('#stageToggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('.pill'); if (!btn) return;
+    el.querySelectorAll('#stageToggle .pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); currentStage = btn.dataset.val;
+  });
+  el.querySelector('#extraToggle').addEventListener('click', () => {
+    el.querySelector('#extraFields').classList.toggle('show');
+  });
+}
+ 
+function aiAvatarSVG() {
+  return `<div class="avatar avatar-ai"><svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/><circle cx="12" cy="12" r="9" opacity="0"/></svg></div>`;
+}
+ 
+/* ---------- word counter ---------- */
+function countWords(text) { return text.trim() ? text.trim().split(/\s+/).length : 0; }
+function updateCounter() {
+  const n = countWords(factsInput.value);
+  wordCounter.textContent = n + ' كلمة';
+  wordCounter.classList.remove('low','mid','good');
+  if (n === 0) { wordCounter.classList.remove('low','mid','good'); }
+  else if (n < 20) { wordCounter.classList.add('low'); wordCounter.textContent += ' — أضف تفاصيل أكتر لتحليل أدق'; }
+  else if (n < 50) { wordCounter.classList.add('mid'); wordCounter.textContent += ' — لسه في مجال للتفصيل'; }
+  else { wordCounter.classList.add('good'); wordCounter.textContent += ' — تفاصيل كويسة للتحليل'; }
+  sendBtn.disabled = n === 0;
+}
+factsInput.addEventListener('input', () => {
+  factsInput.style.height = 'auto';
+  factsInput.style.height = Math.min(factsInput.scrollHeight, 140) + 'px';
+  updateCounter();
+});
+factsInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); sendMessage(); }
+});
+sendBtn.addEventListener('click', sendMessage);
+ 
+/* ---------- voice input ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) {
+  recognition = new SR();
+  recognition.lang = 'ar-EG';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  let baseText = '';
+  let manualStop = false; /* true only when the user explicitly pressed the mic to stop */
+  recognition.onstart = () => { baseText = factsInput.value ? factsInput.value + ' ' : ''; };
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) baseText += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    factsInput.value = baseText + interim;
+    factsInput.dispatchEvent(new Event('input'));
+  };
+  recognition.onerror = (e) => {
+    /* 'no-speech' / 'network' fire right before the engine auto-stops on a silent pause —
+       don't treat them as fatal, onend will decide whether to restart */
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      manualStop = true; isRecording = false; micBtn.classList.remove('recording');
+    }
+  };
+  recognition.onend = () => {
+    if (isRecording && !manualStop) {
+      /* the browser closed the session on its own (e.g. a short pause in speech) —
+         restart it seamlessly so the user isn't cut off */
+      setTimeout(() => { try { recognition.start(); } catch (err) { isRecording = false; micBtn.classList.remove('recording'); } }, 150);
+    } else {
+      isRecording = false; micBtn.classList.remove('recording');
+    }
+  };
+  micBtn.addEventListener('click', () => {
+    if (isRecording) {
+      manualStop = true;
+      recognition.stop();
+      isRecording = false; micBtn.classList.remove('recording');
+    } else {
+      manualStop = false;
+      isRecording = true; micBtn.classList.add('recording');
+      recognition.start();
+    }
+  });
+} else {
+  micBtn.addEventListener('click', () => {
+    micBtn.title = 'المتصفح ده مش بيدعم التسجيل الصوتي، جرّب Chrome';
+  });
+}
+ 
+/* ---------- send flow ---------- */
+async function sendMessage() {
+  const facts = factsInput.value.trim();
+  if (!facts) return;
+  const caseNumber = document.getElementById('caseNumberInput')?.value.trim() || '';
+  const parties = document.getElementById('partiesInput')?.value.trim() || '';
+ 
+  appendUserBubble(facts);
+  factsInput.value = ''; factsInput.style.height = 'auto'; updateCounter();
+  sendBtn.disabled = true;
+ 
+  const thinkingEl = appendThinkingBubble();
+ 
+  try {
+    const data = await callGroqDirect({ type: currentType, stage: currentStage, caseNumber, parties, facts }, (stage) => thinkingEl.setStage?.(stage));
+    thinkingEl.remove();
+    await appendResultSequence(data, { facts, caseNumber, parties });
+    saveToHistory({ type: currentType, stage: currentStage, facts, caseNumber, parties, result: data, ts: Date.now() });
+  } catch (err) {
+    thinkingEl.remove();
+    appendErrorBubble(() => sendMessageRetry(facts, caseNumber, parties));
+  } finally {
+    sendBtn.disabled = factsInput.value.trim() === '';
+  }
+}
+ 
+function sendMessageRetry(facts, caseNumber, parties) {
+  factsInput.value = facts;
+  if (document.getElementById('caseNumberInput')) document.getElementById('caseNumberInput').value = caseNumber;
+  if (document.getElementById('partiesInput')) document.getElementById('partiesInput').value = parties;
+  sendMessage();
+}
+ 
+function appendUserBubble(text) {
+  const el = document.createElement('div');
+  el.className = 'msg msg-user';
+  el.innerHTML = `<div class="avatar avatar-user">أنت</div><div class="bubble">${escapeHTML(text)}</div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+}
+ 
+const STAGE_MESSAGES = ['بقرأ وقائع القضية...', 'بحلل الأطراف والاتهام...', 'بفحص سلامة الإجراءات...', 'بطابق مع مكتبة الدفوع...', 'بترتب الدفوع حسب الأولوية...'];
+const REVIEW_STAGE_MESSAGE = 'القضية دي معقدة، براجع التحليل تاني للتأكد من دقته...';
+function appendThinkingBubble() {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai thinking';
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="dot-flow"><span></span><span></span><span></span></div><span class="stage-text">${STAGE_MESSAGES[0]}</span></div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+  const stageTextEl = el.querySelector('.stage-text');
+  let i = 0;
+  let reviewMode = false;
+  el._interval = setInterval(() => {
+    if (reviewMode) return; // في مرحلة المراجعة بنثبت الرسالة
+    i = (i + 1) % STAGE_MESSAGES.length;
+    stageTextEl.style.opacity = 0;
+    setTimeout(() => { stageTextEl.textContent = STAGE_MESSAGES[i]; stageTextEl.style.opacity = 1; }, 200);
+  }, 1600);
+  el.setStage = (stage) => {
+    if (stage === 'review') {
+      reviewMode = true;
+      stageTextEl.style.opacity = 0;
+      setTimeout(() => { stageTextEl.textContent = REVIEW_STAGE_MESSAGE; stageTextEl.style.opacity = 1; }, 200);
+    }
+  };
+  const originalRemove = el.remove.bind(el);
+  el.remove = () => { clearInterval(el._interval); originalRemove(); };
+  return el;
+}
+ 
+function appendErrorBubble(retryFn) {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai error-bubble';
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble">حصل خطأ أثناء التحليل ولسه القضية متحفظتش. جرّب تاني.<br><button class="retry-btn">إعادة المحاولة ↻</button></div>`;
+  el.querySelector('.retry-btn').addEventListener('click', () => { el.remove(); retryFn(); });
+  chatScroll.appendChild(el);
+  scrollDown();
+}
+ 
+async function appendResultSequence(data, meta) {
+  const blocks = [];
+ 
+  if (data.summary) blocks.push({
+    title: '📋 تحليل الموقف القانوني',
+    html: `<div>${escapeHTML(data.summary)}</div>${data.confidence ? `<div class="confidence-badge confidence-${data.confidence}">درجة الثقة في التحليل: ${data.confidence}</div>` : ''}`
+  });
+
+  if (data.missing_info && data.missing_info.length) blocks.push({
+    title: '❗ معلومات ناقصة تؤثر على دقة التحليل',
+    html: `<ul class="result-list missing-info-list">${data.missing_info.map(m => `<li>${escapeHTML(m)}</li>`).join('')}</ul>`
+  });
+ 
+  if (data.points && data.points.length) blocks.push({
+    title: '⚠️ نقاط القوة والضعف',
+    html: `<ul class="result-list">${data.points.map(p => `<li>${escapeHTML(p)}</li>`).join('')}</ul>`
+  });
+ 
+  if (data.defenses && data.defenses.length) {
+    const sorted = [...data.defenses].sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1));
+    blocks.push({
+      title: '🛡️ الدفوع المقترحة من مكتبتك',
+      html: sorted.map(d => `
+        <div class="defense-card">
+          <div class="defense-top">
+            <span class="defense-name">${escapeHTML(d.title || '')}</span>
+            <span class="priority-badge ${d.priority || 'متوسط'}">${d.priority || 'متوسط'}</span>
+          </div>
+          <div class="defense-why">${escapeHTML(d.reason || '')}</div>
+          <a class="defense-link" href="dafou-detail.html?section=${encodeURIComponent(d.key || '')}" target="_blank">افتح الدفوع ←</a>
+        </div>`).join('')
+    });
+  }
+ 
+  if (data.scenarios && data.scenarios.length) blocks.push({
+    title: '🔮 سيناريوهات محتملة',
+    html: `<ul class="result-list">${data.scenarios.map(s => `<li>${escapeHTML(s)}</li>`).join('')}</ul>`
+  });
+ 
+  for (let i = 0; i < blocks.length; i++) {
+    await appendOneResultBlock(blocks[i], i === blocks.length - 1, data, meta);
+    await sleep(280);
+  }
+}
+ 
+function appendOneResultBlock(block, isLast, fullData, meta) {
+  return new Promise((resolve) => {
+    const el = document.createElement('div');
+    el.className = 'msg msg-ai';
+    let extra = '';
+    if (isLast) {
+      extra = `
+        <div class="disclaimer-line">تحليل استرشادي أولي بالذكاء الاصطناعي بناءً على وصفك للوقائع، ولا يُعد استشارة قانونية نهائية ولا بديلاً عن التقدير المهني للمحامي.</div>
+        <div class="msg-actions">
+          <button class="action-btn copy-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            نسخ التحليل
+          </button>
+          <button class="action-btn pdf-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            تحميل PDF
+          </button>
+        </div>`;
+    }
+    el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="result-title">${block.title}</div>${block.html}${extra}</div>`;
+    chatScroll.appendChild(el);
+    scrollDown();
+    if (isLast) {
+      el.querySelector('.copy-btn').addEventListener('click', () => copyAnalysis(fullData, meta));
+      el.querySelector('.pdf-btn').addEventListener('click', () => downloadPDF(fullData, meta));
+    }
+    setTimeout(resolve, 60);
+  });
+}
+ 
+/* ---------- copy / pdf ---------- */
+function analysisToText(data, meta) {
+  let out = `تحليل قضية — ${TYPE_LABELS[meta.type] || ''} — ${STAGE_LABELS[meta.stage] || ''}\n`;
+  if (meta.caseNumber) out += `رقم القضية: ${meta.caseNumber}\n`;
+  if (meta.parties) out += `الأطراف: ${meta.parties}\n`;
+  out += `\nالوقائع:\n${meta.facts}\n`;
+  if (data.summary) out += `\nتحليل الموقف القانوني:\n${data.summary}\n`;
+  if (data.confidence) out += `\nدرجة الثقة في التحليل: ${data.confidence}\n`;
+  if (data.missing_info?.length) out += `\nمعلومات ناقصة تؤثر على دقة التحليل:\n${data.missing_info.map(m => '- ' + m).join('\n')}\n`;
+  if (data.points?.length) out += `\nنقاط القوة والضعف:\n${data.points.map(p => '- ' + p).join('\n')}\n`;
+  if (data.defenses?.length) out += `\nالدفوع المقترحة:\n${data.defenses.map(d => `- [${d.priority || ''}] ${d.title}: ${d.reason}`).join('\n')}\n`;
+  if (data.scenarios?.length) out += `\nسيناريوهات محتملة:\n${data.scenarios.map(s => '- ' + s).join('\n')}\n`;
+  out += `\n(تحليل استرشادي بالذكاء الاصطناعي، ليس استشارة قانونية نهائية)`;
+  return out;
+}
+function copyAnalysis(data, meta) {
+  navigator.clipboard.writeText(analysisToText(data, meta)).then(() => toast('اتنسخ التحليل ✓'));
+}
+function downloadPDF(data, meta) {
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const text = analysisToText(data, meta);
+    const lines = doc.splitTextToSize(text, 180);
+    doc.setFontSize(11);
+    doc.text(lines, 15, 15);
+    doc.save('تحليل-القضية.pdf');
+  } catch (e) {
+    toast('تعذّر إنشاء PDF، هنسخلك النص بدل منه');
+    copyAnalysis(data, meta);
+  }
+}
+function toast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#211C12;color:#FBF3DC;padding:10px 18px;border-radius:10px;font-size:12.5px;border:1px solid rgba(212,175,55,0.4);z-index:2000;animation:toastIn .25s ease;';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+ 
+/* ---------- history ---------- */
+function saveToHistory(entry) {
+  entry.id = 'h_' + Date.now();
+  history.unshift(entry);
+  history = history.slice(0, 30);
+  localStorage.setItem('legista_tahlil_history', JSON.stringify(history));
+  activeHistoryId = entry.id;
+  renderHistoryList();
+}
+function renderHistoryList() {
+  historyList.innerHTML = '';
+  if (!history.length) { historyList.appendChild(historyEmpty); return; }
+  history.forEach(h => {
+    const item = document.createElement('div');
+    item.className = 'history-item' + (h.id === activeHistoryId ? ' active' : '');
+    item.innerHTML = `
+      <div class="history-item-top">
+        <span class="history-item-type ${h.type}">${TYPE_LABELS[h.type] || ''}</span>
+        <span class="history-item-date">${formatDate(h.ts)}</span>
+      </div>
+      <div class="history-item-snippet">${escapeHTML(h.facts.slice(0, 70))}</div>`;
+    item.addEventListener('click', () => loadHistoryEntry(h));
+    historyList.appendChild(item);
+  });
+}
+function loadHistoryEntry(h) {
+  activeHistoryId = h.id;
+  renderHistoryList();
+  chatScroll.innerHTML = '';
+  currentType = h.type; currentStage = h.stage;
+  renderIntake();
+  appendUserBubble(h.facts);
+  appendResultSequence(h.result, h);
+  sidebar.classList.remove('open');
+}
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+}
+ 
+/* ---------- utils ---------- */
+function escapeHTML(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+function scrollDown() { chatScroll.scrollTop = chatScroll.scrollHeight; }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+ 
+/* ---------- new chat / sidebar toggle ---------- */
+document.getElementById('newChatBtn').addEventListener('click', () => {
+  activeHistoryId = null;
+  chatScroll.innerHTML = '';
+  currentType = 'criminal'; currentStage = 'investigation';
+  renderIntake();
+  renderHistoryList();
+  sidebar.classList.remove('open');
+});
+document.getElementById('sidebarToggle').addEventListener('click', () => sidebar.classList.toggle('open'));
+ 
+/* ---------- init ---------- */
+renderIntake();
+renderHistoryList();
+updateCounter();
+</script>
+</body>
+</html>
+ 
