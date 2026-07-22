@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أحكام محكمة النقض — LEGISTA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height: 100%; }
+body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white); direction:rtl; }
+::-webkit-scrollbar { width:8px; } ::-webkit-scrollbar-thumb { background:rgba(212,175,55,0.2); border-radius:4px; }
+
+.top-nav { position:sticky; top:0; z-index:100; background:rgba(10,10,13,0.9); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; }
+.nav-back { color:var(--gray); text-decoration:none; font-size:13px; font-weight:700; }
+.nav-back:hover { color:var(--gold); }
+.nav-logo { font-family:'Syne',sans-serif; font-weight:800; letter-spacing:5px; font-size:16px; background:linear-gradient(90deg,var(--gold),var(--gold-soft)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+
+.hero { text-align:center; padding:56px 20px 32px; max-width:800px; margin:0 auto; }
+.hero .eyebrow { font-size:11px; letter-spacing:4px; color:var(--gold-soft); font-weight:800; margin-bottom:14px; }
+.hero h1 { font-family:'Syne',sans-serif; font-size:clamp(26px,4vw,40px); font-weight:800; margin-bottom:14px; }
+.hero p { font-size:14px; color:var(--gray); line-height:1.9; }
+
+.wrap { max-width:920px; margin:0 auto; padding:0 20px 100px; }
+
+.search-box { position:relative; margin-bottom:20px; }
+.search-box input { width:100%; padding:16px 50px 16px 20px; border-radius:14px; border:1px solid var(--border); background:var(--surface); color:var(--white); font-family:'Cairo',sans-serif; font-size:14px; outline:none; }
+.search-box input:focus { border-color:var(--gold); }
+.search-box .icon { position:absolute; right:20px; top:50%; transform:translateY(-50%); color:var(--gray); font-size:16px; }
+.result-count { font-size:12px; color:var(--gray); margin-bottom:16px; }
+.result-count b { color:var(--gold-soft); }
+
+.cat-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+.cat-chip { padding:7px 14px; border-radius:20px; border:1px solid var(--border); background:var(--surface); color:var(--gray); font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap; }
+.cat-chip:hover { border-color:var(--gold); color:var(--gold-soft); }
+.cat-chip.active { background:var(--gold); border-color:var(--gold); color:#0A0A0D; }
+
+.entry-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 24px; margin-bottom:14px; cursor:pointer; transition:border-color .2s; }
+.entry-card:hover { border-color:rgba(212,175,55,0.35); }
+.entry-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px; }
+.entry-cat-badge { font-size:10px; font-weight:800; padding:4px 12px; border-radius:20px; background:rgba(212,175,55,0.1); color:var(--gold-soft); white-space:nowrap; }
+.entry-sub { font-size:11px; color:var(--gray); margin-top:4px; }
+.entry-summary { font-size:13.5px; line-height:2; color:rgba(255,255,255,0.85); white-space:pre-line; }
+.entry-toggle { font-size:11px; color:var(--cyber); font-weight:700; margin-top:10px; display:inline-block; }
+.entry-rule { display:none; margin-top:16px; padding-top:16px; border-top:1px dashed var(--border); font-size:13.5px; line-height:2.1; color:rgba(255,255,255,0.75); white-space:pre-line; text-align:justify; }
+.entry-card.open .entry-rule { display:block; }
+.entry-card.open .entry-toggle { color:var(--gold); }
+.entry-cases { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.case-tag { font-size:11px; padding:5px 12px; border-radius:8px; background:rgba(0,229,255,0.08); color:var(--cyber); font-weight:700; direction:ltr; display:inline-block; }
+
+.empty-state { text-align:center; padding:60px 20px; color:var(--gray); font-size:13px; }
+.disclaimer { text-align:center; font-size:11px; color:var(--gray); margin-top:30px; line-height:1.9; opacity:0.7; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html" class="nav-back">← الرئيسية</a>
+  <a href="index.html" class="nav-logo">LEGISTA</a>
+</div>
+
+<div class="hero">
+  <p class="eyebrow">مكتبة الأحكام</p>
+  <h1>أحكام محكمة النقض<br>الدوائر الجنائية</h1>
+  <p>المستحدث من المبادئ القانونية الصادرة عن الدوائر الجنائية بمحكمة النقض — ابحث بالكلمة أو تصفح حسب الموضوع.</p>
+</div>
+
+<div class="wrap">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ابحث بكلمة، رقم الطعن، أو موضوع القاعدة...">
+    <span class="icon">🔍</span>
+  </div>
+
+  <div class="cat-filters" id="catFilters"></div>
+
+  <div class="result-count" id="resultCount"></div>
+
+  <div id="entriesWrap"></div>
+
+  <p class="disclaimer">
+    المحتوى هنا مستخرج من إصدار "المستحدث من المبادئ الصادرة من الدوائر الجنائية بمحكمة النقض" الصادر عن المكتب الفني لمحكمة النقض. هذه المبادئ مرجع استرشادي ولا تُغني عن الرجوع لنص الحكم الكامل أو استشارة محامٍ متخصص.
+  </p>
+</div>
+
+<script src="ahkam_data.js"></script>
+<script>
+let activeCategory = 'الكل';
+
+const filtersWrap = document.getElementById('catFilters');
+const categoryCounts = {};
+AHKAM_DATA.forEach(e => {
+  const c = e.category || 'غير مصنف';
+  categoryCounts[c] = (categoryCounts[c] || 0) + 1;
+});
+const sortedCats = Object.keys(categoryCounts).sort((a,b) => categoryCounts[b]-categoryCounts[a]);
+
+function buildFilters() {
+  const chips = ['الكل', ...sortedCats];
+  filtersWrap.innerHTML = chips.map(c => {
+    const count = c === 'الكل' ? AHKAM_DATA.length : categoryCounts[c];
+    return `<div class="cat-chip ${c===activeCategory?'active':''}" data-cat="${escapeAttr(c)}">${escapeHtml(c)} (${count})</div>`;
+  }).join('');
+}
+buildFilters();
+
+filtersWrap.addEventListener('click', e => {
+  const chip = e.target.closest('.cat-chip');
+  if (!chip) return;
+  activeCategory = chip.dataset.cat;
+  buildFilters();
+  render();
+});
+
+document.getElementById('searchInput').addEventListener('input', render);
+
+function render() {
+  const term = document.getElementById('searchInput').value.trim();
+  let list = AHKAM_DATA;
+  if (activeCategory !== 'الكل') {
+    list = list.filter(e => (e.category || 'غير مصنف') === activeCategory);
+  }
+  if (term) {
+    list = list.filter(e =>
+      e.summary.includes(term) || e.rule.includes(term) ||
+      (e.category || '').includes(term) ||
+      e.cases.some(c => c.caseNo.includes(term))
+    );
+  }
+  document.getElementById('resultCount').innerHTML = `عدد النتائج: <b>${list.length}</b> من أصل ${AHKAM_DATA.length} مبدأ`;
+  const wrap = document.getElementById('entriesWrap');
+  if (!list.length) { wrap.innerHTML = '<div class="empty-state">مفيش نتائج مطابقة، جرب كلمة تانية</div>'; return; }
+  wrap.innerHTML = list.map((e, idx) => entryHtml(e, idx)).join('');
+}
+
+function entryHtml(e, idx) {
+  const casesHtml = (e.cases && e.cases.length)
+    ? `<div class="entry-cases">${e.cases.map(c => `<span class="case-tag">طعن ${c.caseNo} لسنة ${c.judicialYear} ق — جلسة ${c.sessionDate}</span>`).join('')}</div>`
+    : '';
+  return `
+    <div class="entry-card" onclick="this.classList.toggle('open')">
+      <div class="entry-top">
+        <div>
+          <span class="entry-cat-badge">${escapeHtml(e.category || 'غير مصنف')}</span>
+          ${e.subcategory ? `<div class="entry-sub">${escapeHtml(e.subcategory)}</div>` : ''}
+        </div>
+      </div>
+      <div class="entry-summary">${escapeHtml(e.summary)}</div>
+      <span class="entry-toggle">▾ اعرض نص القاعدة كاملاً</span>
+      <div class="entry-rule">${escapeHtml(e.rule)}</div>
+      ${casesHtml}
+    </div>`;
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+function escapeAttr(str) { return escapeHtml(str).replace(/"/g, '&quot;'); }
+
+render();
+</script>
+</body>
+</html>
