@@ -24,7 +24,7 @@
 * , *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white); min-height:100vh; }
 ::-webkit-scrollbar { width:8px; } ::-webkit-scrollbar-thumb { background:rgba(184,134,11,0.25); border-radius:4px; }
- 
+
 /* ══ LOGIN GATE ══ */
 #loginScreen { position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; align-items:center; justify-content:center; }
 .login-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:44px 36px; width:100%; max-width:360px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.08); }
@@ -34,7 +34,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .login-box input:focus { border-color:var(--gold); }
 .login-box button { width:100%; padding:13px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--gold),#96700e); color:#fff; font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
 .login-err { color:var(--danger); font-size:12px; margin-top:10px; min-height:14px; }
- 
+
 /* ══ SHELL ══ */
 #dashboard { display:none; }
 #dashboard.show { display:block; }
@@ -45,12 +45,12 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .topbar .tab-btn:hover { background:var(--bg2); color:var(--white); }
 .topbar .tab-btn.active { background:var(--gold); color:#fff; }
 .logout-btn { background:transparent; border:1px solid var(--border); color:var(--gray); padding:8px 14px; border-radius:8px; font-family:'Cairo',sans-serif; font-size:12px; font-weight:700; cursor:pointer; }
- 
+
 .wrap { max-width:1200px; margin:0 auto; padding:28px 24px 80px; }
 .view { display:none; }
 .view.active { display:block; animation:fadeIn .3s; }
 @keyframes fadeIn { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
- 
+
 /* ══ STAT CARDS ══ */
 .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; }
 .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; }
@@ -60,17 +60,17 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .stat-card.success .val { color:var(--success); }
 .stat-card.danger .val { color:var(--danger); }
 .stat-card.cyber .val { color:var(--cyber); }
- 
+
 .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:20px; }
 .chart-card h3 { font-size:14px; font-weight:800; margin-bottom:16px; }
 .charts-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
 @media (max-width:800px) { .charts-grid { grid-template-columns:1fr; } }
- 
+
 /* ══ SEARCH ══ */
 .search-bar { display:flex; gap:10px; margin-bottom:18px; }
 .search-bar input { flex:1; padding:12px 16px; border-radius:10px; border:1px solid var(--border); background:var(--surface); font-family:'Cairo',sans-serif; font-size:13px; outline:none; }
 .search-bar input:focus { border-color:var(--gold); }
- 
+
 /* ══ USER CARDS ══ */
 .user-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:12px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
 .user-card img.avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--bg2); }
@@ -89,7 +89,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .sub-toggle-btn.to-free { background:var(--gray); color:#fff; }
 .user-card .shot-thumb { width:44px; height:44px; border-radius:8px; object-fit:cover; cursor:pointer; border:1px solid var(--border); }
 .empty-state { text-align:center; padding:60px 20px; color:var(--gray); font-size:13px; }
- 
+
 /* ══ EXPIRY ══ */
 .expiry-row { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 18px; margin-bottom:10px; }
 .expiry-row .days-left { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; min-width:70px; text-align:center; }
@@ -98,7 +98,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .expiry-row .meta { flex:1; }
 .expiry-row .meta .n { font-size:13px; font-weight:700; }
 .expiry-row .meta .d { font-size:11px; color:var(--gray); }
- 
+
 /* ══ PAYMENT REQUESTS ══ */
 .payment-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px; display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; }
 .payment-card img.shot { width:90px; height:90px; border-radius:10px; object-fit:cover; cursor:pointer; border:1px solid var(--border); flex-shrink:0; }
@@ -113,7 +113,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .status-tag.pending { background:rgba(107,107,120,0.12); color:var(--gray); }
 .status-tag.approved { background:rgba(15,157,104,0.12); color:var(--success); }
 .status-tag.rejected { background:rgba(229,72,77,0.12); color:var(--danger); }
- 
+
 /* ══ FEEDBACK ══ */
 .feedback-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:12px; }
 .feedback-card .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
@@ -122,7 +122,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .feedback-card .msg { font-size:13px; color:var(--white); line-height:1.8; margin-bottom:10px; }
 .feedback-card img { max-width:160px; border-radius:8px; cursor:pointer; }
 .feedback-card .date { font-size:11px; color:var(--gray); }
- 
+
 /* ══ MAINTENANCE ══ */
 .maint-box { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:36px; text-align:center; max-width:480px; margin:0 auto; }
 .maint-box .icon { font-size:40px; margin-bottom:16px; }
@@ -132,7 +132,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .maint-btn { padding:14px 32px; border:none; border-radius:12px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
 .maint-btn.enable { background:var(--danger); color:#fff; }
 .maint-btn.disable { background:var(--success); color:#fff; }
- 
+
 /* ══ FILES ══ */
 .file-toolbar { display:flex; gap:10px; margin-bottom:18px; align-items:center; flex-wrap:wrap; }
 .upload-btn { background:linear-gradient(135deg,var(--gold),#96700e); color:#fff; border:none; padding:11px 20px; border-radius:10px; font-family:'Cairo',sans-serif; font-size:13px; font-weight:800; cursor:pointer; }
@@ -141,7 +141,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .file-row .fsize { font-size:11px; color:var(--gray); }
 .file-del-btn { background:rgba(229,72,77,0.1); color:var(--danger); border:none; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; }
 .file-view-btn { background:rgba(0,119,182,0.1); color:var(--cyber); border:none; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; text-decoration:none; }
- 
+
 .section-title { font-size:18px; font-weight:900; margin-bottom:18px; }
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--white); color:#fff; padding:12px 22px; border-radius:10px; font-size:13px; font-weight:700; z-index:5000; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(-6px); }
@@ -152,7 +152,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 </style>
 </head>
 <body>
- 
+
 <!-- ══ LOGIN GATE ══ -->
 <div id="loginScreen">
   <div class="login-box">
@@ -163,7 +163,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
- 
+
 <!-- ══ DASHBOARD ══ -->
 <div id="dashboard">
   <div class="topbar">
@@ -173,15 +173,16 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
       <button class="tab-btn" data-view="users">المستخدمين والاشتراكات</button>
       <button class="tab-btn" data-view="expiry">مواعيد الانتهاء</button>
       <button class="tab-btn" data-view="payments">طلبات الدفع</button>
+      <button class="tab-btn" data-view="consultations">طلبات الاستشارات</button>
       <button class="tab-btn" data-view="feedback">الشكاوى والمقترحات</button>
       <button class="tab-btn" data-view="maintenance">وضع الصيانة</button>
       <button class="tab-btn" data-view="files">ملفات الموقع</button>
     </div>
     <button class="logout-btn" onclick="logoutAdmin()">خروج</button>
   </div>
- 
+
   <div class="wrap">
- 
+
     <!-- OVERVIEW -->
     <div class="view active" id="view-overview">
       <div class="section-title">نظرة عامة</div>
@@ -204,7 +205,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
         </div>
       </div>
     </div>
- 
+
     <!-- USERS & SUBSCRIPTIONS -->
     <div class="view" id="view-users">
       <div class="section-title">المستخدمين والاشتراكات</div>
@@ -213,25 +214,31 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
       </div>
       <div id="usersListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
     </div>
- 
+
     <!-- EXPIRY -->
     <div class="view" id="view-expiry">
       <div class="section-title">مواعيد انتهاء الاشتراكات (الأقرب انتهاءً أولًا)</div>
       <div id="expiryListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
     </div>
- 
+
     <!-- PAYMENTS -->
     <div class="view" id="view-payments">
       <div class="section-title">طلبات الدفع</div>
       <div id="paymentsListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
     </div>
- 
+
+    <!-- CONSULTATIONS -->
+    <div class="view" id="view-consultations">
+      <div class="section-title">طلبات الاستشارات القانونية</div>
+      <div id="consultationsListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+
     <!-- FEEDBACK -->
     <div class="view" id="view-feedback">
       <div class="section-title">الشكاوى والمقترحات</div>
       <div id="feedbackListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
     </div>
- 
+
     <!-- MAINTENANCE -->
     <div class="view" id="view-maintenance">
       <div class="section-title">وضع الصيانة</div>
@@ -244,7 +251,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
         <button class="maint-btn enable" id="maintToggleBtn" onclick="toggleMaintenance()">تفعيل وضع الصيانة</button>
       </div>
     </div>
- 
+
     <!-- FILES -->
     <div class="view" id="view-files">
       <div class="section-title">ملفات الموقع (GitHub)</div>
@@ -255,20 +262,20 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
       </div>
       <div id="filesListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
     </div>
- 
+
   </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
 <div class="lightbox" id="lightbox" onclick="this.classList.remove('show')"><img id="lightboxImg" src=""></div>
- 
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc,
   query, orderBy, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
- 
+
 const firebaseConfig = {
   apiKey: "AIzaSyC6PRK7EECoPF3qDawVSRYmMg0uufTs6Xw",
   authDomain: "legista-o.firebaseapp.com",
@@ -277,16 +284,16 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig, "legista-admin");
 const db = getFirestore(app);
- 
+
 window._db = db;
 window._fs = { collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, query, orderBy, runTransaction };
- 
+
 window.dispatchEvent(new Event('firebase-ready'));
 </script>
- 
+
 <script>
 const ADMIN_PASSWORD = "OMAR0801";
- 
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -297,7 +304,7 @@ function openLightbox(src) {
   document.getElementById('lightboxImg').src = src;
   document.getElementById('lightbox').classList.add('show');
 }
- 
+
 /* ══ LOGIN GATE ══ */
 function checkAdminPassword() {
   const val = document.getElementById('adminPasswordInput').value;
@@ -318,7 +325,7 @@ if (sessionStorage.getItem('legista_admin_ok') === '1') {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').classList.add('show');
 }
- 
+
 /* ══ TABS ══ */
 document.getElementById('tabsBar').addEventListener('click', e => {
   const btn = e.target.closest('.tab-btn');
@@ -329,22 +336,22 @@ document.getElementById('tabsBar').addEventListener('click', e => {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
 });
- 
+
 /* ══ GLOBAL STATE ══ */
 let ALL_USERS = [];
 let ALL_PAYMENTS = [];
 let ALL_FEEDBACK = [];
 let ALL_VISITS = {};
- 
+
 async function initDashboardData() {
   if (!window._db) {
     window.addEventListener('firebase-ready', initDashboardData, { once: true });
     return;
   }
-  await Promise.all([loadUsers(), loadPayments(), loadFeedback(), loadVisits(), loadMaintenanceStatus()]);
+  await Promise.all([loadUsers(), loadPayments(), loadConsultations(), loadFeedback(), loadVisits(), loadMaintenanceStatus()]);
   renderOverview();
 }
- 
+
 /* ══ USERS ══ */
 async function loadUsers() {
   const { collection, getDocs } = window._fs;
@@ -362,7 +369,7 @@ async function loadUsers() {
   renderUsers();
   renderExpiry();
 }
- 
+
 async function generateUserCode() {
   const { doc, runTransaction } = window._fs;
   const counterRef = doc(window._db, 'siteSettings', 'counters');
@@ -379,7 +386,7 @@ async function generateUserCode() {
   }
   return 'LEG-' + String(next).padStart(4, '0');
 }
- 
+
 function renderUsers() {
   const wrap = document.getElementById('usersListWrap');
   const term = (document.getElementById('userSearchInput').value || '').trim().toLowerCase();
@@ -393,7 +400,7 @@ function renderUsers() {
   if (!list.length) { wrap.innerHTML = '<div class="empty-state">مفيش مستخدمين مطابقين</div>'; return; }
   wrap.innerHTML = list.map(u => userCardHtml(u)).join('');
 }
- 
+
 function userCardHtml(u) {
   const isPaid = u.subscription === 'paid';
   const phoneClean = (u.phone || '').replace(/[^0-9]/g, '');
@@ -416,7 +423,7 @@ function userCardHtml(u) {
       </button>
     </div>`;
 }
- 
+
 async function toggleSubscription(userId) {
   const { doc, updateDoc } = window._fs;
   const u = ALL_USERS.find(x => x.id === userId);
@@ -432,7 +439,7 @@ async function toggleSubscription(userId) {
   renderOverview();
   showToast(nowPaid ? 'تم إلغاء اشتراك المستخدم' : 'تم تفعيل اشتراك المستخدم');
 }
- 
+
 /* ══ EXPIRY ══ */
 function renderExpiry() {
   const wrap = document.getElementById('expiryListWrap');
@@ -453,7 +460,7 @@ function renderExpiry() {
       </div>`;
   }).join('');
 }
- 
+
 /* ══ PAYMENTS ══ */
 async function loadPayments() {
   const { collection, getDocs, query, orderBy } = window._fs;
@@ -464,7 +471,7 @@ async function loadPayments() {
   } catch (e) { ALL_PAYMENTS = []; }
   renderPayments();
 }
- 
+
 function renderPayments() {
   const wrap = document.getElementById('paymentsListWrap');
   if (!ALL_PAYMENTS.length) { wrap.innerHTML = '<div class="empty-state">مفيش طلبات دفع حاليًا</div>'; return; }
@@ -487,18 +494,19 @@ function renderPayments() {
     </div>`).join('');
 }
 function statusLabel(s) { return s === 'approved' ? 'تمت الموافقة' : s === 'rejected' ? 'مرفوض' : 'قيد الانتظار'; }
- 
+
 async function setPaymentStatus(paymentId, status) {
   const { doc, updateDoc } = window._fs;
   const p = ALL_PAYMENTS.find(x => x.id === paymentId);
   if (!p) return;
   await updateDoc(doc(window._db, 'paymentRequests', paymentId), { status });
   p.status = status;
- 
+
   // If approved and we know the user's email, activate their subscription too
   if (status === 'approved' && p.email) {
     let u = ALL_USERS.find(x => x.email === p.email);
-    const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+    const durationDays = (p.package === 'سنوي' || p.package === 'yearly') ? 365 : 30;
+    const expiry = Date.now() + durationDays * 24 * 60 * 60 * 1000;
     if (u) {
       await updateDoc(doc(window._db, 'users', u.id), { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
       Object.assign(u, { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
@@ -518,7 +526,56 @@ async function setPaymentStatus(paymentId, status) {
   renderOverview();
   showToast('تم تحديث حالة الطلب');
 }
- 
+
+/* ══ CONSULTATIONS ══ */
+let ALL_CONSULTATIONS = [];
+async function loadConsultations() {
+  const { collection, getDocs, query, orderBy } = window._fs;
+  try {
+    const snap = await getDocs(query(collection(window._db, 'consultationRequests'), orderBy('createdAt', 'desc')));
+    ALL_CONSULTATIONS = [];
+    snap.forEach(d => ALL_CONSULTATIONS.push({ id: d.id, ...d.data() }));
+  } catch (e) { ALL_CONSULTATIONS = []; }
+  renderConsultations();
+}
+
+function renderConsultations() {
+  const wrap = document.getElementById('consultationsListWrap');
+  if (!ALL_CONSULTATIONS.length) { wrap.innerHTML = '<div class="empty-state">مفيش طلبات استشارات حاليًا</div>'; return; }
+  wrap.innerHTML = ALL_CONSULTATIONS.map(c => {
+    const phoneClean = (c.phone || '').replace(/[^0-9]/g, '');
+    const waLink = phoneClean ? `https://wa.me/${phoneClean.replace(/^0/, '20')}` : null;
+    return `
+    <div class="payment-card">
+      ${c.screenshot ? `<img class="shot" src="${c.screenshot}" onclick="openLightbox('${c.screenshot}')">` : ''}
+      <div class="info">
+        <div><b>الاسم:</b> ${escapeHtml(c.name || '—')}</div>
+        <div><b>الهاتف:</b> ${waLink ? `<a href="${waLink}" target="_blank" style="color:var(--success);font-weight:700">${escapeHtml(c.phone)} 📱</a>` : escapeHtml(c.phone || '—')}</div>
+        <div><b>الإيميل:</b> ${escapeHtml(c.email || '—')}</div>
+        <div><b>نوع الاستشارة:</b> ${escapeHtml(c.package || '—')} ${c.price ? '(' + c.price + ' جنيه)' : ''}</div>
+        <div><b>رسالة العميل:</b> ${escapeHtml(c.message || '—')}</div>
+        <div><b>المحفظة / المحول منه:</b> ${escapeHtml(c.wallet || '—')} — ${escapeHtml(c.senderNumber || '—')}</div>
+        <div><b>الحالة:</b> <span class="status-tag ${c.status || 'pending'}">${statusLabel(c.status)}</span></div>
+      </div>
+      <div class="payment-actions">
+        <button class="pbtn approve" onclick="setConsultationStatus('${c.id}','approved')">✔ تم التواصل</button>
+        <button class="pbtn pending" onclick="setConsultationStatus('${c.id}','pending')">⏳ تعليق</button>
+        <button class="pbtn reject" onclick="setConsultationStatus('${c.id}','rejected')">✕ رفض</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function setConsultationStatus(id, status) {
+  const { doc, updateDoc } = window._fs;
+  const c = ALL_CONSULTATIONS.find(x => x.id === id);
+  if (!c) return;
+  await updateDoc(doc(window._db, 'consultationRequests', id), { status });
+  c.status = status;
+  renderConsultations();
+  showToast('تم تحديث حالة الاستشارة');
+}
+
 /* ══ FEEDBACK ══ */
 async function loadFeedback() {
   const { collection, getDocs, query, orderBy } = window._fs;
@@ -543,7 +600,7 @@ function renderFeedback() {
       ${f.image ? `<img src="${f.image}" onclick="openLightbox('${f.image}')">` : ''}
     </div>`).join('');
 }
- 
+
 /* ══ VISITS ══ */
 async function loadVisits() {
   const { collection, getDocs } = window._fs;
@@ -553,7 +610,7 @@ async function loadVisits() {
     snap.forEach(d => ALL_VISITS[d.id] = d.data().count || 0);
   } catch (e) { ALL_VISITS = {}; }
 }
- 
+
 /* ══ MAINTENANCE ══ */
 async function loadMaintenanceStatus() {
   const { doc, getDoc } = window._fs;
@@ -585,7 +642,7 @@ async function toggleMaintenance() {
   updateMaintUI(newVal);
   showToast(newVal ? 'تم تفعيل وضع الصيانة' : 'تم إيقاف وضع الصيانة');
 }
- 
+
 /* ══ OVERVIEW / CHARTS ══ */
 let visitsChartInstance, subsChartInstance;
 function renderOverview() {
@@ -595,11 +652,11 @@ function renderOverview() {
   document.getElementById('statTotalUsers').textContent = total;
   document.getElementById('statSubscribed').textContent = subscribed;
   document.getElementById('statUnsubscribed').textContent = unsubscribed;
- 
+
   const todayKey = new Date().toISOString().slice(0, 10);
   const todayCount = ALL_VISITS[todayKey] || 0;
   document.getElementById('statVisitsToday').textContent = todayCount;
- 
+
   const now = new Date();
   const monthPrefix = todayKey.slice(0, 7);
   const yearPrefix = todayKey.slice(0, 4);
@@ -616,7 +673,7 @@ function renderOverview() {
   });
   document.getElementById('statVisitsMonth').textContent = monthTotal;
   document.getElementById('statVisitsYear').textContent = yearTotal;
- 
+
   const vCtx = document.getElementById('visitsChart');
   if (visitsChartInstance) visitsChartInstance.destroy();
   visitsChartInstance = new Chart(vCtx, {
@@ -627,7 +684,7 @@ function renderOverview() {
     },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
- 
+
   const sCtx = document.getElementById('subsChart');
   if (subsChartInstance) subsChartInstance.destroy();
   subsChartInstance = new Chart(sCtx, {
@@ -639,7 +696,7 @@ function renderOverview() {
     options: { plugins: { legend: { position: 'bottom' } } }
   });
 }
- 
+
 /* ══ FILE MANAGER ══ */
 async function loadFiles() {
   const wrap = document.getElementById('filesListWrap');
@@ -697,7 +754,7 @@ function handleFileUpload(e) {
   e.target.value = '';
 }
 document.querySelector('[data-view="files"]').addEventListener('click', () => { if (sessionStorage.getItem('legista_admin_ok') === '1') loadFiles(); });
- 
+
 /* ══ HELPERS ══ */
 function escapeHtml(str) {
   return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -705,4 +762,3 @@ function escapeHtml(str) {
 </script>
 </body>
 </html>
- 
