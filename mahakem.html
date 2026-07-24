@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مواقع المحاكم — LEGANO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --bg2: #121217;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --success: #00FFB2;
+  --surface: #1A1A22;
+  --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--white); direction: rtl; min-height: 100vh; }
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 20% 0%, rgba(0,229,255,0.05) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 100%, rgba(212,175,55,0.06) 0%, transparent 55%);
+}
+
+nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 48px); max-width: 1100px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(10,10,13,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; }
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+.nav-back { font-size: 12px; color: var(--gray); text-decoration: none; font-weight: 700; letter-spacing: .5px; display: flex; align-items: center; gap: 6px; transition: color .2s; }
+.nav-back:hover { color: var(--white); }
+
+.wrap { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; padding: 130px 24px 100px; }
+
+.page-eyebrow { font-size: 10px; letter-spacing: 5px; color: var(--cyber); font-weight: 700; opacity: .85; margin-bottom: 14px; }
+.page-h1 { font-size: clamp(28px,4.2vw,46px); font-weight: 900; line-height: 1.2; margin-bottom: 18px; }
+.page-h1 span { background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.page-sub { font-size: 14px; color: var(--gray); line-height: 1.9; max-width: 640px; margin-bottom: 44px; }
+
+.picker-card { background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin-bottom: 36px; }
+.picker-label { font-size: 12px; color: var(--gold-soft); font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; display: block; }
+.picker-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.gov-select {
+  flex: 1; min-width: 220px;
+  background: var(--surface); color: var(--white); border: 1px solid rgba(255,255,255,0.12);
+  padding: 15px 18px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: left 16px center; background-size: 18px;
+}
+.gov-select:focus { outline: none; border-color: rgba(212,175,55,0.5); }
+.search-input {
+  flex: 1; min-width: 220px;
+  background: var(--surface); color: var(--white); border: 1px solid rgba(255,255,255,0.12);
+  padding: 15px 18px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 14px;
+}
+.search-input::placeholder { color: var(--gray); }
+.search-input:focus { outline: none; border-color: rgba(0,229,255,0.4); }
+
+.result-meta { font-size: 12px; color: var(--gray); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.result-meta b { color: var(--gold-soft); font-family: 'Syne', sans-serif; font-size: 15px; }
+
+.courts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+.court-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px;
+  display: flex; flex-direction: column; gap: 14px; transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.court-card:hover { transform: translateY(-3px); border-color: rgba(212,175,55,0.35); box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+.court-top { display: flex; align-items: flex-start; gap: 12px; }
+.court-icon { width: 42px; height: 42px; border-radius: 11px; background: rgba(0,229,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+.court-info { flex: 1; min-width: 0; }
+.court-name { font-size: 15px; font-weight: 800; line-height: 1.4; margin-bottom: 4px; }
+.court-tag { display: inline-block; font-size: 10px; letter-spacing: .5px; font-weight: 700; padding: 3px 9px; border-radius: 6px; color: var(--gold-soft); background: rgba(212,175,55,0.12); }
+.court-tag.blue { color: var(--cyber); background: rgba(0,229,255,0.1); }
+.court-note { font-size: 12px; color: var(--gray); line-height: 1.7; }
+.court-btn {
+  margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, var(--gold), #b8941a); color: #0A0A0D; text-decoration: none;
+  padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 800; transition: transform .15s, box-shadow .2s;
+}
+.court-btn:hover { transform: scale(1.02); box-shadow: 0 4px 20px rgba(212,175,55,0.35); }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
+.empty-state .emoji { font-size: 40px; margin-bottom: 14px; }
+
+.disclaimer { margin-top: 48px; font-size: 12px; color: var(--gray); line-height: 1.9; border-top: 1px solid var(--border); padding-top: 24px; }
+.disclaimer b { color: var(--gold-soft); }
+
+@media (max-width: 640px) {
+  .picker-row { flex-direction: column; }
+  .courts-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">LEGANO</a>
+  <a class="nav-back" href="index.html">الرئيسية ←</a>
+</nav>
+
+<div class="wrap">
+  <p class="page-eyebrow">COURT LOCATOR · دليل مواقع المحاكم</p>
+  <h1 class="page-h1">مش عارف المحكمة فين؟<br><span>اختار المحافظة، ولاقيها على الخريطة فورًا.</span></h1>
+  <p class="page-sub">دليل شامل لكل محاكم مصر الابتدائية ومحاكم الاستئناف، النيابات العامة، محاكم الأسرة، المحاكم الاقتصادية، وفروع مجلس الدولة على مستوى المحافظات — اختار المحافظة، ودوس على أي محكمة عشان تفتحلك خرائط جوجل بمكانها مباشرة، سواء عايز تروح تقاضي أو تستخرج صور من ملف.</p>
+
+  <div class="picker-card">
+    <span class="picker-label">اختر المحافظة</span>
+    <div class="picker-row">
+      <select class="gov-select" id="govSelect"></select>
+      <input class="search-input" id="searchInput" type="text" placeholder="ابحث باسم المحكمة (مثلاً: أسرة، اقتصادية، استئناف)...">
+    </div>
+  </div>
+
+  <div class="result-meta" id="resultMeta"></div>
+  <div class="courts-grid" id="courtsGrid"></div>
+
+  <div class="disclaimer">
+    <b>ملحوظة:</b> البيانات دي بتغطي المحاكم والنيابات الرئيسية حسب التقسيم القضائي المعروف لكل محافظة، وزرار الخريطة بيفتح بحث جوجل مابس باسم المحكمة مباشرة. أحيانًا ممكن الاسم على الخريطة يختلف شوية عن الاسم الرسمي أو يكون فرع/دور المحكمة داخل مجمع محاكم أكبر — يُفضّل دايمًا التأكيد بمكالمة أو زيارة استطلاعية قبل أي إجراء رسمي.
+  </div>
+</div>
+
+<script>
+const DATA = {
+"القاهرة": [
+  {n:"محكمة استئناف القاهرة", t:"استئناف"},
+  {n:"محكمة النقض", t:"نقض"},
+  {n:"محكمة شمال القاهرة الابتدائية", t:"ابتدائية"},
+  {n:"محكمة جنوب القاهرة الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة القاهرة", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالقاهرة", t:"اقتصادية"},
+  {n:"مجلس الدولة - الديوان العام", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالقاهرة", t:"نيابة"},
+  {n:"محكمة جنايات القاهرة", t:"جنايات"}
+],
+"الجيزة": [
+  {n:"محكمة الجيزة الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الجيزة", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالجيزة", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع الجيزة", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالجيزة", t:"نيابة"},
+  {n:"محكمة الدقي الجزئية", t:"جزئية"},
+  {n:"محكمة العجوزة الجزئية", t:"جزئية"}
+],
+"القليوبية": [
+  {n:"محكمة بنها الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة بنها", t:"أسرة"},
+  {n:"النيابة العامة الكلية ببنها", t:"نيابة"},
+  {n:"مجلس الدولة - فرع بنها", t:"مجلس دولة"},
+  {n:"محكمة شبرا الخيمة الجزئية", t:"جزئية"}
+],
+"الإسكندرية": [
+  {n:"محكمة استئناف الإسكندرية", t:"استئناف"},
+  {n:"مجمع محاكم السيد كريم (المحكمة البحرية)", t:"مجمع محاكم"},
+  {n:"مجمع المحاكم الجديد بالإسكندرية", t:"مجمع محاكم"},
+  {n:"محكمة أسرة الإسكندرية", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالإسكندرية", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع الإسكندرية", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالإسكندرية", t:"نيابة"}
+],
+"البحيرة": [
+  {n:"محكمة دمنهور الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة دمنهور", t:"أسرة"},
+  {n:"النيابة العامة الكلية بدمنهور", t:"نيابة"},
+  {n:"مجلس الدولة - فرع دمنهور", t:"مجلس دولة"},
+  {n:"محكمة كفر الدوار الجزئية", t:"جزئية"}
+],
+"مطروح": [
+  {n:"محكمة مرسى مطروح الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة مرسى مطروح", t:"أسرة"},
+  {n:"النيابة العامة الكلية بمطروح", t:"نيابة"}
+],
+"كفر الشيخ": [
+  {n:"محكمة كفر الشيخ الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة كفر الشيخ", t:"أسرة"},
+  {n:"النيابة العامة الكلية بكفر الشيخ", t:"نيابة"},
+  {n:"مجلس الدولة - فرع كفر الشيخ", t:"مجلس دولة"}
+],
+"الدقهلية": [
+  {n:"محكمة استئناف المنصورة", t:"استئناف"},
+  {n:"محكمة المنصورة الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة المنصورة", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالمنصورة", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع المنصورة", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالمنصورة", t:"نيابة"}
+],
+"دمياط": [
+  {n:"محكمة دمياط الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة دمياط", t:"أسرة"},
+  {n:"النيابة العامة الكلية بدمياط", t:"نيابة"}
+],
+"الشرقية": [
+  {n:"محكمة استئناف الزقازيق", t:"استئناف"},
+  {n:"محكمة الزقازيق الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الزقازيق", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالزقازيق", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع الزقازيق", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالزقازيق", t:"نيابة"}
+],
+"الغربية": [
+  {n:"محكمة استئناف طنطا", t:"استئناف"},
+  {n:"محكمة طنطا الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة طنطا", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بطنطا", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع طنطا", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بطنطا", t:"نيابة"}
+],
+"المنوفية": [
+  {n:"محكمة شبين الكوم الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة شبين الكوم", t:"أسرة"},
+  {n:"النيابة العامة الكلية بشبين الكوم", t:"نيابة"},
+  {n:"مجلس الدولة - فرع شبين الكوم", t:"مجلس دولة"}
+],
+"بورسعيد": [
+  {n:"محكمة بورسعيد الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة بورسعيد", t:"أسرة"},
+  {n:"المحكمة الاقتصادية ببورسعيد", t:"اقتصادية"},
+  {n:"النيابة العامة الكلية ببورسعيد", t:"نيابة"}
+],
+"الإسماعيلية": [
+  {n:"محكمة استئناف الإسماعيلية", t:"استئناف"},
+  {n:"محكمة الإسماعيلية الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الإسماعيلية", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالإسماعيلية", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع الإسماعيلية", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالإسماعيلية", t:"نيابة"}
+],
+"السويس": [
+  {n:"محكمة السويس الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة السويس", t:"أسرة"},
+  {n:"النيابة العامة الكلية بالسويس", t:"نيابة"}
+],
+"شمال سيناء": [
+  {n:"محكمة العريش الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة العريش", t:"أسرة"},
+  {n:"النيابة العامة الكلية بالعريش", t:"نيابة"}
+],
+"جنوب سيناء": [
+  {n:"محكمة الطور الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الطور", t:"أسرة"},
+  {n:"النيابة العامة بالطور", t:"نيابة"}
+],
+"الفيوم": [
+  {n:"محكمة الفيوم الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الفيوم", t:"أسرة"},
+  {n:"النيابة العامة الكلية بالفيوم", t:"نيابة"},
+  {n:"مجلس الدولة - فرع الفيوم", t:"مجلس دولة"}
+],
+"بني سويف": [
+  {n:"محكمة استئناف بني سويف", t:"استئناف"},
+  {n:"محكمة بني سويف الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة بني سويف", t:"أسرة"},
+  {n:"مجلس الدولة - فرع بني سويف", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية ببني سويف", t:"نيابة"}
+],
+"المنيا": [
+  {n:"محكمة المنيا الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة المنيا", t:"أسرة"},
+  {n:"النيابة العامة الكلية بالمنيا", t:"نيابة"},
+  {n:"مجلس الدولة - فرع المنيا", t:"مجلس دولة"}
+],
+"أسيوط": [
+  {n:"محكمة استئناف أسيوط", t:"استئناف"},
+  {n:"محكمة أسيوط الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة أسيوط", t:"أسرة"},
+  {n:"مجلس الدولة - فرع أسيوط", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بأسيوط", t:"نيابة"}
+],
+"سوهاج": [
+  {n:"محكمة سوهاج الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة سوهاج", t:"أسرة"},
+  {n:"النيابة العامة الكلية بسوهاج", t:"نيابة"},
+  {n:"مجلس الدولة - فرع سوهاج", t:"مجلس دولة"}
+],
+"قنا": [
+  {n:"محكمة استئناف قنا", t:"استئناف"},
+  {n:"محكمة قنا الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة قنا", t:"أسرة"},
+  {n:"مجلس الدولة - فرع قنا", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بقنا", t:"نيابة"}
+],
+"الأقصر": [
+  {n:"محكمة الأقصر الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الأقصر", t:"أسرة"},
+  {n:"المحكمة الاقتصادية بالأقصر", t:"اقتصادية"},
+  {n:"مجلس الدولة - فرع الأقصر", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بالأقصر", t:"نيابة"}
+],
+"أسوان": [
+  {n:"محكمة أسوان الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة أسوان", t:"أسرة"},
+  {n:"مجلس الدولة - فرع أسوان", t:"مجلس دولة"},
+  {n:"النيابة العامة الكلية بأسوان", t:"نيابة"}
+],
+"البحر الأحمر": [
+  {n:"محكمة الغردقة الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الغردقة", t:"أسرة"},
+  {n:"النيابة العامة بالغردقة", t:"نيابة"}
+],
+"الوادي الجديد": [
+  {n:"محكمة الخارجة الابتدائية", t:"ابتدائية"},
+  {n:"محكمة أسرة الخارجة", t:"أسرة"},
+  {n:"النيابة العامة بالخارجة", t:"نيابة"}
+]
+};
+
+const ICONS = {
+  "استئناف":"⚖️", "نقض":"🏛️", "ابتدائية":"🏢", "جزئية":"🏢", "أسرة":"👪",
+  "اقتصادية":"💼", "مجلس دولة":"📜", "نيابة":"🕵️", "جنايات":"🚔", "مجمع محاكم":"🏛️"
+};
+const BLUE_TAGS = ["نيابة","مجلس دولة","اقتصادية"];
+
+const govSelect = document.getElementById('govSelect');
+const searchInput = document.getElementById('searchInput');
+const courtsGrid = document.getElementById('courtsGrid');
+const resultMeta = document.getElementById('resultMeta');
+
+Object.keys(DATA).forEach(gov => {
+  const opt = document.createElement('option');
+  opt.value = gov;
+  opt.textContent = gov;
+  govSelect.appendChild(opt);
+});
+
+function mapsLink(name, gov) {
+  const q = encodeURIComponent(name + " " + gov + " مصر");
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
+function render() {
+  const gov = govSelect.value;
+  const query = searchInput.value.trim();
+  let courts = DATA[gov] || [];
+  if (query) {
+    courts = courts.filter(c => c.n.includes(query) || c.t.includes(query));
+  }
+
+  resultMeta.innerHTML = courts.length
+    ? `<b>${courts.length}</b> جهة قضائية في ${gov}`
+    : '';
+
+  if (!courts.length) {
+    courtsGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="emoji">🔍</div>
+      <div>مفيش نتائج مطابقة — جرّب كلمة تانية أو امسح البحث</div>
+    </div>`;
+    return;
+  }
+
+  courtsGrid.innerHTML = courts.map(c => `
+    <div class="court-card">
+      <div class="court-top">
+        <div class="court-icon">${ICONS[c.t] || '🏛️'}</div>
+        <div class="court-info">
+          <div class="court-name">${c.n}</div>
+          <span class="court-tag ${BLUE_TAGS.includes(c.t) ? 'blue' : ''}">${c.t}</span>
+        </div>
+      </div>
+      <a class="court-btn" href="${mapsLink(c.n, gov)}" target="_blank" rel="noopener">
+        📍 افتح على خرائط جوجل
+      </a>
+    </div>
+  `).join('');
+}
+
+govSelect.addEventListener('change', render);
+searchInput.addEventListener('input', render);
+
+// init: pick governorate from URL hash if present, else first
+const hashGov = decodeURIComponent(location.hash.replace('#',''));
+if (hashGov && DATA[hashGov]) govSelect.value = hashGov;
+render();
+</script>
+</body>
+</html>
