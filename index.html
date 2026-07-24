@@ -4,9 +4,9 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LEGISTA — المحرك القانوني الذكي</title>
+<title>LEGANO — المحرك القانوني الذكي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&family=Pirata+One&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0A0A0D;
@@ -28,7 +28,7 @@ body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--whi
 #cursor-glow { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .08s; }
 
 #loader { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
-.loader-logo { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: 12px; background: linear-gradient(90deg, var(--gold), #fff8dc, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; opacity: 0; animation: fadeInLogo 0.8s 0.3s forwards; }
+.loader-logo { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: 8px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; opacity: 0; animation: fadeInLogo 0.8s 0.3s forwards; }
 .loader-status { font-size: 11px; letter-spacing: 4px; color: var(--gray); font-weight: 600; opacity: 0; animation: fadeInLogo 0.5s 1s forwards; }
 .loader-bar-wrap { width: 200px; height: 1px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; opacity: 0; animation: fadeInLogo 0.5s 1s forwards; }
 .loader-bar { height: 100%; background: var(--gold); animation: loadBar 1.5s 1s ease-out forwards; width: 0; }
@@ -42,7 +42,7 @@ body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--whi
 
 nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; width: calc(100% - 48px); max-width: 1100px; display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(10,10,13,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 14px; transition: padding .3s, box-shadow .3s; direction: rtl; }
 nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-.nav-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 5px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; flex-shrink: 0; }
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; flex-shrink: 0; }
 .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-inline-start: auto; }
 .nav-links { display: flex; gap: 32px; }
 .nav-links a { font-size: 12px; color: var(--gray); text-decoration: none; letter-spacing: 1px; font-weight: 600; transition: color .2s; }
@@ -187,7 +187,7 @@ nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 .ai-suggestion:hover { background: rgba(0,229,255,0.05); }
 
 footer { position: relative; z-index: 2; padding: 48px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
-.footer-logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 6px; color: var(--gold); margin-bottom: 12px; }
+.footer-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 4px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; }
 .footer-sub { font-size: 11px; color: var(--gray); letter-spacing: 2px; }
 
 .reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s, transform .7s; }
@@ -727,7 +727,7 @@ div[id*="g_id_onload"],
   .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
 }
 @media (max-width: 480px) {
-  .loader-logo { font-size: 28px; letter-spacing: 6px; }
+  .loader-logo { font-size: 28px; letter-spacing: 5px; }
   .loader-status { font-size: 9px; letter-spacing: 2px; text-align: center; padding: 0 16px; }
   .loader-bar-wrap { width: 160px; }
   .loader-ready { font-size: 11px; letter-spacing: 4px; }
@@ -870,7 +870,7 @@ div[id*="g_id_onload"],
 <div id="cursor-glow"></div>
 
 <div id="loader">
-  <div class="loader-logo">LEGISTA</div>
+  <div class="loader-logo">LEGANO</div>
   <div class="loader-status">INITIALIZING LEGAL INTELLIGENCE...</div>
   <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
   <div class="loader-ready" id="loaderReady">READY.</div>
@@ -879,7 +879,7 @@ div[id*="g_id_onload"],
 <canvas id="bg-canvas"></canvas>
 
 <nav id="mainNav">
-  <a class="nav-logo" href="index.html">LEGISTA</a>
+  <a class="nav-logo" href="index.html">LEGANO</a>
   <div class="nav-links">
     <a href="#modules">الأقسام</a>
     <a href="#dafou">الدفوع</a>
@@ -1402,7 +1402,7 @@ div[id*="g_id_onload"],
 </div>
 
 <footer>
-  <div class="footer-logo">LEGISTA</div>
+  <div class="footer-logo">LEGANO</div>
   <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
 </footer>
 
@@ -1510,7 +1510,7 @@ div[id*="g_id_onload"],
     <button type="button" class="modal-close" onclick="closeSubscribeModal()">✕</button>
 
     <form id="subscribeFormWrap">
-      <p class="modal-eyebrow">الاشتراك في LEGISTA</p>
+      <p class="modal-eyebrow">الاشتراك في LEGANO</p>
       <h3 class="modal-title">اشترك في الباقة <span id="subPlanEcho">الشهرية</span></h3>
 
       <p class="modal-section-label">1) قيمة الاشتراك — <span id="subPriceEcho">250</span> جنيه</p>
