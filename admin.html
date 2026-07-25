@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>لوحة التحكم — LEGANO</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0A0A0D">
@@ -497,6 +501,17 @@ function renderPayments() {
 }
 function statusLabel(s) { return s === 'approved' ? 'تمت الموافقة' : s === 'rejected' ? 'مرفوض' : 'قيد الانتظار'; }
 
+// يتعرف على مدة الاشتراك من نص الباقة حتى لو كان فيه سعر أو نص إضافي معاه
+// مثال: "سنوي (500 جنيه)" أو "سنوي" أو "yearly" كلهم بيترجموا لـ 365 يوم
+function getPlanDurationDays(packageText) {
+  const s = (packageText || '').toString().trim();
+  if (/نصف\s*سنوي|semi\s*-?\s*annual|6\s*شهور/i.test(s)) return 182;   // نصف سنوي
+  if (/ربع\s*سنوي|quarterly/i.test(s)) return 91;                       // ربع سنوي
+  if (/سنوي|yearly|annual/i.test(s)) return 365;                        // سنوي
+  if (/شهري|monthly/i.test(s)) return 30;                                // شهري
+  return 30; // افتراضي لو النص مش معروف
+}
+
 async function setPaymentStatus(paymentId, status) {
   const { doc, updateDoc } = window._fs;
   const p = ALL_PAYMENTS.find(x => x.id === paymentId);
@@ -507,7 +522,7 @@ async function setPaymentStatus(paymentId, status) {
   // If approved and we know the user's email, activate their subscription too
   if (status === 'approved' && p.email) {
     let u = ALL_USERS.find(x => x.email === p.email);
-    const durationDays = (p.package === 'سنوي' || p.package === 'yearly') ? 365 : 30;
+    const durationDays = getPlanDurationDays(p.package);
     const expiry = Date.now() + durationDays * 24 * 60 * 60 * 1000;
     if (u) {
       await updateDoc(doc(window._db, 'users', u.id), { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
