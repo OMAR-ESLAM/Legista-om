@@ -253,6 +253,78 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* ══ WELCOME / PAYWALL / SUBSCRIBE MODALS ══ */
+.lg-overlay { display: none; position: fixed; inset: 0; z-index: 6000; background: rgba(33,28,18,0.45); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
+.lg-overlay.show { display: flex; }
+.lg-modal { background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 24px; padding: 36px; max-width: 480px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); text-align: center; }
+.lg-modal.wide { max-width: 860px; text-align: initial; }
+.lg-close { position: absolute; top: 16px; left: 16px; width: 32px; height: 32px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--border-soft); color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.lg-close:hover { background: var(--surface-3); color: var(--ink); }
+.lg-icon { font-size: 40px; margin-bottom: 14px; }
+.lg-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--accent); font-weight: 800; margin-bottom: 10px; }
+.lg-title { font-size: 22px; font-weight: 900; margin-bottom: 10px; color: var(--ink); }
+.lg-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 26px; line-height: 1.8; }
+.lg-cta { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #fff; width: 100%; padding: 15px; border-radius: 14px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; cursor: pointer; transition: transform .15s, box-shadow .2s; box-shadow: var(--shadow-gold); }
+.lg-cta:hover { transform: scale(1.02); box-shadow: 0 12px 30px rgba(184,134,11,0.35); }
+.lg-cta-ghost { background: none; border: none; color: var(--muted); font-size: 12.5px; margin-top: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+.pw-plans { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-bottom: 6px; text-align: center; }
+.pw-plan { background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 16px; padding: 22px 18px; position: relative; transition: border-color .2s, transform .2s; }
+.pw-plan:hover { border-color: var(--border); transform: translateY(-3px); }
+.pw-plan.featured { border-color: rgba(184,134,11,0.45); }
+.pw-plan-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 9px; font-weight: 900; padding: 3px 12px; border-radius: 20px; letter-spacing: 2px; white-space: nowrap; }
+.pw-plan-period { font-size: 11px; letter-spacing: 2px; color: var(--muted-2); margin-bottom: 10px; font-weight: 700; }
+.pw-plan-price { font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; color: var(--ink); line-height: 1; }
+.pw-plan-price span { font-size: 13px; color: var(--muted); font-weight: 400; }
+.pw-plan-save { font-size: 10px; color: var(--sage); margin-top: 6px; font-weight: 700; letter-spacing: 1px; min-height: 16px; }
+.pw-plan-features { margin-top: 14px; display: flex; flex-direction: column; gap: 5px; }
+.pw-feat { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; justify-content: center; }
+.pw-feat::before { content: '✓'; color: var(--sage); font-weight: 900; font-size: 10px; }
+.pw-plan .lg-cta { margin-top: 16px; padding: 13px; font-size: 13.5px; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 6500; background: rgba(33,28,18,0.45); backdrop-filter: blur(6px); align-items: flex-start; justify-content: center; padding: 60px 16px; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.modal-box { position: relative; width: 100%; max-width: 560px; background: var(--bg-1); border: 1px solid var(--border-soft); border-radius: 22px; padding: 32px; text-align: initial; box-shadow: var(--shadow-lg); }
+.modal-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--accent); font-weight: 800; margin-bottom: 8px; }
+.modal-title { font-size: 19px; font-weight: 900; margin-bottom: 22px; color: var(--ink); }
+.modal-section-label { font-size: 12.5px; font-weight: 800; color: var(--accent-2); margin: 20px 0 12px; }
+
+.m-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.m-field { margin-bottom: 14px; }
+.m-field label { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: block; font-weight: 600; }
+.m-field input { width: 100%; padding: 12px 14px; background: var(--bg-2); border: 1px solid var(--border-soft); border-radius: 10px; color: var(--ink); font-family: 'Cairo', sans-serif; font-size: 13px; outline: none; transition: border-color .2s; }
+.m-field input:focus { border-color: var(--border); }
+
+.wallets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wallet-card { position: relative; cursor: pointer; text-align: center; background: var(--bg-2); border: 2px solid var(--border-soft); border-radius: 14px; padding: 16px 10px; transition: border-color .2s; }
+.wallet-card.selected { border-color: var(--accent); background: rgba(184,134,11,0.06); }
+.wallet-check { position: absolute; top: 10px; left: 10px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-soft); font-size: 10px; display: flex; align-items: center; justify-content: center; color: transparent; }
+.wallet-card.selected .wallet-check { border-color: var(--accent); background: var(--accent); color: #fff; }
+.wallet-logo { width: 40px; height: 40px; object-fit: contain; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; border-radius: 10px; }
+.wallet-name { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+.wallet-number { font-size: 12px; color: var(--accent-2); font-weight: 700; }
+
+.m-upload { position: relative; border: 2px dashed var(--border); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; font-size: 12px; color: var(--muted); transition: border-color .2s, background .2s; }
+.m-upload:hover { border-color: var(--accent); background: rgba(184,134,11,0.03); }
+.m-upload input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#subScreenshotPreviewWrap { margin-top: 10px; }
+#subScreenshotPreviewWrap img { max-width: 140px; max-height: 140px; border-radius: 10px; border: 1px solid var(--border-soft); }
+
+.m-submit { width: 100%; margin-top: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border: none; padding: 15px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 900; cursor: pointer; transition: transform .15s, box-shadow .2s; }
+.m-submit:hover { transform: scale(1.01); box-shadow: var(--shadow-gold); }
+
+.modal-success { display: none; text-align: center; padding: 20px 10px; }
+.modal-success.show { display: block; }
+.modal-success .success-icon { font-size: 42px; margin-bottom: 14px; }
+.modal-success .success-title { font-size: 18px; font-weight: 900; margin-bottom: 10px; color: var(--ink); }
+.modal-success .success-sub { font-size: 13px; color: var(--muted); line-height: 1.9; }
+
+@media (max-width: 520px) {
+  .pw-plans { grid-template-columns: 1fr; }
+  .m-field-row { grid-template-columns: 1fr; }
+  .wallets-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -292,8 +364,138 @@ body::before {
     </div>
   </main>
 </div>
- 
+
+<!-- WELCOME MODAL (shown once, before first use) -->
+<div class="lg-overlay" id="welcomeOverlay">
+  <div class="lg-modal">
+    <button class="lg-close" onclick="closeWelcomeModal()">✕</button>
+    <div class="lg-icon">⚖️</div>
+    <div class="lg-eyebrow">LEGANO · تحليل القضايا</div>
+    <div class="lg-title">تحليل مجاني واحد بس</div>
+    <div class="lg-sub">هتقدر تجرب الأداة وتعمل تحليل قانوني كامل لقضيتك مجانًا مرة واحدة. بعد كده، هتحتاج تشترك عشان تكمل تستخدم الأداة وباقي أدوات LEGANO كلها.</div>
+    <button class="lg-cta" onclick="closeWelcomeModal()">ابدأ التحليل المجاني ←</button>
+  </div>
+</div>
+
+<!-- PAYWALL MODAL (shown after the one free trial) -->
+<div class="lg-overlay" id="paywallOverlay">
+  <div class="lg-modal wide">
+    <button class="lg-close" onclick="closePaywall()">✕</button>
+    <div style="text-align:center">
+      <div class="lg-eyebrow">LEGANO PRO · UPGRADE</div>
+      <div class="lg-title">انتهت تجربتك المجانية ⚡</div>
+      <div class="lg-sub">لقد استخدمت تحليلك المجاني — اشترك للاستمرار في تحليل قضاياك بلا حدود مع كل أدوات LEGANO</div>
+    </div>
+    <div class="pw-plans">
+      <div class="pw-plan">
+        <div class="pw-plan-period">MONTHLY</div>
+        <div class="pw-plan-price">250<span> جنيه / شهريًا</span></div>
+        <div class="pw-plan-save"> </div>
+        <div class="pw-plan-features">
+          <div class="pw-feat">تحليل قضايا غير محدود بالذكاء الاصطناعي</div>
+          <div class="pw-feat">الوصول لكل الأقسام (عقود، إنذارات، جنح، دعاوى، دفوع)</div>
+          <div class="pw-feat">حاسبة المواريث كاملة بدون حد استخدام</div>
+          <div class="pw-feat">تحديثات وصيغ جديدة أول بأول</div>
+          <div class="pw-feat">دعم فني بالأولوية</div>
+        </div>
+        <button type="button" class="lg-cta" onclick="openSubscribeModal('شهري', 250)">اشترك الآن ←</button>
+      </div>
+      <div class="pw-plan featured">
+        <div class="pw-plan-badge">وفّر أكتر</div>
+        <div class="pw-plan-period">YEARLY</div>
+        <div class="pw-plan-price">500<span> جنيه / سنويًا</span></div>
+        <div class="pw-plan-save">بدل 3000 في السنة</div>
+        <div class="pw-plan-features">
+          <div class="pw-feat">كل مميزات الاشتراك الشهري</div>
+          <div class="pw-feat">بدل 3000 جنيه في السنة، بتدفع 500 بس</div>
+          <div class="pw-feat">أولوية في أي مميزات جديدة تتضاف</div>
+          <div class="pw-feat">دعم فني مباشر على مدار السنة</div>
+          <div class="pw-feat">سعر ثابت من غير زيادة طول مدة الاشتراك</div>
+        </div>
+        <button type="button" class="lg-cta" onclick="openSubscribeModal('سنوي', 500)">اشترك الآن ←</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHARED: TOAST + SUBSCRIBE MODAL ══ -->
+<div id="legistaToast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#211C12;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:700;font-family:Cairo,sans-serif;z-index:99998;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;"></div>
+
+<div class="modal-overlay" id="subscribeModal">
+  <div class="modal-box">
+    <button type="button" class="lg-close" onclick="closeSubscribeModal()">✕</button>
+
+    <form id="subscribeFormWrap">
+      <p class="modal-eyebrow">الاشتراك في LEGANO</p>
+      <h3 class="modal-title">اشترك في الباقة <span id="subPlanEcho">الشهرية</span></h3>
+
+      <p class="modal-section-label">1) قيمة الاشتراك — <span id="subPriceEcho">250</span> جنيه</p>
+
+      <p class="modal-section-label">2) الدفع — حوّل قيمة الاشتراك على أي محفظة</p>
+      <div class="wallets-grid">
+        <div class="wallet-card selected" data-wallet="orange" onclick="selectSubWallet(this)">
+          <div class="wallet-check">✓</div>
+          <div class="wallet-logo" style="background:rgba(255,102,0,0.12);">🟠</div>
+          <div class="wallet-name">أورنج كاش</div>
+          <div class="wallet-number" dir="ltr">01287750049</div>
+        </div>
+        <div class="wallet-card" data-wallet="vodafone" onclick="selectSubWallet(this)">
+          <div class="wallet-check">✓</div>
+          <div class="wallet-logo" style="background:rgba(229,0,0,0.12);">🔴</div>
+          <div class="wallet-name">فودافون كاش</div>
+          <div class="wallet-number" dir="ltr">01021472439</div>
+        </div>
+      </div>
+
+      <div class="m-field-row" style="margin-top:16px">
+        <div class="m-field">
+          <label>حوّلت من رقم إيه؟</label>
+          <input type="tel" id="subSenderNumber" required placeholder="01xxxxxxxxx">
+        </div>
+        <div class="m-field">
+          <label>إرفاق سكرين شوت التحويل</label>
+          <div class="m-upload" id="subUploadBox">
+            <span id="subUploadLabel">📎 اضغط لرفع صورة التحويل</span>
+            <input type="file" id="subScreenshot" accept="image/*" required>
+          </div>
+        </div>
+      </div>
+      <div id="subScreenshotPreviewWrap"></div>
+
+      <button type="submit" class="m-submit">تأكيد الدفع وإرسال طلب الاشتراك ←</button>
+    </form>
+
+    <div class="modal-success" id="subModalSuccess">
+      <div class="success-icon">✅</div>
+      <div class="success-title">تم استلام طلب الاشتراك</div>
+      <p class="success-sub">هنراجع التحويل ونفعّل اشتراكك خلال وقت قصير. هتوصلك رسالة على واتساب أو تلاقي اشتراكك اتفعّل تلقائي لما تدخل الموقع تاني.</p>
+    </div>
+  </div>
+</div>
+
 <script>
+// ===================== TRIAL / PAYWALL / WELCOME =====================
+const SECTION_KEY = 'legista_used_tahlil';
+const WELCOME_KEY = 'legista_welcome_seen_tahlil';
+function checkTrial() { return localStorage.getItem(SECTION_KEY) === '1'; }
+function markUsed()   { localStorage.setItem(SECTION_KEY, '1'); }
+function showPaywall(){ document.getElementById('paywallOverlay').classList.add('show'); }
+function closePaywall() { document.getElementById('paywallOverlay').classList.remove('show'); }
+function closeWelcomeModal() {
+  document.getElementById('welcomeOverlay').classList.remove('show');
+  localStorage.setItem(WELCOME_KEY, '1');
+}
+(function showWelcomeIfNeeded() {
+  if (checkTrial()) return; // already used their trial, no need to explain again
+  if (localStorage.getItem(WELCOME_KEY) === '1') return;
+  function reveal() { document.getElementById('welcomeOverlay').classList.add('show'); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', reveal);
+  } else {
+    reveal();
+  }
+})();
+
 /* ==========================================================
    ⚠️ ضعي مفتاح Groq بتاعك هنا فقط (بين علامتي التنصيص) ⚠️
    حل سريع للتجربة المحلية فقط — المفتاح هيبقى ظاهر لأي حد
@@ -736,6 +938,11 @@ if (SR) {
 async function sendMessage() {
   const facts = factsInput.value.trim();
   if (!facts) return;
+
+  // TRIAL CHECK
+  await ensureSubscriptionChecked();
+  if (checkTrial() && !isUserSubscribed) { showPaywall(); return; }
+
   const caseNumber = document.getElementById('caseNumberInput')?.value.trim() || '';
   const parties = document.getElementById('partiesInput')?.value.trim() || '';
  
@@ -750,6 +957,7 @@ async function sendMessage() {
     thinkingEl.remove();
     await appendResultSequence(data, { facts, caseNumber, parties });
     saveToHistory({ type: currentType, stage: currentStage, facts, caseNumber, parties, result: data, ts: Date.now() });
+    markUsed();
   } catch (err) {
     thinkingEl.remove();
     appendErrorBubble(() => sendMessageRetry(facts, caseNumber, parties));
@@ -987,6 +1195,164 @@ renderIntake();
 renderHistoryList();
 updateCounter();
 </script>
+
+<!-- ══ SHARED FIREBASE INIT (payments/subscriptions) ══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC6PRK7EECoPF3qDawVSRYmMg0uufTs6Xw",
+  authDomain: "legista-o.firebaseapp.com",
+  projectId: "legista-o",
+  appId: "1:964258159036:web:a3a66d4f5ea38f9964f3b9"
+};
+const app = initializeApp(firebaseConfig, "legista-site");
+const db = getFirestore(app);
+
+window._db = db;
+window._fs = { doc, getDoc, setDoc, updateDoc, addDoc, collection, increment };
+window.dispatchEvent(new Event('legista-firebase-ready'));
+</script>
+
+<script>
+function withLegistaDb(cb) {
+  if (window._db) { cb(); return; }
+  window.addEventListener('legista-firebase-ready', cb, { once: true });
+}
+
+/* ══ SUBSCRIPTION STATUS CHECK (users/{email}.subscription === 'paid') ══ */
+let isUserSubscribed = false;
+let _subscriptionCheckDone = false;
+function ensureSubscriptionChecked() {
+  if (_subscriptionCheckDone) return Promise.resolve();
+  return new Promise(resolve => {
+    const saved = localStorage.getItem('legista_user');
+    let user = null;
+    try { user = saved ? JSON.parse(saved) : null; } catch (e) { user = null; }
+    if (!user || !user.email) { _subscriptionCheckDone = true; resolve(); return; }
+    withLegistaDb(async () => {
+      try {
+        const { doc, getDoc } = window._fs;
+        const snap = await getDoc(doc(window._db, 'users', user.email));
+        if (snap.exists()) {
+          const d = snap.data();
+          isUserSubscribed = d.subscription === 'paid' && !!d.subscriptionExpiry && d.subscriptionExpiry > Date.now();
+        }
+      } catch (e) {
+        console.error('legista subscription check failed', e);
+      }
+      _subscriptionCheckDone = true;
+      resolve();
+    });
+  });
+}
+// كيك أوف مبكر عشان يكون جاهز قبل ما اليوزر يضغط على زرار التحليل
+ensureSubscriptionChecked();
+
+/* ══ RESUME PENDING SUBSCRIBE AFTER RETURNING FROM LOGIN ══ */
+(function resumePendingAction() {
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get('action');
+  if (action !== 'subscribe') return;
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) return;
+  const plan = params.get('plan') || 'شهري';
+  const price = parseInt(params.get('price'), 10) || 250;
+  window.addEventListener('load', () => setTimeout(() => openSubscribeModal(plan, price), 300));
+})();
+
+/* ══ TOAST HELPER ══ */
+function showLegistaToast(msg) {
+  const t = document.getElementById('legistaToast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(-6px)';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  }, 2800);
+}
+
+/* ══ SUBSCRIBE MODAL ══ */
+let subCurrentPlan = 'شهري', subCurrentPrice = 250, subScreenshotData = null;
+
+function openSubscribeModal(plan, price) {
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) {
+    showLegistaToast('سجل الدخول أولاً عشان تقدر تشترك');
+    const returnUrl = window.location.pathname.split('/').pop() + '?action=subscribe&plan=' + encodeURIComponent(plan) + '&price=' + price;
+    setTimeout(() => { window.location.href = 'login.html?next=' + encodeURIComponent(returnUrl); }, 600);
+    return;
+  }
+  subCurrentPlan = plan;
+  subCurrentPrice = price;
+  document.getElementById('subPlanEcho').textContent = plan === 'سنوي' ? 'السنوية' : 'الشهرية';
+  document.getElementById('subPriceEcho').textContent = price;
+  document.getElementById('subscribeModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSubscribeModal() {
+  document.getElementById('subscribeModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('subscribeModal').addEventListener('click', e => {
+  if (e.target.id === 'subscribeModal') closeSubscribeModal();
+});
+function selectSubWallet(card) {
+  document.querySelectorAll('#subscribeModal .wallet-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+document.getElementById('subScreenshot').addEventListener('change', () => {
+  const file = document.getElementById('subScreenshot').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    subScreenshotData = e.target.result;
+    document.getElementById('subUploadLabel').textContent = '✅ ' + file.name;
+    document.getElementById('subScreenshotPreviewWrap').innerHTML = `<img src="${subScreenshotData}" style="max-width:140px;max-height:140px;border-radius:10px;border:1px solid rgba(0,0,0,0.1)" alt="سكرين شوت التحويل">`;
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('subscribeFormWrap').addEventListener('submit', e => {
+  e.preventDefault();
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) { showLegistaToast('سجل الدخول أولاً'); return; }
+  const user = JSON.parse(saved);
+  const wallet = document.querySelector('#subscribeModal .wallet-card.selected');
+  const submitBtn = document.querySelector('#subscribeFormWrap .m-submit');
+  const payload = {
+    email: user.email,
+    name: user.name,
+    package: subCurrentPlan,
+    price: subCurrentPrice,
+    wallet: wallet.dataset.wallet,
+    senderNumber: document.getElementById('subSenderNumber').value.trim(),
+    screenshot: subScreenshotData,
+    status: 'pending',
+    createdAt: Date.now()
+  };
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'جارِ الإرسال...';
+  withLegistaDb(async () => {
+    const { collection, addDoc } = window._fs;
+    try {
+      await addDoc(collection(window._db, 'paymentRequests'), payload);
+      document.getElementById('subscribeFormWrap').style.display = 'none';
+      document.getElementById('subModalSuccess').classList.add('show');
+    } catch (err) {
+      console.error(err);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'تأكيد الدفع وإرسال طلب الاشتراك ←';
+      showLegistaToast('حصل خطأ أثناء إرسال الطلب، حاول تاني');
+    }
+  });
+});
+</script>
+
 </body>
 </html>
  
