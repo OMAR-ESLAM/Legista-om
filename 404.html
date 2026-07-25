@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<title>الصفحة غير موجودة (404) | LEGANO</title>
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --surface: #1A1A22;
+  --border: rgba(212,175,55,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
+body {
+  font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
+  direction:rtl; min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:24px;
+  position:relative; overflow:hidden;
+}
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: radial-gradient(ellipse at 20% 15%, rgba(0,229,255,0.06) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 85%, rgba(212,175,55,0.07) 0%, transparent 55%);
+}
+
+.nav-logo {
+  position:fixed; top:28px; right:32px; z-index:2;
+  font-family:'Syne',sans-serif; font-weight:800; letter-spacing:4px; font-size:16px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-soft));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  text-decoration:none;
+}
+
+.wrap { position:relative; z-index:1; max-width:560px; }
+
+.gavel { font-size:56px; margin-bottom:8px; opacity:.9; }
+
+.code {
+  font-family:'Syne',sans-serif; font-size:clamp(70px,16vw,140px); font-weight:800; line-height:1;
+  background:linear-gradient(90deg,var(--gold),var(--gold-soft),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:8px;
+}
+
+h1 { font-size:clamp(20px,3vw,28px); font-weight:800; margin-bottom:14px; }
+p.sub { font-size:14px; color:var(--gray); line-height:1.9; margin-bottom:36px; }
+p.sub b { color:var(--gold-soft); }
+
+.actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:44px; }
+.btn-primary {
+  background:linear-gradient(135deg,var(--gold),#b8941a); border:none; color:#0A0A0D;
+  padding:15px 32px; border-radius:12px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:900;
+  text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:transform .15s, box-shadow .2s;
+}
+.btn-primary:hover { transform:scale(1.04); box-shadow:0 4px 28px rgba(212,175,55,0.35); }
+.btn-secondary {
+  background:transparent; border:1px solid rgba(255,255,255,0.15); color:var(--white);
+  padding:15px 32px; border-radius:12px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:600;
+  text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:border-color .2s, background .2s;
+}
+.btn-secondary:hover { border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.04); }
+
+.quick-links { border-top:1px solid var(--border); padding-top:28px; width:100%; }
+.quick-label { font-size:11px; letter-spacing:2px; color:var(--gray); font-weight:700; margin-bottom:16px; }
+.links-grid { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+.links-grid a {
+  font-size:12.5px; color:var(--gold-soft); text-decoration:none; font-weight:700;
+  padding:8px 16px; border:1px solid var(--border); border-radius:20px; background:var(--surface);
+  transition:border-color .2s, color .2s;
+}
+.links-grid a:hover { border-color:rgba(212,175,55,0.5); color:var(--white); }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="nav-logo">LEGANO</a>
+
+<div class="wrap">
+  <div class="gavel">⚖️</div>
+  <div class="code">404</div>
+  <h1>الصفحة اللي بتدور عليها مش موجودة</h1>
+  <p class="sub">يمكن اللينك اتغيّر أو الصفحة اتشالت، أو حصل غلط بسيط في الكتابة. <b>محتوى موقع LEGANO</b> كله لسه موجود، تقدر توصله من هنا:</p>
+
+  <div class="actions">
+    <a href="index.html" class="btn-primary">← ارجع للرئيسية</a>
+    <a href="index.html#modules" class="btn-secondary">استكشف الأقسام</a>
+  </div>
+
+  <div class="quick-links">
+    <p class="quick-label">أو روح على طول لـ</p>
+    <div class="links-grid">
+      <a href="3oqood.html">العقود</a>
+      <a href="inzarat.html">الإنذارات</a>
+      <a href="junah.html">الجنح المباشرة</a>
+      <a href="dawawi.html">صيغ الدعاوى</a>
+      <a href="dafou.html">مكتبة الدفوع</a>
+      <a href="ahkam.html">أحكام النقض الجنائية</a>
+      <a href="ahkam_madaniya.html">أحكام النقض المدنية</a>
+      <a href="mawareeth.html">حاسبة المواريث</a>
+      <a href="mawaeed.html">المواعيد القانونية</a>
+      <a href="mahakem.html">مواقع المحاكم</a>
+      <a href="qaat.html">خريطة الجلسات</a>
+      <a href="tahlil.html">تحليل القضايا بالذكاء الاصطناعي</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
