@@ -1075,7 +1075,8 @@ function buildForm(tmpl) {
 // ===================== GENERATION =====================
 async function generateDocument() {
   if(!currentTmpl) return;
-  if (checkTrial()) { showPaywall(); return; }
+  await ensureSubscriptionChecked();
+  if (checkTrial() && !isUserSubscribed) { showPaywall(); return; }
   const btn = document.getElementById('genBtn');
   btn.disabled=true; btn.textContent='⟳ جارٍ التوليد...';
   const vals = {};
@@ -1361,6 +1362,35 @@ function withLegistaDb(cb) {
   if (window._db) { cb(); return; }
   window.addEventListener('legista-firebase-ready', cb, { once: true });
 }
+
+/* ══ SUBSCRIPTION STATUS CHECK (users/{email}.subscription === 'paid') ══ */
+let isUserSubscribed = false;
+let _subscriptionCheckDone = false;
+function ensureSubscriptionChecked() {
+  if (_subscriptionCheckDone) return Promise.resolve();
+  return new Promise(resolve => {
+    const saved = localStorage.getItem('legista_user');
+    let user = null;
+    try { user = saved ? JSON.parse(saved) : null; } catch (e) { user = null; }
+    if (!user || !user.email) { _subscriptionCheckDone = true; resolve(); return; }
+    withLegistaDb(async () => {
+      try {
+        const { doc, getDoc } = window._fs;
+        const snap = await getDoc(doc(window._db, 'users', user.email));
+        if (snap.exists()) {
+          const d = snap.data();
+          isUserSubscribed = d.subscription === 'paid' && !!d.subscriptionExpiry && d.subscriptionExpiry > Date.now();
+        }
+      } catch (e) {
+        console.error('legista subscription check failed', e);
+      }
+      _subscriptionCheckDone = true;
+      resolve();
+    });
+  });
+}
+// كيك أوف مبكر عشان يكون جاهز قبل ما اليوزر يضغط على زرار التوليد
+ensureSubscriptionChecked();
 
 /* ══ RESUME PENDING SUBSCRIBE AFTER RETURNING FROM LOGIN ══ */
 (function resumePendingAction() {
