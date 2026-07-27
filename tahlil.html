@@ -496,13 +496,8 @@ function closeWelcomeModal() {
   }
 })();
 
-/* ==========================================================
-   ⚠️ ضعي مفتاح Groq بتاعك هنا فقط (بين علامتي التنصيص) ⚠️
-   حل سريع للتجربة المحلية فقط — المفتاح هيبقى ظاهر لأي حد
-   يعمل View Source للصفحة. للاستخدام الفعلي والآمن انشري
-   المشروع على Vercel وحطي المفتاح في Environment Variables.
-   ========================================================== */
-const GROQ_KEY = "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";
+/* بروكسي الذكاء الاصطناعي — بينادي Gemini API (مجاني) من خلال api/analyze.js على السيرفر، عشان المفتاح يفضل مخفي ومحدش ياخده من كود الصفحة */
+const GROQ_ANALYZE_ENDPOINT = '/api/analyze';
 
 /* ---------- مكتبة الدفوع (نفس الـ keys الموجودة في dafou-detail.html) ---------- */
 /* قاعدة معرفة حقيقية: نصوص مبادئ الدفوع الفعلية من dafou-detail.html — تُستخدم لتغذية الموديل بمرجع نصي حقيقي بدل الاعتماد على ذاكرته */
@@ -687,11 +682,10 @@ function sanitizeDefenses(defenses, caseType) {
 const GROQ_MODEL = 'openai/gpt-oss-120b'; // reasoning model: يفكر قبل ما يجاوب (llama-3.3-70b-versatile اتشالت من Groq)
 
 async function groqChatJSON(messages, { reasoningEffort = 'medium', maxTokens = 1800 } = {}) {
-  const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const groqRes = await fetch(GROQ_ANALYZE_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${GROQ_KEY}`,
     },
     body: JSON.stringify({
       model: GROQ_MODEL,
@@ -705,9 +699,9 @@ async function groqChatJSON(messages, { reasoningEffort = 'medium', maxTokens = 
   });
   if (!groqRes.ok) {
     const errText = await groqRes.text();
-    console.error('Groq API error:', groqRes.status, errText);
-    const err = new Error('groq error');
-    err.isTooLarge = groqRes.status === 413 || /too large|rate_limit_exceeded|tokens per minute/i.test(errText);
+    console.error('AI analysis API error:', groqRes.status, errText);
+    const err = new Error('ai_analysis_error');
+    err.isTooLarge = groqRes.status === 413 || groqRes.status === 429 || /too large|rate_limit_exceeded|tokens per minute|resource_exhausted|quota/i.test(errText);
     throw err;
   }
   const groqData = await groqRes.json();
