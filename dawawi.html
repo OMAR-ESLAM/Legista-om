@@ -290,6 +290,35 @@ textarea.field-input { min-height: 90px; resize: vertical; line-height: 1.7; }
   .m-field-row { grid-template-columns: 1fr; }
   .wallets-grid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 768px) {
+  html, body { height: auto !important; overflow-x: hidden !important; overflow-y: auto !important; }
+  .top-nav { padding: 0 14px; height: 52px; min-height: 52px; position: sticky; top: 0; z-index: 200; }
+  .nav-section { display: none; }
+  .nav-logo { font-size: 14px; letter-spacing: 3px; }
+  .nav-back { font-size: 11px; padding: 6px 12px; }
+  .app-layout { flex-direction: column; height: auto; overflow: visible; }
+  .tmpl-sidebar { width: 100%; min-width: unset; border-left: none; border-bottom: 1px solid rgba(212,175,55,0.15); }
+  .tmpl-sidebar.mob-hidden { display: none; }
+  .tmpl-header { padding: 14px 16px; }
+  .tmpl-search { width: 100%; font-size: 14px; padding: 10px 14px; }
+  .cat-group { flex: unset; overflow-y: visible; max-height: none; padding-bottom: 80px; }
+  .tmpl-item { padding: 13px 16px; font-size: 14px; }
+  .workspace-center { display: none; overflow: visible; height: auto; width: 100%; }
+  .workspace-center.mob-visible { display: flex; }
+  .form-area { padding: 16px; gap: 14px; box-sizing: border-box; }
+  .fields-grid { grid-template-columns: 1fr !important; }
+  .field-group.full { grid-column: span 1 !important; }
+  .field-input, textarea.field-input { width: 100%; max-width: 100%; box-sizing: border-box; font-size: 14px; }
+  .gen-btn { width: 100%; margin-bottom: 80px; }
+  .output-area { padding: 0 16px 100px; }
+  .output-box { padding: 18px 14px; font-size: 13px; }
+  .ai-panel { display: none !important; }
+  .mob-back-btn { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; background: var(--surface); border: 1px solid rgba(212,175,55,0.4); color: var(--gold); padding: 11px 24px; border-radius: 30px; font-family: 'Cairo',sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.5); align-items: center; gap: 8px; white-space: nowrap; }
+  .mob-back-btn.show { display: flex; }
+  .pw-plans { grid-template-columns: 1fr; }
+  .pw-title { font-size: 20px; }
+}
 </style>
 </head>
 <body>
@@ -352,7 +381,8 @@ textarea.field-input { min-height: 90px; resize: vertical; line-height: 1.7; }
     <div class="ai-tip"><strong>💡 تلميح:</strong> بعد توليد الصيغة، استخدم زر الطباعة للحصول على نسخة جاهزة للمحكمة.</div>
   </div>
 </div>
- 
+<button class="mob-back-btn" id="mobBackBtn" onclick="mobShowSidebar()">☰ الصيغ</button>
+
 <!-- PAYWALL MODAL -->
 <div class="paywall-overlay" id="paywallOverlay">
   <div class="pw-modal">
@@ -8846,6 +8876,7 @@ function selectTemplate(id) {
  
   document.getElementById('aiMsg').textContent =
     `جاهز لتوليد "${t.name}". أدخل البيانات المطلوبة وسيقوم الذكاء الاصطناعي بملء الصيغة فوراً.`;
+  mobShowForm();
 }
  
 async function generateDoc() {
@@ -8912,6 +8943,20 @@ function printOutput() {
     </style></head><body>${content}</body></html>`);
   win.document.close();
   win.print();
+}
+
+function isMobile(){ return window.innerWidth <= 768; }
+function mobShowForm(){
+  if(!isMobile()) return;
+  document.querySelector('.tmpl-sidebar').classList.add('mob-hidden');
+  document.querySelector('.workspace-center').classList.add('mob-visible');
+  document.getElementById('mobBackBtn').classList.add('show');
+}
+function mobShowSidebar(){
+  if(!isMobile()) return;
+  document.querySelector('.tmpl-sidebar').classList.remove('mob-hidden');
+  document.querySelector('.workspace-center').classList.remove('mob-visible');
+  document.getElementById('mobBackBtn').classList.remove('show');
 }
 </script>
 
