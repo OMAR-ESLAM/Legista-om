@@ -13,8 +13,14 @@
 // ملحوظة: التير المجاني ليه حد أقصى للطلبات في الدقيقة/اليوم (rate limit)،
 // لو حصل تجاوز هيرجع خطأ 429 وده هيتظهر للمستخدم كرسالة "حصل خطأ، جرب تاني".
 
-const GEMINI_MODEL = 'gemini-2.5-flash-lite'; // gemini-2.5-flash بقى مش متاح للمشاريع الجديدة، فبنستخدم Flash-Lite (لسه متاح ومجاني)
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+// قائمة موديلات نجرب بيها بالترتيب — لو الأول اتقفل أو اتلغى (بيحصل مع جوجل كتير)،
+// بيتجرب اللي بعده تلقائيًا من غير ما نحتاج نرجع نعدّل الكود يدوي في كل مرة
+const GEMINI_MODEL_CANDIDATES = [
+  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-flash-latest',
+  'gemini-2.5-flash-lite',
+];
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -65,17 +71,32 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const geminiRes = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiBody),
-    });
+    let geminiRes = null;
+    let rawText = '';
+    let lastStatus = 500;
 
-    const rawText = await geminiRes.text();
+    for (const model of GEMINI_MODEL_CANDIDATES) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      geminiRes = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(geminiBody),
+      });
+      rawText = await geminiRes.text();
+      lastStatus = geminiRes.status;
+
+      if (geminiRes.ok) break; // نجح، بلاش نكمل نجرب موديلات تانية
+
+      // لو المشكلة إن الموديل نفسه اتلغى/مش متاح (404)، جرب اللي بعده في القائمة
+      const isModelUnavailable = geminiRes.status === 404;
+      if (!isModelUnavailable) break; // أي خطأ تاني (429 rate limit، 400 بيانات غلط...) وقف على طول، معنى نجرب موديل تاني
+
+      console.error(`Gemini model "${model}" unavailable (404), trying next candidate...`);
+    }
 
     if (!geminiRes.ok) {
-      console.error('Gemini API error:', geminiRes.status, rawText);
-      res.status(geminiRes.status);
+      console.error('Gemini API error:', lastStatus, rawText);
+      res.status(lastStatus);
       res.setHeader('Content-Type', 'application/json');
       res.send(rawText);
       return;
