@@ -9,6 +9,12 @@
 //   cases/{caseId}
 //     - ownerEmail, title, caseType, status,
 //       clientName, opponentName, courtName,
+//       caseNumber (رقم الدعوى/القضية), policeStation (القسم/مركز الشرطة المحرر فيه المحضر — جنائي غالبًا),
+//       tags (مصفوفة تصنيفات نصية), quickNotes (ملاحظات حرة سريعة),
+//       feeAgreed (الأتعاب المتفق عليها), paymentsTotal (إجمالي المدفوع — متزامن من subcollection payments),
+//       nextHearingDate (أقرب جلسة قادمة — متزامنة من subcollection hearings),
+//       stageProgress ({done,total}), currentStageTitle,
+//       deadlineStatus ('overdue'|'soon'|'ok'|null), deadlineDate, deadlineStageTitle (متزامنين من مرحلة "جارية" الحالية),
 //       createdAt, updatedAt
 //   cases/{caseId}/documents/{docId}
 //     - sourceTool, templateName, content, createdAt
@@ -16,10 +22,16 @@
 //     - summary, points, defenses[], scenarios, selectedDefenses[], createdAt
 //   cases/{caseId}/stages/{stageId}
 //     - title, order, status ('لسه'|'جارية'|'مكتملة'), isAuto, note,
-//       isDecision (true لمرحلة قرار النيابة في القضايا الجنائية), branch, createdAt
+//       isDecision (true لمرحلة قرار النيابة في القضايا الجنائية), branch,
+//       deadlineDays (عدد أيام الميعاد القانوني من بداية المرحلة، اختياري), startedAt (وقت ما بقت "جارية"),
+//       createdAt
 //   cases/{caseId}/evidence/{evidenceId}
 //     - kind ('محضر'|'حكم'|'عقد'|'أخرى'), name, mimeType, data (base64 مضغوط),
 //       notes (ملاحظات المحامي), gapAnalysis (نتيجة تحليل الذكاء الاصطناعي للثغرات إن وُجدت), createdAt
+//   cases/{caseId}/hearings/{hearingId}
+//     - date (تاريخ الجلسة), notes (اللي حصل فيها), decision (القرار/التأجيل), nextHearingDate, createdAt
+//   cases/{caseId}/payments/{paymentId}
+//     - amount, date, note, createdAt
 // ══════════════════════════════════════════════════════════════════════════
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -43,6 +55,7 @@ const db = getFirestore(app);
 // ═══ ثوابت ═══
 const CASE_TYPES = ['مدني', 'جنائي', 'تجاري', 'أحوال شخصية', 'عمالي', 'إداري', 'أخرى'];
 const CASE_STATUSES = ['نشطة', 'معلّقة', 'مغلقة'];
+const DEADLINE_SOON_DAYS = 3; // لو باقي على الميعاد ٣ أيام أو أقل بيتحول لتنبيه "قرب"
 
 // ═══ أدوات مساعدة عامة ═══
 function escapeHTML(str) {
@@ -86,6 +99,21 @@ function toMillis(v) {
   return v;
 }
 
+// بتحسب حالة الميعاد القانوني لمرحلة معينة بناءً على تاريخ بداية المرحلة + عدد أيام الميعاد
+// بترجع null لو مفيش ميعاد متحدد للمرحلة دي، أو { dueDate, daysLeft, status } لو موجود
+// status: 'overdue' (فات) | 'soon' (قرب، DEADLINE_SOON_DAYS أيام أو أقل) | 'ok' (لسه في وقت)
+function computeDeadlineInfo(stage) {
+  if (!stage || !stage.deadlineDays || !stage.startedAt) return null;
+  const start = toMillis(stage.startedAt);
+  const dueDate = start + stage.deadlineDays * 86400000;
+  const now = Date.now();
+  const daysLeft = Math.ceil((dueDate - now) / 86400000);
+  let status = 'ok';
+  if (now > dueDate) status = 'overdue';
+  else if (daysLeft <= DEADLINE_SOON_DAYS) status = 'soon';
+  return { dueDate, daysLeft, status };
+}
+
 // ═══ CASES ═══
 
 async function listCases(ownerEmail) {
@@ -114,7 +142,7 @@ async function getCase(caseId) {
   }
 }
 
-async function createCase({ ownerEmail, title, caseType, clientName, opponentName, courtName, status }) {
+async function createCase({ ownerEmail, title, caseType, clientName, opponentName, courtName, caseNumber, policeStation, status, tags }) {
   const now = Date.now();
   const payload = {
     ownerEmail: ownerEmail || '',
@@ -124,6 +152,13 @@ async function createCase({ ownerEmail, title, caseType, clientName, opponentNam
     clientName: clientName || '',
     opponentName: opponentName || '',
     courtName: courtName || '',
+    caseNumber: caseNumber || '',
+    policeStation: policeStation || '',
+    tags: tags || [],
+    quickNotes: '',
+    feeAgreed: 0,
+    paymentsTotal: 0,
+    nextHearingDate: '',
     createdAt: now,
     updatedAt: now,
   };
@@ -145,7 +180,7 @@ async function updateCase(caseId, fields) {
 
 async function deleteCaseFully(caseId) {
   try {
-    for (const sub of ['documents', 'analyses', 'stages', 'evidence']) {
+    for (const sub of ['documents', 'analyses', 'stages', 'evidence', 'hearings', 'payments']) {
       const snap = await getDocs(collection(db, 'cases', caseId, sub));
       if (snap.docs.length) {
         const batch = writeBatch(db);
@@ -297,6 +332,7 @@ function getStageTemplate(caseType) {
 // بيحمّل خطة المراحل الافتراضية جوه القضية (أول مرحلة "جارية"، والباقي "لسه ماجاش عليها")
 async function seedStagesFromTemplate(caseId, caseType) {
   const titles = getStageTemplate(caseType);
+  const now = Date.now();
   const created = [];
   for (let i = 0; i < titles.length; i++) {
     const row = await addSubDoc(caseId, 'stages', {
@@ -304,6 +340,8 @@ async function seedStagesFromTemplate(caseId, caseType) {
       status: i === 0 ? 'جارية' : 'لسه',
       isAuto: false, note: '',
       isDecision: titles[i] === DECISION_STAGE_TITLE,
+      deadlineDays: null,
+      startedAt: i === 0 ? now : null,
     });
     created.push(row);
   }
@@ -315,7 +353,7 @@ async function advanceAfterStage(caseId, finishedOrder) {
   const stages = await listSub(caseId, 'stages');
   stages.sort((a, b) => a.order - b.order);
   const next = stages.find(s => s.order > finishedOrder && s.status === 'لسه');
-  if (next) await updateSubDoc(caseId, 'stages', next.id, { status: 'جارية' });
+  if (next) await updateSubDoc(caseId, 'stages', next.id, { status: 'جارية', startedAt: Date.now() });
 }
 
 // بعد قرار النيابة (حفظ/إحالة)، بنمسح أي مراحل قديمة بعد نقطة القرار (لو اتغيّر القرار)
@@ -325,16 +363,50 @@ async function branchStagesAfterDecision(caseId, decisionOrder, branchKey) {
   const existing = await listSub(caseId, 'stages');
   const stale = existing.filter(s => s.order > decisionOrder);
   for (const s of stale) await deleteSubDoc(caseId, 'stages', s.id);
+  const now = Date.now();
   const created = [];
   for (let i = 0; i < titles.length; i++) {
     const row = await addSubDoc(caseId, 'stages', {
       title: titles[i], order: decisionOrder + i + 1,
       status: i === 0 ? 'جارية' : 'لسه',
       isAuto: false, note: '', branch: branchKey,
+      deadlineDays: null,
+      startedAt: i === 0 ? now : null,
     });
     created.push(row);
   }
   return created;
+}
+
+// ═══ لوحة التحكم (Dashboard) ═══
+// بتجمّع من فوق بيانات القضايا المتزامنة (deadlineStatus / nextHearingDate / updatedAt...)
+// من غير ما تعمل قراءة إضافية لكل subcollection — الاعتماد على إن case-file.html
+// بيزامن الحقول دي كل ما تتغير مرحلة أو جلسة أو دفعة.
+async function getDashboardSummary(ownerEmail) {
+  const cases = await listCases(ownerEmail);
+  const openCases = cases.filter(c => c.status !== 'مغلقة');
+
+  const deadlines = openCases
+    .filter(c => c.deadlineStatus === 'overdue' || c.deadlineStatus === 'soon')
+    .map(c => ({
+      caseId: c.id, caseTitle: c.title, stageTitle: c.deadlineStageTitle || c.currentStageTitle || '',
+      dueDate: c.deadlineDate || null, status: c.deadlineStatus,
+    }))
+    .sort((a, b) => (a.status === b.status ? (a.dueDate || 0) - (b.dueDate || 0) : (a.status === 'overdue' ? -1 : 1)));
+
+  const now = Date.now();
+  const upcomingHearings = openCases
+    .filter(c => c.nextHearingDate && new Date(c.nextHearingDate).getTime() >= now - 86400000)
+    .map(c => ({ caseId: c.id, caseTitle: c.title, date: c.nextHearingDate }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const recentlyUpdated = [...cases].sort((a, b) => toMillis(b.updatedAt) - toMillis(a.updatedAt)).slice(0, 8);
+
+  return {
+    totalActive: cases.filter(c => c.status === 'نشطة').length,
+    totalPending: cases.filter(c => c.status === 'معلّقة').length,
+    deadlines, upcomingHearings, recentlyUpdated,
+  };
 }
 
 // ═══ اختصارات لصفحات الأدوات الأربعة (عقود / إنذارات / جنح / تحليل) ═══
@@ -397,10 +469,11 @@ async function openSaveToCasePicker({ ownerEmail, onSave }) {
 }
 
 window.CaseWidget = {
-  CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES, BRANCH_TEMPLATES, DECISION_STAGE_TITLE,
-  escapeHTML, toast,
+  CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES, BRANCH_TEMPLATES, DECISION_STAGE_TITLE, DEADLINE_SOON_DAYS,
+  escapeHTML, toast, toMillis,
   listCases, getCase, createCase, updateCase, deleteCaseFully,
   listSub, addSubDoc, updateSubDoc, deleteSubDoc,
   saveDocumentToCase, saveAnalysisToCase, saveEvidenceToCase, openSaveToCasePicker,
   getStageTemplate, seedStagesFromTemplate, advanceAfterStage, branchStagesAfterDecision,
+  computeDeadlineInfo, getDashboardSummary,
 };
