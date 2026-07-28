@@ -13,7 +13,7 @@
 // ملحوظة: التير المجاني ليه حد أقصى للطلبات في الدقيقة/اليوم (rate limit)،
 // لو حصل تجاوز هيرجع خطأ 429 وده هيتظهر للمستخدم كرسالة "حصل خطأ، جرب تاني".
 
-const GEMINI_MODEL = 'gemini-2.5-flash'; // موديل سريع ومتاح على التير المجاني
+const GEMINI_MODEL = 'gemini-2.5-flash-lite'; // gemini-2.5-flash بقى مش متاح للمشاريع الجديدة، فبنستخدم Flash-Lite (لسه متاح ومجاني)
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 module.exports = async (req, res) => {
