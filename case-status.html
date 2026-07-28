@@ -85,6 +85,7 @@ async function boot() {
     <div class="case-title">${window.CaseWidget.escapeHTML(c.title)}</div>
     <div class="case-meta">
       <span>◈ ${window.CaseWidget.escapeHTML(c.caseType || '—')}</span>
+      ${c.caseNumber ? `<span>#️⃣ ${window.CaseWidget.escapeHTML(c.caseNumber)}</span>` : ''}
       ${c.courtName ? `<span>⚖ ${window.CaseWidget.escapeHTML(c.courtName)}</span>` : ''}
     </div>
     ${stages.length ? `
