@@ -34,10 +34,32 @@ a{color:inherit;}
 .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
 .list-title{font-size:20px;font-weight:900;}
 .list-title span{color:var(--gold);}
+.header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .btn-new-case{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:11px 20px;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.btn-dashboard-link{font-size:12px;color:var(--cyber);text-decoration:none;border:1px solid rgba(0,229,255,0.25);padding:9px 16px;border-radius:10px;white-space:nowrap;}
+.btn-dashboard-link:hover{background:rgba(0,229,255,0.07);}
+.search-box{position:relative;margin-bottom:16px;max-width:360px;}
+.search-box input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.search-box input:focus{border-color:var(--cyber);}
 .filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
 .filter-chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--gray);cursor:pointer;background:transparent;font-family:'Cairo',sans-serif;}
 .filter-chip.active{border-color:var(--cyber);color:var(--cyber);background:rgba(0,229,255,0.06);}
+
+/* ═══ tags ═══ */
+.tag-chip{display:inline-block;font-size:10px;padding:2px 9px;border-radius:9px;background:rgba(0,229,255,0.08);color:var(--cyber);border:1px solid rgba(0,229,255,0.2);margin-inline-end:4px;margin-top:4px;}
+.tags-row{display:flex;flex-wrap:wrap;gap:0;margin-top:6px;}
+.cw-field-hint2{font-size:10.5px;color:var(--gray);margin-top:4px;}
+
+/* ═══ deadline badges ═══ */
+.deadline-badge{font-size:10px;padding:3px 9px;border-radius:9px;font-weight:800;white-space:nowrap;}
+.deadline-badge.ok{background:rgba(0,229,255,0.08);color:var(--cyber);}
+.deadline-badge.soon{background:rgba(255,167,38,0.14);color:#ffa726;}
+.deadline-badge.overdue{background:rgba(255,107,107,0.16);color:#ff6b6b;}
+.folder-deadline{font-size:10.5px;margin-top:8px;font-weight:700;}
+.folder-deadline.soon{color:#ffa726;}
+.folder-deadline.overdue{color:#ff6b6b;}
+.stage-deadline-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;font-size:11.5px;color:var(--gray);}
+.stage-deadline-row input{width:64px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:5px 8px;color:var(--white);font-family:'Cairo',sans-serif;font-size:12px;text-align:center;}
 
 .case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:28px 22px;padding-top:10px;}
 
@@ -105,7 +127,42 @@ a{color:inherit;}
 .btn-sm{font-size:12px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--white);cursor:pointer;font-family:'Cairo',sans-serif;}
 .btn-sm.danger{color:#ff6b6b;border-color:rgba(255,107,107,0.3);}
 
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px;}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px;flex-wrap:wrap;}
+
+/* ═══ hearings tab ═══ */
+.hearing-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px;margin-bottom:20px;}
+.hearing-form .cw-field.full{grid-column:1/-1;}
+.hearing-form textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;resize:vertical;min-height:60px;}
+@media (max-width:640px){.hearing-form{grid-template-columns:1fr;}}
+.hearing-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.hearing-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;flex-wrap:wrap;}
+.hearing-date{font-size:13.5px;font-weight:800;color:var(--gold);}
+.hearing-notes{font-size:12.5px;line-height:1.8;color:var(--white);margin-bottom:4px;}
+.hearing-decision{font-size:12px;color:var(--cyber);}
+.hearing-next{font-size:11.5px;color:var(--gray);margin-top:4px;}
+
+/* ═══ fees tab ═══ */
+.fee-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:640px;margin-bottom:22px;}
+@media (max-width:560px){.fee-summary{grid-template-columns:1fr;}}
+.fee-stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.fee-stat .lbl{font-size:11px;color:var(--gray);margin-bottom:6px;}
+.fee-stat .val{font-size:17px;font-weight:900;}
+.fee-stat.remaining .val{color:var(--gold);}
+.fee-stat.paid .val{color:var(--success);}
+.fee-agreed-row{display:flex;gap:8px;margin-bottom:22px;max-width:400px;align-items:flex-end;}
+.fee-agreed-row .cw-field{flex:1;margin-bottom:0;}
+.payment-form{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;max-width:640px;}
+.payment-form input{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;}
+.payment-form input#pAmount{width:130px;}
+.payment-form input#pNote{flex:1;min-width:160px;}
+.payment-card{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:13px;}
+.payment-amount{font-weight:800;color:var(--success);}
+.payment-meta{font-size:11.5px;color:var(--gray);}
+
+/* ═══ notes tab ═══ */
+.notes-box textarea{width:100%;min-height:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13.5px;line-height:1.9;direction:rtl;resize:vertical;outline:none;}
+.notes-box textarea:focus{border-color:var(--cyber);}
+.notes-saved-hint{font-size:11px;color:var(--gray);margin-top:8px;}
 .tab{padding:10px 18px;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;}
 .tab.active{color:var(--gold);border-color:var(--gold);}
 .tab-panel{display:none;}
@@ -207,6 +264,18 @@ a{color:inherit;}
 .cw-modal-btn.referral{background:linear-gradient(90deg,var(--success),#00d99a);color:#03181a;}
 .cw-modal-btn.dismissal{background:linear-gradient(90deg,#ff8a5c,#ff6b6b);color:#1a0a06;}
 .cw-modal-btn.cancel{background:transparent;border:1px solid var(--border);color:var(--gray);}
+
+/* ═══ new case modal (form) ═══ */
+.cw-modal.form{max-width:480px;text-align:right;}
+.cw-modal.form .t{text-align:center;}
+.new-case-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 6px;text-align:right;}
+.new-case-grid .cw-field.full{grid-column:1 / -1;}
+@media (max-width:480px){.new-case-grid{grid-template-columns:1fr;}}
+.cw-field .req{color:#ff6b6b;}
+.new-case-actions{display:flex;gap:10px;margin-top:16px;}
+.new-case-actions .cw-modal-btn{flex:1;}
+.cw-modal-btn.primary{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;}
+.cw-field-hint{font-size:10.5px;color:var(--gray);margin-top:4px;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -214,6 +283,7 @@ a{color:inherit;}
 <div class="top-nav">
   <a href="index.html" class="nav-back">← الرئيسية</a>
   <span class="nav-section">◈ ملفات القضايا</span>
+  <a href="dashboard.html" style="font-size:11px;color:var(--cyber);text-decoration:none;letter-spacing:1px;border:1px solid rgba(0,229,255,0.2);padding:6px 14px;border-radius:8px;">لوحة التحكم ◷</a>
   <a href="index.html" class="nav-logo">LEGISTA</a>
 </div>
 
@@ -229,8 +299,12 @@ a{color:inherit;}
   <div id="listView">
     <div class="list-header">
       <div class="list-title">ملفات <span>القضايا</span></div>
-      <button class="btn-new-case" id="btnNewCase">+ قضية جديدة</button>
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn-dashboard-link">◷ لوحة التحكم</a>
+        <button class="btn-new-case" id="btnNewCase">+ قضية جديدة</button>
+      </div>
     </div>
+    <div class="search-box"><input id="caseSearchInput" placeholder="ابحث بالعنوان، رقم الدعوى، اسم الموكل أو الخصم، أو تاج..."></div>
     <div class="filters" id="statusFilters">
       <button class="filter-chip active" data-status="الكل">الكل</button>
       <button class="filter-chip" data-status="نشطة">نشطة</button>
@@ -258,9 +332,12 @@ a{color:inherit;}
     <div class="tabs">
       <div class="tab active" data-tab="stages">مراحل القضية</div>
       <div class="tab" data-tab="info">بيانات القضية</div>
+      <div class="tab" data-tab="hearings">الجلسات</div>
+      <div class="tab" data-tab="fees">الأتعاب</div>
       <div class="tab" data-tab="documents">المستندات</div>
       <div class="tab" data-tab="analyses">التحليل والدفوع</div>
       <div class="tab" data-tab="evidence">المرفقات والأدلة</div>
+      <div class="tab" data-tab="notes">ملاحظات</div>
     </div>
 
     <div class="tab-panel paper active" id="panel-stages">
@@ -287,11 +364,56 @@ a{color:inherit;}
         <div class="cw-field"><label>عنوان القضية</label><input id="fTitle"></div>
         <div class="cw-field"><label>نوع القضية</label><select id="fType"></select></div>
         <div class="cw-field"><label>الحالة</label><select id="fStatus"></select></div>
+        <div class="cw-field"><label>رقم الدعوى/القضية</label><input id="fCaseNumber"></div>
         <div class="cw-field"><label>اسم العميل</label><input id="fClient"></div>
         <div class="cw-field"><label>اسم الخصم</label><input id="fOpponent"></div>
+        <div class="cw-field" id="fPoliceStationField" style="display:none;"><label>القسم/مركز الشرطة</label><input id="fPoliceStation"></div>
         <div class="cw-field"><label>المحكمة</label><input id="fCourt"></div>
+        <div class="cw-field" style="grid-column:1/-1;">
+          <label>تاجات (افصل بينهم بفاصلة)</label>
+          <input id="fTags" placeholder="مثال: عاجل، متابعة قريبة">
+        </div>
       </div>
       <button class="btn-save-info" id="btnSaveInfo">حفظ البيانات</button>
+    </div>
+
+    <div class="tab-panel paper" id="panel-hearings">
+      <div class="hearing-form">
+        <div class="cw-field"><label>تاريخ الجلسة</label><input type="date" id="hDate"></div>
+        <div class="cw-field"><label>الجلسة القادمة (لو اتحددت)</label><input type="date" id="hNextDate"></div>
+        <div class="cw-field full"><label>اللي حصل في الجلسة</label><textarea id="hNotes" placeholder="ملخص اللي حصل، المرافعات، المستندات المقدمة..."></textarea></div>
+        <div class="cw-field full"><label>القرار/التأجيل</label><input id="hDecision" placeholder="مثال: تأجلت لتقديم مستندات - أو - صدر الحكم بـ..."></div>
+      </div>
+      <button class="btn-save-info" id="btnAddHearing" style="margin-bottom:20px;">+ إضافة جلسة</button>
+      <div id="hearingsList"></div>
+      <div id="hearingsEmpty" class="empty-state" style="display:none;">
+        <div class="icon">📅</div>
+        <div class="t">مفيش جلسات مسجّلة لسه</div>
+        <div>سجّل كل جلسة بتاريخها عشان تقدر تتابع مسار القضية بالتفصيل.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel paper" id="panel-fees">
+      <div class="fee-summary">
+        <div class="fee-stat"><div class="lbl">الأتعاب المتفق عليها</div><div class="val" id="feeAgreedVal">٠</div></div>
+        <div class="fee-stat paid"><div class="lbl">إجمالي المدفوع</div><div class="val" id="feePaidVal">٠</div></div>
+        <div class="fee-stat remaining"><div class="lbl">المتبقي</div><div class="val" id="feeRemainingVal">٠</div></div>
+      </div>
+      <div class="fee-agreed-row">
+        <div class="cw-field"><label>الأتعاب المتفق عليها (جنيه)</label><input type="number" id="fFeeAgreed" min="0"></div>
+        <button class="btn-save-info" id="btnSaveFeeAgreed">حفظ</button>
+      </div>
+      <div class="payment-form">
+        <input type="number" id="pAmount" placeholder="المبلغ" min="0">
+        <input type="date" id="pDate">
+        <input id="pNote" placeholder="ملاحظة (اختياري)">
+        <button class="btn-save-info" id="btnAddPayment">+ إضافة دفعة</button>
+      </div>
+      <div id="paymentsList"></div>
+      <div id="paymentsEmpty" class="empty-state" style="display:none;">
+        <div class="icon">💰</div>
+        <div class="t">مفيش دفعات مسجّلة لسه</div>
+      </div>
     </div>
 
     <div class="tab-panel paper" id="panel-documents">
@@ -331,6 +453,14 @@ a{color:inherit;}
         <div>ارفع صورة المحضر أو الحكم أو أي مستند تاني، ولو كان محضر تقدر تطلب تحليل ثغراته بالذكاء الاصطناعي.</div>
       </div>
     </div>
+
+    <div class="tab-panel paper" id="panel-notes">
+      <div class="notes-box">
+        <textarea id="notesTextarea" placeholder="أي ملاحظات سريعة عن القضية... أفكار، تذكيرات، حاجات لازم تتابعها. منفصلة عن المستندات الرسمية."></textarea>
+      </div>
+      <button class="btn-save-info" id="btnSaveNotes" style="margin-top:12px;">حفظ الملاحظات</button>
+      <div class="notes-saved-hint" id="notesSavedHint"></div>
+    </div>
   </div>
 
 </div>
@@ -344,6 +474,49 @@ a{color:inherit;}
       <button class="cw-modal-btn referral" id="btnBranchReferral">تمت الإحالة للمحكمة</button>
       <button class="cw-modal-btn dismissal" id="btnBranchDismissal">تم حفظ التحقيق</button>
       <button class="cw-modal-btn cancel" id="btnBranchCancel">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW CASE MODAL (نموذج شامل لإنشاء قضية جديدة) -->
+<div class="cw-modal-overlay" id="newCaseModalOverlay">
+  <div class="cw-modal form">
+    <div class="t">قضية جديدة</div>
+    <div class="sub" style="margin-bottom:0;">املأ بيانات القضية الأساسية عشان نجهّزلك خطة المراحل الصح من أول خطوة.</div>
+    <div class="new-case-grid">
+      <div class="cw-field full">
+        <label>عنوان القضية <span class="req">*</span></label>
+        <input id="ncTitle" placeholder="مثال: قضية نصب واحتيال - محمد أحمد">
+      </div>
+      <div class="cw-field">
+        <label>نوع القضية <span class="req">*</span></label>
+        <select id="ncType"></select>
+      </div>
+      <div class="cw-field">
+        <label>رقم الدعوى/القضية</label>
+        <input id="ncCaseNumber" placeholder="لو متاح لسه">
+      </div>
+      <div class="cw-field">
+        <label>اسم الموكل</label>
+        <input id="ncClient" placeholder="اسم العميل">
+      </div>
+      <div class="cw-field">
+        <label>اسم الخصم</label>
+        <input id="ncOpponent" placeholder="اسم الطرف التاني">
+      </div>
+      <div class="cw-field" id="ncPoliceStationField" style="display:none;">
+        <label>القسم/مركز الشرطة</label>
+        <input id="ncPoliceStation" placeholder="مثال: قسم شرطة مدينة نصر">
+      </div>
+      <div class="cw-field">
+        <label>المحكمة</label>
+        <input id="ncCourt" placeholder="لو محددة">
+      </div>
+    </div>
+    <div class="cw-field-hint">هيتحط خطة مراحل مقترحة تلقائيًا حسب نوع القضية اللي هتختاره، وتقدر تعدّلها بعدين من صفحة القضية.</div>
+    <div class="new-case-actions">
+      <button class="cw-modal-btn cancel" id="btnNewCaseCancel">إلغاء</button>
+      <button class="cw-modal-btn primary" id="btnNewCaseCreate">إنشاء القضية</button>
     </div>
   </div>
 </div>
@@ -380,13 +553,22 @@ async function refreshCases() {
   renderList();
 }
 
+let searchQuery = '';
+
 function renderList() {
   const grid = document.getElementById('caseGrid');
-  const filtered = activeStatus === 'الكل' ? allCases : allCases.filter(c => c.status === activeStatus);
+  let filtered = activeStatus === 'الكل' ? allCases : allCases.filter(c => c.status === activeStatus);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(c => [
+      c.title, c.caseNumber, c.clientName, c.opponentName, ...(c.tags || [])
+    ].filter(Boolean).some(v => String(v).toLowerCase().includes(q)));
+  }
   document.getElementById('emptyState').style.display = filtered.length ? 'none' : 'block';
   grid.innerHTML = filtered.map(c => {
     const prog = c.stageProgress || null;
     const pct = prog && prog.total ? Math.round((prog.done / prog.total) * 100) : 0;
+    const dl = c.deadlineStatus === 'overdue' ? '⏰ فات الميعاد القانوني!' : (c.deadlineStatus === 'soon' ? '⏰ الميعاد قرب' : '');
     return `
     <div class="case-folder" data-id="${c.id}">
       <div class="folder-ribbon status-${c.status}">${c.status}</div>
@@ -394,9 +576,12 @@ function renderList() {
       <div class="case-folder-meta">
         <div>◈ ${window.CaseWidget.escapeHTML(c.caseType || '—')}</div>
         ${c.clientName ? `<div>👤 ${window.CaseWidget.escapeHTML(c.clientName)}</div>` : ''}
+        ${c.caseNumber ? `<div>#️⃣ ${window.CaseWidget.escapeHTML(c.caseNumber)}</div>` : ''}
       </div>
+      ${(c.tags || []).length ? `<div class="tags-row">${c.tags.map(t => `<span class="tag-chip">${window.CaseWidget.escapeHTML(t)}</span>`).join('')}</div>` : ''}
       ${prog ? `<div class="case-folder-progress"><div class="case-folder-progress-bar" style="width:${pct}%"></div></div>
       <div class="case-folder-next">${c.currentStageTitle ? '◈ ' + window.CaseWidget.escapeHTML(c.currentStageTitle) : 'كل المراحل خلصت 🎉'}</div>` : ''}
+      ${dl ? `<div class="folder-deadline ${c.deadlineStatus}">${dl}</div>` : ''}
     </div>`;
   }).join('');
   grid.querySelectorAll('.case-folder').forEach(card => {
@@ -416,13 +601,71 @@ document.getElementById('statusFilters').addEventListener('click', (e) => {
   renderList();
 });
 
-document.getElementById('btnNewCase').addEventListener('click', async () => {
+let searchDebounce;
+document.getElementById('caseSearchInput').addEventListener('input', (e) => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => { searchQuery = e.target.value.trim(); renderList(); }, 150);
+});
+
+/* ---------- new case modal ---------- */
+function togglePoliceStationField(selectEl, wrapEl) {
+  wrapEl.style.display = selectEl.value === 'جنائي' ? 'block' : 'none';
+}
+
+function openNewCaseModal() {
+  const overlay = document.getElementById('newCaseModalOverlay');
+  const typeSel = document.getElementById('ncType');
+  typeSel.innerHTML = window.CaseWidget.CASE_TYPES.map(t => `<option>${t}</option>`).join('');
+  document.getElementById('ncTitle').value = '';
+  document.getElementById('ncCaseNumber').value = '';
+  document.getElementById('ncClient').value = '';
+  document.getElementById('ncOpponent').value = '';
+  document.getElementById('ncPoliceStation').value = '';
+  document.getElementById('ncCourt').value = '';
+  const psField = document.getElementById('ncPoliceStationField');
+  togglePoliceStationField(typeSel, psField);
+  typeSel.onchange = () => togglePoliceStationField(typeSel, psField);
+  overlay.classList.add('show');
+  document.getElementById('ncTitle').focus();
+}
+function closeNewCaseModal() {
+  document.getElementById('newCaseModalOverlay').classList.remove('show');
+}
+
+document.getElementById('btnNewCase').addEventListener('click', openNewCaseModal);
+document.getElementById('btnNewCaseCancel').addEventListener('click', closeNewCaseModal);
+document.getElementById('newCaseModalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'newCaseModalOverlay') closeNewCaseModal();
+});
+
+document.getElementById('btnNewCaseCreate').addEventListener('click', async () => {
   const user = getUser();
-  const title = prompt('عنوان القضية الجديدة:');
-  if (!title || !title.trim()) return;
-  const created = await window.CaseWidget.createCase({ ownerEmail: user.email, title: title.trim() });
-  await refreshCases();
-  openDetail(created.id);
+  const title = document.getElementById('ncTitle').value.trim();
+  if (!title) { window.CaseWidget.toast('لازم تكتب عنوان القضية'); document.getElementById('ncTitle').focus(); return; }
+  const caseType = document.getElementById('ncType').value;
+  const btn = document.getElementById('btnNewCaseCreate');
+  btn.disabled = true; btn.textContent = 'جارِ الإنشاء...';
+  try {
+    const created = await window.CaseWidget.createCase({
+      ownerEmail: user.email,
+      title,
+      caseType,
+      clientName: document.getElementById('ncClient').value.trim(),
+      opponentName: document.getElementById('ncOpponent').value.trim(),
+      courtName: document.getElementById('ncCourt').value.trim(),
+      caseNumber: document.getElementById('ncCaseNumber').value.trim(),
+      policeStation: document.getElementById('ncPoliceStation').value.trim(),
+    });
+    await window.CaseWidget.seedStagesFromTemplate(created.id, caseType);
+    closeNewCaseModal();
+    await refreshCases();
+    openDetail(created.id);
+  } catch (err) {
+    console.error('create case error', err);
+    window.CaseWidget.toast('حصل خطأ أثناء إنشاء القضية');
+  } finally {
+    btn.disabled = false; btn.textContent = 'إنشاء القضية';
+  }
 });
 
 async function openDetail(caseId) {
@@ -441,6 +684,12 @@ async function openDetail(caseId) {
   document.getElementById('fClient').value = c.clientName || '';
   document.getElementById('fOpponent').value = c.opponentName || '';
   document.getElementById('fCourt').value = c.courtName || '';
+  document.getElementById('fCaseNumber').value = c.caseNumber || '';
+  document.getElementById('fPoliceStation').value = c.policeStation || '';
+  document.getElementById('fTags').value = (c.tags || []).join('، ');
+  const fPsField = document.getElementById('fPoliceStationField');
+  fPsField.style.display = typeSel.value === 'جنائي' ? 'block' : 'none';
+  typeSel.onchange = () => { fPsField.style.display = typeSel.value === 'جنائي' ? 'block' : 'none'; };
 
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'stages'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-stages'));
@@ -450,6 +699,9 @@ async function openDetail(caseId) {
   await loadDocuments(caseId);
   await loadAnalyses(caseId);
   await loadEvidence(caseId);
+  await loadHearings(caseId);
+  await loadFees(caseId, c);
+  loadNotes(c);
 }
 
 document.getElementById('btnBackToList').addEventListener('click', () => {
@@ -469,6 +721,9 @@ document.getElementById('btnSaveInfo').addEventListener('click', async () => {
     clientName: document.getElementById('fClient').value.trim(),
     opponentName: document.getElementById('fOpponent').value.trim(),
     courtName: document.getElementById('fCourt').value.trim(),
+    caseNumber: document.getElementById('fCaseNumber').value.trim(),
+    policeStation: document.getElementById('fPoliceStation').value.trim(),
+    tags: document.getElementById('fTags').value.split(/[،,]/).map(t => t.trim()).filter(Boolean),
   });
   document.getElementById('detailTitle').textContent = document.getElementById('fTitle').value.trim();
   btn.disabled = false; btn.textContent = 'حفظ البيانات';
@@ -607,7 +862,14 @@ function renderStages(caseId, stages) {
   }
 
   const list = document.getElementById('stagesList');
-  list.innerHTML = stages.map(s => `
+  list.innerHTML = stages.map(s => {
+    const dl = window.CaseWidget.computeDeadlineInfo(s);
+    const dlBadge = dl ? `<span class="deadline-badge ${dl.status}">${
+      dl.status === 'overdue' ? `⏰ فات الميعاد بـ ${Math.abs(dl.daysLeft)} يوم` :
+      dl.status === 'soon' ? `⏰ باقي ${dl.daysLeft} يوم على الميعاد` :
+      `باقي ${dl.daysLeft} يوم على الميعاد`
+    }</span>` : '';
+    return `
     <div class="stage-item" data-id="${s.id}" data-status="${s.status}" data-order="${s.order}" data-decision="${s.isDecision ? '1' : '0'}">
       <div class="stage-dot"></div>
       <div class="stage-card">
@@ -621,8 +883,15 @@ function renderStages(caseId, stages) {
           ${s.isAuto && s.status !== 'مكتملة' ? `<button class="stage-run-auto run-btn">⚡ نفّذها دلوقتي</button>` : ''}
           <button class="link-btn danger stage-del-btn">حذف</button>
         </div>
+        ${s.status === 'جارية' ? `
+        <div class="stage-deadline-row">
+          الميعاد القانوني (أيام):
+          <input type="number" min="1" class="deadline-days-input" value="${s.deadlineDays || ''}" placeholder="—">
+          ${dlBadge}
+        </div>` : (dlBadge ? `<div class="stage-deadline-row">${dlBadge}</div>` : '')}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   list.querySelectorAll('.stage-item').forEach(item => {
     const id = item.dataset.id;
@@ -639,11 +908,17 @@ function renderStages(caseId, stages) {
       loadStages(caseId, currentCaseType());
     });
     item.querySelector('.reopen-btn')?.addEventListener('click', async () => {
-      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { status: 'جارية' });
+      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { status: 'جارية', startedAt: Date.now() });
       loadStages(caseId, currentCaseType());
     });
     item.querySelector('.auto-check').addEventListener('change', async (e) => {
       await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { isAuto: e.target.checked });
+      loadStages(caseId, currentCaseType());
+    });
+    item.querySelector('.deadline-days-input')?.addEventListener('change', async (e) => {
+      const days = parseInt(e.target.value, 10);
+      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { deadlineDays: isNaN(days) || days <= 0 ? null : days });
+      window.CaseWidget.toast('تم حفظ الميعاد ✓');
       loadStages(caseId, currentCaseType());
     });
     item.querySelector('.run-btn')?.addEventListener('click', async () => {
@@ -676,15 +951,23 @@ function currentCaseType() {
 async function syncCaseProgress(caseId, stages) {
   const done = stages.filter(s => s.status === 'مكتملة').length;
   const active = stages.find(s => s.status === 'جارية');
-  await window.CaseWidget.updateCase(caseId, {
+  // نجيب أقرب ميعاد بين كل المراحل "الجارية" (ممكن يبقى فيه أكتر من واحدة لو اتعملها reopen)
+  let deadlineStatus = null, deadlineDate = null, deadlineStageTitle = '';
+  stages.filter(s => s.status === 'جارية').forEach(s => {
+    const info = window.CaseWidget.computeDeadlineInfo(s);
+    if (!info) return;
+    if (deadlineStatus === null || info.dueDate < deadlineDate) {
+      deadlineStatus = info.status; deadlineDate = info.dueDate; deadlineStageTitle = s.title;
+    }
+  });
+  const fields = {
     stageProgress: { done, total: stages.length },
     currentStageTitle: active ? active.title : (stages.length ? '' : ''),
-  });
+    deadlineStatus, deadlineDate, deadlineStageTitle,
+  };
+  await window.CaseWidget.updateCase(caseId, fields);
   const idx = allCases.findIndex(c => c.id === caseId);
-  if (idx > -1) {
-    allCases[idx].stageProgress = { done, total: stages.length };
-    allCases[idx].currentStageTitle = active ? active.title : '';
-  }
+  if (idx > -1) Object.assign(allCases[idx], fields);
 }
 
 document.getElementById('btnAddStage').addEventListener('click', async () => {
@@ -694,6 +977,7 @@ document.getElementById('btnAddStage').addEventListener('click', async () => {
   const existing = await window.CaseWidget.listSub(currentCaseId, 'stages');
   await window.CaseWidget.addSubDoc(currentCaseId, 'stages', {
     title, order: existing.length, status: existing.length ? 'لسه' : 'جارية', isAuto: false, note: '',
+    deadlineDays: null, startedAt: existing.length ? null : Date.now(),
   });
   input.value = '';
   loadStages(currentCaseId, currentCaseType());
@@ -901,6 +1185,126 @@ async function loadEvidence(caseId) {
     });
   });
 }
+
+/* ---------- hearings tab ---------- */
+async function loadHearings(caseId) {
+  const items = await window.CaseWidget.listSub(caseId, 'hearings');
+  items.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  const list = document.getElementById('hearingsList');
+  document.getElementById('hearingsEmpty').style.display = items.length ? 'none' : 'block';
+  list.innerHTML = items.map(h => `
+    <div class="hearing-card" data-id="${h.id}">
+      <div class="hearing-card-top">
+        <span class="hearing-date">📅 ${h.date ? new Date(h.date).toLocaleDateString('ar-EG') : '—'}</span>
+        <button class="link-btn danger del-hearing-btn">حذف</button>
+      </div>
+      ${h.notes ? `<div class="hearing-notes">${window.CaseWidget.escapeHTML(h.notes)}</div>` : ''}
+      ${h.decision ? `<div class="hearing-decision">◈ ${window.CaseWidget.escapeHTML(h.decision)}</div>` : ''}
+      ${h.nextHearingDate ? `<div class="hearing-next">الجلسة القادمة: ${new Date(h.nextHearingDate).toLocaleDateString('ar-EG')}</div>` : ''}
+    </div>`).join('');
+  list.querySelectorAll('.del-hearing-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('حذف الجلسة دي؟')) return;
+      const id = btn.closest('.hearing-card').dataset.id;
+      await window.CaseWidget.deleteSubDoc(caseId, 'hearings', id);
+      loadHearings(caseId);
+    });
+  });
+}
+
+document.getElementById('btnAddHearing').addEventListener('click', async () => {
+  const date = document.getElementById('hDate').value;
+  if (!date) { window.CaseWidget.toast('لازم تحدد تاريخ الجلسة'); return; }
+  const nextHearingDate = document.getElementById('hNextDate').value;
+  const notes = document.getElementById('hNotes').value.trim();
+  const decision = document.getElementById('hDecision').value.trim();
+  await window.CaseWidget.addSubDoc(currentCaseId, 'hearings', { date, nextHearingDate, notes, decision });
+  if (nextHearingDate) await window.CaseWidget.updateCase(currentCaseId, { nextHearingDate });
+  document.getElementById('hDate').value = '';
+  document.getElementById('hNextDate').value = '';
+  document.getElementById('hNotes').value = '';
+  document.getElementById('hDecision').value = '';
+  window.CaseWidget.toast('تم تسجيل الجلسة ✓');
+  loadHearings(currentCaseId);
+});
+
+/* ---------- fees tab ---------- */
+function fmtMoney(n) {
+  return (Number(n) || 0).toLocaleString('ar-EG') + ' ج.م';
+}
+async function syncPaymentsTotal(caseId) {
+  const payments = await window.CaseWidget.listSub(caseId, 'payments');
+  const total = payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  await window.CaseWidget.updateCase(caseId, { paymentsTotal: total });
+  return { payments, total };
+}
+async function loadFees(caseId, c) {
+  document.getElementById('fFeeAgreed').value = c.feeAgreed || '';
+  const { payments, total } = await syncPaymentsTotal(caseId);
+  const agreed = Number(c.feeAgreed) || 0;
+  document.getElementById('feeAgreedVal').textContent = fmtMoney(agreed);
+  document.getElementById('feePaidVal').textContent = fmtMoney(total);
+  document.getElementById('feeRemainingVal').textContent = fmtMoney(agreed - total);
+  payments.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  const list = document.getElementById('paymentsList');
+  document.getElementById('paymentsEmpty').style.display = payments.length ? 'none' : 'block';
+  list.innerHTML = payments.map(p => `
+    <div class="payment-card" data-id="${p.id}">
+      <div>
+        <span class="payment-amount">${fmtMoney(p.amount)}</span>
+        ${p.note ? ` <span class="payment-meta">— ${window.CaseWidget.escapeHTML(p.note)}</span>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="payment-meta">${p.date ? new Date(p.date).toLocaleDateString('ar-EG') : ''}</span>
+        <button class="link-btn danger del-payment-btn">حذف</button>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('.del-payment-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('حذف الدفعة دي؟')) return;
+      const id = btn.closest('.payment-card').dataset.id;
+      await window.CaseWidget.deleteSubDoc(caseId, 'payments', id);
+      const cc = await window.CaseWidget.getCase(caseId);
+      loadFees(caseId, cc);
+    });
+  });
+}
+
+document.getElementById('btnSaveFeeAgreed').addEventListener('click', async () => {
+  const val = parseFloat(document.getElementById('fFeeAgreed').value) || 0;
+  await window.CaseWidget.updateCase(currentCaseId, { feeAgreed: val });
+  window.CaseWidget.toast('تم حفظ الأتعاب المتفق عليها ✓');
+  const cc = await window.CaseWidget.getCase(currentCaseId);
+  loadFees(currentCaseId, cc);
+});
+
+document.getElementById('btnAddPayment').addEventListener('click', async () => {
+  const amount = parseFloat(document.getElementById('pAmount').value);
+  if (!amount || amount <= 0) { window.CaseWidget.toast('لازم تكتب مبلغ صحيح'); return; }
+  const date = document.getElementById('pDate').value || new Date().toISOString().slice(0, 10);
+  const note = document.getElementById('pNote').value.trim();
+  await window.CaseWidget.addSubDoc(currentCaseId, 'payments', { amount, date, note });
+  document.getElementById('pAmount').value = '';
+  document.getElementById('pDate').value = '';
+  document.getElementById('pNote').value = '';
+  window.CaseWidget.toast('تم تسجيل الدفعة ✓');
+  const cc = await window.CaseWidget.getCase(currentCaseId);
+  loadFees(currentCaseId, cc);
+});
+
+/* ---------- notes tab ---------- */
+function loadNotes(c) {
+  document.getElementById('notesTextarea').value = c.quickNotes || '';
+  document.getElementById('notesSavedHint').textContent = '';
+}
+document.getElementById('btnSaveNotes').addEventListener('click', async () => {
+  const btn = document.getElementById('btnSaveNotes');
+  btn.disabled = true;
+  await window.CaseWidget.updateCase(currentCaseId, { quickNotes: document.getElementById('notesTextarea').value });
+  btn.disabled = false;
+  document.getElementById('notesSavedHint').textContent = 'اتحفظت آخر مرة ' + new Date().toLocaleTimeString('ar-EG');
+  window.CaseWidget.toast('تم حفظ الملاحظات ✓');
+});
 
 boot();
 </script>
