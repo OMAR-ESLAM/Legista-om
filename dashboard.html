@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم | LEGISTA</title>
+<meta name="description" content="نظرة سريعة على كل قضاياك: المواعيد اللي قربت أو فاتت، الجلسات القادمة، وآخر تحديثات.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
+a{color:inherit;}
+
+.top-nav{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
+.nav-back{font-size:11px;color:var(--cyber);text-decoration:none;letter-spacing:1px;border:1px solid rgba(0,229,255,0.2);padding:6px 14px;border-radius:8px;}
+.nav-back:hover{background:rgba(0,229,255,0.07);}
+.nav-section{font-size:11px;letter-spacing:3px;color:var(--gray);font-weight:600;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:5px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px 80px;}
+.page-title{font-size:22px;font-weight:900;margin-bottom:6px;}
+.page-title span{color:var(--gold);}
+.page-sub{font-size:13px;color:var(--gray);margin-bottom:28px;}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:34px;}
+@media (max-width:760px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;}
+.stat-card .num{font-size:26px;font-weight:900;color:var(--gold);}
+.stat-card.alert .num{color:#ff6b6b;}
+.stat-card .lbl{font-size:11.5px;color:var(--gray);margin-top:6px;}
+
+.section{margin-bottom:36px;}
+.section-title{font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title .cnt{font-size:11px;color:var(--gray);font-weight:600;}
+
+.row-card{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;cursor:pointer;transition:border-color .2s, transform .2s;gap:12px;flex-wrap:wrap;}
+.row-card:hover{border-color:rgba(212,175,55,0.4);transform:translateY(-1px);}
+.row-card.overdue{border-inline-start:3px solid #ff6b6b;}
+.row-card.soon{border-inline-start:3px solid #ffa726;}
+.row-main{min-width:0;}
+.row-title{font-size:13.5px;font-weight:800;margin-bottom:3px;}
+.row-sub{font-size:11.5px;color:var(--gray);}
+.row-badge{font-size:10.5px;padding:4px 11px;border-radius:9px;font-weight:800;white-space:nowrap;}
+.row-badge.overdue{background:rgba(255,107,107,0.16);color:#ff6b6b;}
+.row-badge.soon{background:rgba(255,167,38,0.14);color:#ffa726;}
+.row-badge.info{background:rgba(0,229,255,0.08);color:var(--cyber);}
+
+.empty-row{text-align:center;padding:40px 20px;color:var(--gray);font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:14px;}
+.login-gate{text-align:center;padding:100px 20px;}
+.login-gate .icon{font-size:48px;margin-bottom:14px;}
+.loading-row{text-align:center;padding:40px;color:var(--gray);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="case-file.html" class="nav-back">← ملفات القضايا</a>
+  <span class="nav-section">◈ لوحة التحكم</span>
+  <a href="index.html" class="nav-logo">LEGISTA</a>
+</div>
+
+<div class="wrap">
+
+  <div id="loginGate" class="login-gate" style="display:none;">
+    <div class="icon">🔒</div>
+    <div class="page-title">سجّل الدخول لعرض لوحة التحكم</div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="page-title">لوحة <span>التحكم</span></div>
+    <div class="page-sub">نظرة سريعة على كل قضاياك — المواعيد اللي محتاجة انتباه، الجلسات القادمة، وآخر تحديث.</div>
+
+    <div class="stat-row" id="statRow"></div>
+
+    <div class="section">
+      <div class="section-title">⏰ مواعيد قانونية محتاجة انتباه <span class="cnt" id="deadlinesCount"></span></div>
+      <div id="deadlinesList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📅 جلسات قادمة <span class="cnt" id="hearingsCount"></span></div>
+      <div id="hearingsList"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🕘 آخر تحديث</div>
+      <div id="recentList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import './case-widget.js';
+
+function getUser() {
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) return null;
+  try { return JSON.parse(saved); } catch (e) { return null; }
+}
+
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('ar-EG');
+}
+
+async function boot() {
+  const user = getUser();
+  if (!user) {
+    document.getElementById('loginGate').style.display = 'block';
+    return;
+  }
+  document.getElementById('content').style.display = 'block';
+
+  const summary = await window.CaseWidget.getDashboardSummary(user.email);
+
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat-card"><div class="num">${summary.totalActive}</div><div class="lbl">قضايا نشطة</div></div>
+    <div class="stat-card"><div class="num">${summary.totalPending}</div><div class="lbl">قضايا معلّقة</div></div>
+    <div class="stat-card ${summary.deadlines.filter(d => d.status === 'overdue').length ? 'alert' : ''}">
+      <div class="num">${summary.deadlines.filter(d => d.status === 'overdue').length}</div><div class="lbl">مواعيد فاتت</div></div>
+    <div class="stat-card"><div class="num">${summary.deadlines.filter(d => d.status === 'soon').length}</div><div class="lbl">مواعيد قربت</div></div>
+  `;
+
+  document.getElementById('deadlinesCount').textContent = summary.deadlines.length ? `(${summary.deadlines.length})` : '';
+  const dlList = document.getElementById('deadlinesList');
+  dlList.innerHTML = summary.deadlines.length ? summary.deadlines.map(d => `
+    <div class="row-card ${d.status}" data-id="${d.caseId}">
+      <div class="row-main">
+        <div class="row-title">${window.CaseWidget.escapeHTML(d.caseTitle)}</div>
+        <div class="row-sub">${window.CaseWidget.escapeHTML(d.stageTitle || '')}${d.dueDate ? ' — الميعاد: ' + fmtDate(d.dueDate) : ''}</div>
+      </div>
+      <span class="row-badge ${d.status}">${d.status === 'overdue' ? 'فات الميعاد ⏰' : 'الميعاد قرب ⏰'}</span>
+    </div>`).join('') : `<div class="empty-row">مفيش مواعيد قانونية قربت أو فاتت دلوقتي 🎉</div>`;
+
+  document.getElementById('hearingsCount').textContent = summary.upcomingHearings.length ? `(${summary.upcomingHearings.length})` : '';
+  const hList = document.getElementById('hearingsList');
+  hList.innerHTML = summary.upcomingHearings.length ? summary.upcomingHearings.map(h => `
+    <div class="row-card" data-id="${h.caseId}">
+      <div class="row-main">
+        <div class="row-title">${window.CaseWidget.escapeHTML(h.caseTitle)}</div>
+        <div class="row-sub">جلسة يوم ${fmtDate(h.date)}</div>
+      </div>
+      <span class="row-badge info">📅 ${fmtDate(h.date)}</span>
+    </div>`).join('') : `<div class="empty-row">مفيش جلسات قادمة متسجّلة</div>`;
+
+  const rList = document.getElementById('recentList');
+  rList.innerHTML = summary.recentlyUpdated.length ? summary.recentlyUpdated.map(c => `
+    <div class="row-card" data-id="${c.id}">
+      <div class="row-main">
+        <div class="row-title">${window.CaseWidget.escapeHTML(c.title)}</div>
+        <div class="row-sub">${window.CaseWidget.escapeHTML(c.currentStageTitle || c.caseType || '')}</div>
+      </div>
+      <span class="row-badge info">${fmtDate(c.updatedAt)}</span>
+    </div>`).join('') : `<div class="empty-row">مفيش قضايا لسه</div>`;
+
+  document.querySelectorAll('.row-card').forEach(row => {
+    row.addEventListener('click', () => {
+      location.href = `case-file.html?case=${row.dataset.id}`;
+    });
+  });
+}
+boot();
+</script>
+</body>
+</html>
