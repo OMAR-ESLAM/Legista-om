@@ -250,6 +250,73 @@ body::before {
 .send-btn svg, .mic-btn svg { width: 16px; height: 16px; }
 .mic-btn { transition: all .2s, transform .12s; }
 .mic-btn:active { transform: scale(0.88); }
+.attach-btn { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s, transform .12s; background: var(--bg-2); color: var(--muted); }
+.attach-btn:hover { background: var(--surface-3); color: var(--ink); }
+.attach-btn:active { transform: scale(0.88); }
+.attach-btn svg { width: 16px; height: 16px; }
+
+/* attachment previews above composer */
+.attach-strip { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 4px 10px; }
+.attach-chip { position: relative; width: 56px; height: 56px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); background: var(--bg-2); flex-shrink: 0; }
+.attach-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.attach-chip.is-pdf { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: 9px; text-align: center; padding: 4px; }
+.attach-chip.is-pdf svg { width: 18px; height: 18px; color: var(--accent-2); }
+.attach-chip-remove { position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: rgba(20,16,8,0.72); color: #fff; border: none; font-size: 10px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.bubble-attach-thumbs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.bubble-attach-chip { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(255,255,255,0.25); }
+.bubble-attach-chip.is-pdf { display: flex; align-items: center; justify-content: center; font-size: 10px; padding: 4px; text-align: center; background: rgba(255,255,255,0.1); color: inherit; }
+.bubble-attach-note { opacity: .9; font-size: 12.5px; }
+
+/* attach action sheet */
+.attach-sheet { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 420px; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); box-shadow: 0 -8px 30px rgba(0,0,0,0.25); }
+#attachSheetOverlay { align-items: flex-end; }
+#attachSheetOverlay.show { display: flex; }
+.attach-sheet-title { font-size: 13px; font-weight: 800; color: var(--ink); text-align: center; margin-bottom: 14px; }
+.attach-option { width: 100%; display: flex; align-items: center; gap: 12px; text-align: right; padding: 13px 14px; border-radius: 14px; border: 1px solid var(--border-soft); background: var(--bg-2); margin-bottom: 10px; cursor: pointer; transition: all .15s; }
+.attach-option:hover { border-color: var(--accent); background: var(--surface-2); }
+.attach-option-icon { flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px; background: var(--surface-3); display: flex; align-items: center; justify-content: center; color: var(--accent-2); }
+.attach-option-icon svg { width: 18px; height: 18px; }
+.attach-option-label { display: block; font-size: 13px; font-weight: 700; color: var(--ink); }
+.attach-option-sub { display: block; font-size: 11px; color: var(--muted-2); margin-top: 2px; }
+.attach-sheet-cancel { width: 100%; padding: 12px; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--muted); background: none; border: none; cursor: pointer; }
+
+/* ══ document scanner ══ */
+.scanner-overlay { display: none; position: fixed; inset: 0; z-index: 3000; background: #0a0906; }
+.scanner-overlay.show { display: block; }
+.scanner-camera-view, .scanner-review-view { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.scanner-topbar { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 16px 16px calc(10px + env(safe-area-inset-top, 0px)); }
+.scanner-icon-btn { background: rgba(255,255,255,0.12); color: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.scanner-page-count { color: rgba(255,255,255,0.75); font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; }
+#scannerVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+.scanner-guide-frame { position: absolute; top: 12%; bottom: 22%; left: 7%; right: 7%; z-index: 2; pointer-events: none; }
+.scanner-guide-frame span { position: absolute; width: 26px; height: 26px; border-color: var(--accent, #B8860B); }
+.scanner-guide-frame span:nth-child(1) { top: 0; right: 0; border-top: 3px solid; border-right: 3px solid; border-radius: 0 6px 0 0; }
+.scanner-guide-frame span:nth-child(2) { top: 0; left: 0; border-top: 3px solid; border-left: 3px solid; border-radius: 6px 0 0 0; }
+.scanner-guide-frame span:nth-child(3) { bottom: 0; right: 0; border-bottom: 3px solid; border-right: 3px solid; border-radius: 0 0 6px 0; }
+.scanner-guide-frame span:nth-child(4) { bottom: 0; left: 0; border-bottom: 3px solid; border-left: 3px solid; border-radius: 0 0 0 6px; }
+.scanner-bottombar { position: relative; z-index: 3; margin-top: auto; padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(0deg, rgba(0,0,0,0.55), transparent); }
+.scanner-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; }
+.scanner-thumbs img { width: 44px; height: 58px; object-fit: cover; border-radius: 6px; border: 2px solid rgba(255,255,255,0.5); flex-shrink: 0; }
+.scanner-controls { display: flex; align-items: center; justify-content: center; position: relative; }
+.scanner-controls-spacer { width: 70px; }
+.scanner-capture-btn { width: 68px; height: 68px; border-radius: 50%; background: #fff; border: 4px solid rgba(255,255,255,0.35); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.scanner-capture-btn span { width: 54px; height: 54px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 2px #0a0906; }
+.scanner-capture-btn:active span { background: var(--accent, #B8860B); }
+.scanner-finish-btn { position: absolute; left: 0; background: var(--accent, #B8860B); color: #1a1610; border: none; padding: 9px 16px; border-radius: 20px; font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 800; cursor: pointer; }
+
+.scanner-crop-wrap { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 12px; }
+.scanner-crop-wrap img { max-width: 100%; max-height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+.scanner-crop-box { position: absolute; border: 2px solid var(--accent, #B8860B); box-shadow: 0 0 0 2000px rgba(0,0,0,0.55); touch-action: none; }
+.crop-handle { position: absolute; width: 22px; height: 22px; background: var(--accent, #B8860B); border: 2px solid #fff; border-radius: 50%; touch-action: none; }
+.crop-handle[data-h="tl"] { top: -11px; left: -11px; cursor: nwse-resize; }
+.crop-handle[data-h="tr"] { top: -11px; right: -11px; cursor: nesw-resize; }
+.crop-handle[data-h="bl"] { bottom: -11px; left: -11px; cursor: nesw-resize; }
+.crop-handle[data-h="br"] { bottom: -11px; right: -11px; cursor: nwse-resize; }
+.scanner-review-bar { position: relative; z-index: 3; padding: 12px 16px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; background: #12100a; }
+.scanner-mode-toggle { display: flex; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 3px; }
+.scanner-mode-btn { flex: 1; padding: 9px; border: none; background: none; color: rgba(255,255,255,0.6); font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; border-radius: 9px; cursor: pointer; }
+.scanner-mode-btn.active { background: var(--accent, #B8860B); color: #1a1610; }
+.scanner-confirm-btn { width: 100%; padding: 13px; border: none; border-radius: 14px; background: linear-gradient(135deg, var(--accent, #B8860B), var(--accent-2, #8a6a1e)); color: #1a1610; font-family: 'Cairo', sans-serif; font-size: 13.5px; font-weight: 800; cursor: pointer; }
 .composer-meta { display: flex; justify-content: space-between; align-items: center; padding: 7px 6px 0; font-size: 11px; }
 .word-counter { color: var(--muted-2); transition: color .2s; }
 .word-counter.low { color: var(--seal-soft); }
@@ -380,11 +447,15 @@ body::before {
     </div>
  
     <div class="composer-wrap">
+      <div class="attach-strip" id="attachStrip" style="display:none"></div>
       <div class="composer">
         <button class="mic-btn" id="micBtn" title="سجّل وقائع القضية بصوتك">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </button>
-        <textarea id="factsInput" rows="1" placeholder="اكتب وقائع القضية هنا... أو دوس على المايك واحكيها بصوتك"></textarea>
+        <button class="attach-btn" id="attachBtn" title="أرفق مستندات">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <textarea id="factsInput" rows="1" placeholder="اكتب وقائع القضية هنا... أو أرفق مستندات، أو دوس على المايك واحكيها بصوتك"></textarea>
         <button class="send-btn" id="sendBtn" disabled title="ابعت للتحليل">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
@@ -395,6 +466,74 @@ body::before {
       </div>
     </div>
   </main>
+</div>
+
+<input type="file" id="attachFileInput" accept="image/*,application/pdf" multiple style="display:none">
+
+<!-- ATTACH ACTION SHEET -->
+<div class="lg-overlay" id="attachSheetOverlay">
+  <div class="attach-sheet">
+    <div class="attach-sheet-title">إرفاق مستند</div>
+    <button class="attach-option" id="attachFromFilesBtn">
+      <span class="attach-option-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      </span>
+      <span>
+        <span class="attach-option-label">اختيار من ملفات الجهاز</span>
+        <span class="attach-option-sub">صور أو ملفات PDF محفوظة عندك</span>
+      </span>
+    </button>
+    <button class="attach-option" id="attachFromCameraBtn">
+      <span class="attach-option-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </span>
+      <span>
+        <span class="attach-option-label">تصوير المستند دلوقتي</span>
+        <span class="attach-option-sub">مسح ضوئي فوري بالكاميرا</span>
+      </span>
+    </button>
+    <button class="attach-sheet-cancel" id="attachSheetCancelBtn">إلغاء</button>
+  </div>
+</div>
+
+<!-- DOCUMENT SCANNER -->
+<div class="scanner-overlay" id="scannerOverlay">
+  <div class="scanner-camera-view" id="scannerCameraView">
+    <div class="scanner-topbar">
+      <button class="scanner-icon-btn" id="scannerCloseBtn">✕</button>
+      <span class="scanner-page-count" id="scannerPageCount"></span>
+    </div>
+    <video id="scannerVideo" autoplay playsinline muted></video>
+    <div class="scanner-guide-frame"><span></span><span></span><span></span><span></span></div>
+    <div class="scanner-bottombar">
+      <div class="scanner-thumbs" id="scannerThumbs"></div>
+      <div class="scanner-controls">
+        <button class="scanner-finish-btn" id="scannerFinishBtn" style="display:none">تم (<span id="scannerFinishCount">0</span>)</button>
+        <button class="scanner-capture-btn" id="scannerCaptureBtn"><span></span></button>
+        <span class="scanner-controls-spacer"></span>
+      </div>
+    </div>
+  </div>
+  <div class="scanner-review-view" id="scannerReviewView" style="display:none">
+    <div class="scanner-topbar">
+      <button class="scanner-icon-btn" id="scannerRetakeBtn">↩ إعادة</button>
+      <span class="scanner-page-count">اضبط حواف المستند</span>
+    </div>
+    <div class="scanner-crop-wrap" id="scannerCropWrap">
+      <img id="scannerCropImg">
+      <div class="scanner-crop-box" id="scannerCropBox">
+        <span class="crop-handle" data-h="tl"></span><span class="crop-handle" data-h="tr"></span>
+        <span class="crop-handle" data-h="bl"></span><span class="crop-handle" data-h="br"></span>
+      </div>
+    </div>
+    <div class="scanner-review-bar">
+      <div class="scanner-mode-toggle">
+        <button class="scanner-mode-btn active" data-mode="scan">مسح ضوئي</button>
+        <button class="scanner-mode-btn" data-mode="color">ألوان</button>
+      </div>
+      <button class="scanner-confirm-btn" id="scannerConfirmBtn">تأكيد الصفحة ←</button>
+    </div>
+  </div>
 </div>
 
 <!-- WELCOME MODAL (shown once, before first use) -->
@@ -635,12 +774,17 @@ ${library}
 7. لا تفتِ بشكل قاطع نهائي؛ التحليل استرشادي أولي فقط ولا يغني عن تقدير المحامي المهني.
 8. حقل "follow_ups": اقترح 2 إلى 3 أسئلة متابعة قصيرة جدًا (مش فقرات) تخص هذه القضية بالتحديد فقط (زي أسماء الدفوع أو الوقائع المذكورة فعلاً) — ممنوع أسئلة عامة ممكن تتكرر في أي قضية زي "هل يوجد دفوع إضافية؟".${isComplex ? '\n9. هذه قضية معقدة أو حساسة (وقائع طويلة/جناية/استئناف) — خصص وقت تفكير أطول وتحليل أعمق للتفاصيل الدقيقة والإجراءات قبل الإخراج النهائي.' : ''}`;
 }
-function buildUserPrompt({ type, stage, caseNumber, parties, facts }) {
+function buildUserPrompt({ type, stage, caseNumber, parties, facts, hasAttachments }) {
   let out = `نوع القضية: ${CASE_TYPE_LABELS[type] || type}\n`;
   out += `مرحلة القضية: ${CASE_STAGE_LABELS[stage] || stage}\n`;
   if (caseNumber) out += `رقم القضية: ${caseNumber}\n`;
   if (parties) out += `الأطراف: ${parties}\n`;
-  out += `\nوقائع القضية كما وصفها المحامي:\n${facts}`;
+  if (hasAttachments) {
+    out += `\nملحوظة: تم إرفاق مستند/مستندات (صور أو PDF) مع هذه الرسالة — اقرأها أولًا واستخرج منها وقائع القضية (محضر، حكم، عقد، أو أي مستند قانوني آخر)، وانتبه لو جزء منها غير واضح أو يتعذر قراءته واذكر ذلك في "missing_info".\n`;
+    out += facts ? `\nوالمحامي أضاف كمان توضيح نصي إضافي:\n${facts}` : '';
+  } else {
+    out += `\nوقائع القضية كما وصفها المحامي:\n${facts}`;
+  }
   return out;
 }
 /* ---------- كشف صعوبة القضية: يحدد قوة التفكير وحجم التوكنز المطلوبين ---------- */
@@ -756,24 +900,30 @@ function normalizeAnalysis(parsed, caseType) {
   };
 }
 
-async function callGroqDirect({ type, stage, caseNumber, parties, facts }, onStageChange) {
+async function callGroqDirect({ type, stage, caseNumber, parties, facts, attachments }, onStageChange) {
   const caseType = type === 'civil' ? 'civil' : 'criminal';
   const caseStage = ['investigation', 'trial', 'appeal'].includes(stage) ? stage : 'investigation';
   // حد أقصى أقل من قبل (3500 بدل 6000 حرف) — مهم لحسابات Groq المحدودة، وغالبًا كافي جدًا لوصف وقائع قضية
   const trimmedFacts = facts.slice(0, 3500);
-  const isComplex = assessComplexity({ facts: trimmedFacts, type: caseType, stage: caseStage });
+  const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
+  // مع مستندات مرفقة، الوقائع النصية ممكن تكون فاضية أو مقتضبة — منقيّمش صعوبة القضية غلط بسبب قصر النص وحده
+  const isComplex = hasAttachments ? true : assessComplexity({ facts: trimmedFacts, type: caseType, stage: caseStage });
   // اختيار محلي (بدون تكلفة API) لأقرب أقسام الدفوع لوقائع القضية — بيقلل حجم الطلب جدًا ويركّز التحليل
   const selectedKeys = selectRelevantDefenseKeys(trimmedFacts, caseType, isComplex ? 7 : 5);
 
   const systemPrompt = buildSystemPrompt(caseType, isComplex, selectedKeys);
-  const userPrompt = buildUserPrompt({ type: caseType, stage: caseStage, caseNumber, parties, facts: trimmedFacts });
+  const userPromptText = buildUserPrompt({ type: caseType, stage: caseStage, caseNumber, parties, facts: trimmedFacts, hasAttachments });
+  // رسالة المستخدم: نص عادي لو مفيش مرفقات، أو مصفوفة أجزاء (نص + صور/PDF) لو فيه مرفقات
+  const userContent = hasAttachments
+    ? [{ type: 'text', text: userPromptText }, ...attachments.map(a => ({ type: 'image', mimeType: a.mimeType, data: a.data }))]
+    : userPromptText;
 
   async function runFirstPass(effort, maxTokens, keys) {
     const sys = keys === selectedKeys ? systemPrompt : buildSystemPrompt(caseType, isComplex, keys);
     return groqChatJSON(
       [
         { role: 'system', content: sys },
-        { role: 'user', content: userPrompt },
+        { role: 'user', content: userContent },
       ],
       { reasoningEffort: effort, maxTokens }
     );
@@ -782,6 +932,7 @@ async function callGroqDirect({ type, stage, caseNumber, parties, facts }, onSta
   let firstPass;
   try {
     // ميزانية توكنز محافظة عشان تشتغل حتى على حسابات Groq المجانية (محدودة بتوكنز/الدقيقة)
+    // مستندات مرفقة محتاجة توكنز أكتر شوية (قراءة الصورة/PDF قبل التحليل)
     firstPass = await runFirstPass(isComplex ? 'high' : 'medium', isComplex ? 2600 : 1600, selectedKeys);
   } catch (e) {
     if (!e.isTooLarge) throw e;
@@ -797,7 +948,7 @@ async function callGroqDirect({ type, stage, caseNumber, parties, facts }, onSta
     try {
       const usedKeys = Array.from(new Set(result.defenses.map(d => d.key)));
       const lightLibrary = buildLibraryPrompt(caseType, usedKeys);
-      const critiquePrompt = `الوقائع الأصلية:\n${userPrompt}\n\nمسودة التحليل (JSON):\n${JSON.stringify(result)}\n\nمرجع الدفوع المستخدمة في المسودة:\n${lightLibrary}\n\nراجع المسودة دي ضد الوقائع بدقة:\n- احذف أي دفع مش له سند واضح في الوقائع أو في المرجع أعلاه.\n- صحح أي "priority" مبالغ فيها.\n- احذف أي رقم مادة قانونية غير متأكد منه 100%.\n- أضف أي معلومة ناقصة مهمة في "missing_info".\nأرجع نفس بنية الـ JSON بالضبط، مصححة، بدون أي شرح إضافي.`;
+      const critiquePrompt = `الوقائع الأصلية:\n${userPromptText}\n\nمسودة التحليل (JSON):\n${JSON.stringify(result)}\n\nمرجع الدفوع المستخدمة في المسودة:\n${lightLibrary}\n\nراجع المسودة دي ضد الوقائع بدقة:\n- احذف أي دفع مش له سند واضح في الوقائع أو في المرجع أعلاه.\n- صحح أي "priority" مبالغ فيها.\n- احذف أي رقم مادة قانونية غير متأكد منه 100%.\n- أضف أي معلومة ناقصة مهمة في "missing_info".\nأرجع نفس بنية الـ JSON بالضبط، مصححة، بدون أي شرح إضافي.`;
       const revised = await groqChatJSON(
         [
           { role: 'system', content: 'أنت مستشار قانوني مصري خبير تراجع تحليلك السابق بدقة شديدة وترجع JSON فقط بنفس البنية.' },
@@ -899,7 +1050,7 @@ function updateCounter() {
   else if (n < 20) { wordCounter.classList.add('low'); wordCounter.textContent += ' — أضف تفاصيل أكتر لتحليل أدق'; }
   else if (n < 50) { wordCounter.classList.add('mid'); wordCounter.textContent += ' — لسه في مجال للتفصيل'; }
   else { wordCounter.classList.add('good'); wordCounter.textContent += ' — تفاصيل كويسة للتحليل'; }
-  sendBtn.disabled = n === 0;
+  updateSendButtonState();
 }
 factsInput.addEventListener('input', () => {
   factsInput.style.height = 'auto';
@@ -963,10 +1114,267 @@ if (SR) {
   });
 }
  
+/* ---------- attachments & document scanner ---------- */
+let attachedFiles = []; // { id, name, mimeType, data(base64 no prefix) }
+let attachIdSeq = 0;
+let scannerStream = null;
+let scannedPages = []; // { dataUrl }
+let currentCaptureCanvas = null;
+let cropSelectedMode = 'scan';
+
+function renderAttachStrip() {
+  const strip = document.getElementById('attachStrip');
+  if (!attachedFiles.length) { strip.style.display = 'none'; strip.innerHTML = ''; return; }
+  strip.style.display = 'flex';
+  strip.innerHTML = attachedFiles.map(f => {
+    if (f.mimeType === 'application/pdf') {
+      return `<div class="attach-chip is-pdf" data-id="${f.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        <span>${escapeHTML(f.name.slice(0, 10))}</span>
+        <button class="attach-chip-remove" data-remove="${f.id}">✕</button>
+      </div>`;
+    }
+    return `<div class="attach-chip" data-id="${f.id}">
+      <img src="data:${f.mimeType};base64,${f.data}">
+      <button class="attach-chip-remove" data-remove="${f.id}">✕</button>
+    </div>`;
+  }).join('');
+  strip.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      attachedFiles = attachedFiles.filter(f => f.id !== btn.dataset.remove);
+      renderAttachStrip();
+      updateSendButtonState();
+    });
+  });
+}
+function updateSendButtonState() {
+  const hasText = factsInput.value.trim() !== '';
+  sendBtn.disabled = !hasText && attachedFiles.length === 0;
+}
+function downscaleImageDataUrl(dataUrl, maxDim = 1600, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+function readFileAsAttachment(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const result = String(reader.result);
+      const isImage = (file.type || '').startsWith('image/');
+      if (isImage) {
+        // نضغط/نصغّر الصورة قبل الإرفاق — صور الموبايل الخام ممكن توصل لعدة ميجابايت وتكسر حد حجم الطلب في الـ serverless function
+        const downscaled = await downscaleImageDataUrl(result);
+        resolve({ id: 'att_' + (attachIdSeq++), name: file.name, mimeType: 'image/jpeg', data: downscaled.split(',')[1] || '' });
+        return;
+      }
+      if (file.size > 4 * 1024 * 1024) {
+        reject(new Error('file_too_large'));
+        return;
+      }
+      resolve({ id: 'att_' + (attachIdSeq++), name: file.name, mimeType: file.type || 'application/octet-stream', data: result.split(',')[1] || '' });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+document.getElementById('attachFileInput').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  for (const file of files) {
+    if (attachedFiles.length >= 6) { toast('أقصى عدد مستندات مسموح 6 لكل تحليل'); break; }
+    try { attachedFiles.push(await readFileAsAttachment(file)); }
+    catch (err) {
+      if (err.message === 'file_too_large') toast(`ملف "${file.name}" كبير جدًا (أكبر من 4 ميجا) — جرّب ملف أصغر`);
+      else console.error(err);
+    }
+  }
+  renderAttachStrip();
+  updateSendButtonState();
+  e.target.value = '';
+});
+
+const attachSheetOverlay = document.getElementById('attachSheetOverlay');
+document.getElementById('attachBtn').addEventListener('click', () => attachSheetOverlay.classList.add('show'));
+document.getElementById('attachSheetCancelBtn').addEventListener('click', () => attachSheetOverlay.classList.remove('show'));
+attachSheetOverlay.addEventListener('click', (e) => { if (e.target === attachSheetOverlay) attachSheetOverlay.classList.remove('show'); });
+document.getElementById('attachFromFilesBtn').addEventListener('click', () => {
+  attachSheetOverlay.classList.remove('show');
+  document.getElementById('attachFileInput').click();
+});
+document.getElementById('attachFromCameraBtn').addEventListener('click', () => {
+  attachSheetOverlay.classList.remove('show');
+  openScanner();
+});
+
+/* ---- scanner: camera lifecycle ---- */
+async function openScanner() {
+  document.getElementById('scannerOverlay').classList.add('show');
+  document.getElementById('scannerCameraView').style.display = 'flex';
+  document.getElementById('scannerReviewView').style.display = 'none';
+  scannedPages = [];
+  renderScannerThumbs();
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    document.getElementById('scannerVideo').srcObject = scannerStream;
+  } catch (err) {
+    toast('تعذّر الوصول للكاميرا — تأكد من السماح بصلاحية الكاميرا للموقع');
+    closeScanner(false);
+  }
+}
+function closeScanner(shouldAttach) {
+  if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
+  document.getElementById('scannerOverlay').classList.remove('show');
+  if (shouldAttach && scannedPages.length) {
+    scannedPages.forEach((p, i) => {
+      const base64 = p.dataUrl.split(',')[1] || '';
+      attachedFiles.push({ id: 'att_' + (attachIdSeq++), name: `صفحة ممسوحة ${i + 1}.jpg`, mimeType: 'image/jpeg', data: base64 });
+    });
+    renderAttachStrip();
+    updateSendButtonState();
+  }
+  scannedPages = [];
+}
+document.getElementById('scannerCloseBtn').addEventListener('click', () => closeScanner(scannedPages.length > 0));
+document.getElementById('scannerFinishBtn').addEventListener('click', () => closeScanner(true));
+function renderScannerThumbs() {
+  document.getElementById('scannerThumbs').innerHTML = scannedPages.map(p => `<img src="${p.dataUrl}">`).join('');
+  const count = scannedPages.length;
+  document.getElementById('scannerPageCount').textContent = count ? `${count} صفحة ملتقطة` : '';
+  document.getElementById('scannerFinishBtn').style.display = count ? 'block' : 'none';
+  document.getElementById('scannerFinishCount').textContent = count;
+}
+
+/* ---- scanner: capture + crop + enhance ---- */
+document.getElementById('scannerCaptureBtn').addEventListener('click', () => {
+  const video = document.getElementById('scannerVideo');
+  if (!video.videoWidth) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  currentCaptureCanvas = canvas;
+  showReviewScreen(canvas.toDataURL('image/jpeg', 0.92));
+});
+document.getElementById('scannerRetakeBtn').addEventListener('click', () => {
+  document.getElementById('scannerReviewView').style.display = 'none';
+  document.getElementById('scannerCameraView').style.display = 'flex';
+});
+function showReviewScreen(dataUrl) {
+  document.getElementById('scannerCameraView').style.display = 'none';
+  document.getElementById('scannerReviewView').style.display = 'flex';
+  cropSelectedMode = 'scan';
+  document.querySelectorAll('.scanner-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'scan'));
+  const img = document.getElementById('scannerCropImg');
+  img.onload = () => initCropBox();
+  img.src = dataUrl;
+}
+function initCropBox() {
+  const wrap = document.getElementById('scannerCropWrap');
+  const img = document.getElementById('scannerCropImg');
+  const box = document.getElementById('scannerCropBox');
+  requestAnimationFrame(() => {
+    const imgRect = img.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    const inset = 0.05;
+    const imgLeft = imgRect.left - wrapRect.left;
+    const imgTop = imgRect.top - wrapRect.top;
+    box.dataset.imgLeft = imgLeft; box.dataset.imgTop = imgTop;
+    box.dataset.imgWidth = imgRect.width; box.dataset.imgHeight = imgRect.height;
+    box.style.left = (imgLeft + imgRect.width * inset) + 'px';
+    box.style.top = (imgTop + imgRect.height * inset) + 'px';
+    box.style.width = (imgRect.width * (1 - inset * 2)) + 'px';
+    box.style.height = (imgRect.height * (1 - inset * 2)) + 'px';
+  });
+}
+(function setupCropDrag() {
+  const box = document.getElementById('scannerCropBox');
+  let dragging = null, start = null;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  box.querySelectorAll('.crop-handle').forEach(handle => {
+    handle.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dragging = handle.dataset.h;
+      handle.setPointerCapture(e.pointerId);
+      start = { x: e.clientX, y: e.clientY, left: parseFloat(box.style.left), top: parseFloat(box.style.top), width: parseFloat(box.style.width), height: parseFloat(box.style.height) };
+    });
+    handle.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - start.x, dy = e.clientY - start.y;
+      const imgLeft = parseFloat(box.dataset.imgLeft), imgTop = parseFloat(box.dataset.imgTop);
+      const imgWidth = parseFloat(box.dataset.imgWidth), imgHeight = parseFloat(box.dataset.imgHeight);
+      const minSize = 40;
+      let { left, top, width, height } = start;
+      if (dragging === 'tl') {
+        left = clamp(start.left + dx, imgLeft, start.left + width - minSize);
+        top = clamp(start.top + dy, imgTop, start.top + height - minSize);
+        width = start.left + start.width - left; height = start.top + start.height - top;
+      } else if (dragging === 'tr') {
+        top = clamp(start.top + dy, imgTop, start.top + height - minSize);
+        width = clamp(start.width + dx, minSize, imgLeft + imgWidth - start.left);
+        height = start.top + start.height - top;
+      } else if (dragging === 'bl') {
+        left = clamp(start.left + dx, imgLeft, start.left + width - minSize);
+        width = start.left + start.width - left;
+        height = clamp(start.height + dy, minSize, imgTop + imgHeight - start.top);
+      } else if (dragging === 'br') {
+        width = clamp(start.width + dx, minSize, imgLeft + imgWidth - start.left);
+        height = clamp(start.height + dy, minSize, imgTop + imgHeight - start.top);
+      }
+      box.style.left = left + 'px'; box.style.top = top + 'px';
+      box.style.width = width + 'px'; box.style.height = height + 'px';
+    });
+    handle.addEventListener('pointerup', () => { dragging = null; });
+    handle.addEventListener('pointercancel', () => { dragging = null; });
+  });
+})();
+document.querySelectorAll('.scanner-mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    cropSelectedMode = btn.dataset.mode;
+    document.querySelectorAll('.scanner-mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+  });
+});
+document.getElementById('scannerConfirmBtn').addEventListener('click', async () => {
+  const box = document.getElementById('scannerCropBox');
+  const imgLeft = parseFloat(box.dataset.imgLeft), imgTop = parseFloat(box.dataset.imgTop);
+  const imgWidth = parseFloat(box.dataset.imgWidth), imgHeight = parseFloat(box.dataset.imgHeight);
+  const boxLeft = parseFloat(box.style.left), boxTop = parseFloat(box.style.top);
+  const boxWidth = parseFloat(box.style.width), boxHeight = parseFloat(box.style.height);
+  const scaleX = currentCaptureCanvas.width / imgWidth, scaleY = currentCaptureCanvas.height / imgHeight;
+  const sx = (boxLeft - imgLeft) * scaleX, sy = (boxTop - imgTop) * scaleY;
+  const sw = boxWidth * scaleX, sh = boxHeight * scaleY;
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(sw));
+  out.height = Math.max(1, Math.round(sh));
+  const ctx = out.getContext('2d');
+  if (cropSelectedMode === 'scan') ctx.filter = 'grayscale(1) contrast(1.55) brightness(1.08)';
+  ctx.drawImage(currentCaptureCanvas, sx, sy, sw, sh, 0, 0, out.width, out.height);
+  // نصغّر الناتج قبل الحفظ — التقاط الكاميرا بيبقى بدقة الفيديو الكاملة، وده ممكن يبقى تقيل جدًا لو اتبعت زي ما هو
+  const downscaled = await downscaleImageDataUrl(out.toDataURL('image/jpeg', 0.92), 1600, 0.85);
+  scannedPages.push({ dataUrl: downscaled });
+  renderScannerThumbs();
+  document.getElementById('scannerReviewView').style.display = 'none';
+  document.getElementById('scannerCameraView').style.display = 'flex';
+});
+
 /* ---------- send flow ---------- */
 async function sendMessage() {
   const facts = factsInput.value.trim();
-  if (!facts) return;
+  const attachments = attachedFiles.slice();
+  if (!facts && !attachments.length) return;
 
   // TRIAL CHECK
   await ensureSubscriptionChecked();
@@ -975,37 +1383,50 @@ async function sendMessage() {
   const caseNumber = document.getElementById('caseNumberInput')?.value.trim() || '';
   const parties = document.getElementById('partiesInput')?.value.trim() || '';
  
-  appendUserBubble(facts);
-  factsInput.value = ''; factsInput.style.height = 'auto'; updateCounter();
+  appendUserBubble(facts, attachments);
+  factsInput.value = ''; factsInput.style.height = 'auto';
+  attachedFiles = []; renderAttachStrip();
+  updateCounter();
   sendBtn.disabled = true;
  
   const thinkingEl = appendThinkingBubble();
  
   try {
-    const data = await callGroqDirect({ type: currentType, stage: currentStage, caseNumber, parties, facts }, (stage) => thinkingEl.setStage?.(stage));
+    const data = await callGroqDirect({ type: currentType, stage: currentStage, caseNumber, parties, facts, attachments }, (stage) => thinkingEl.setStage?.(stage));
     thinkingEl.remove();
-    await appendResultSequence(data, { facts, caseNumber, parties });
-    saveToHistory({ type: currentType, stage: currentStage, facts, caseNumber, parties, result: data, ts: Date.now() });
+    await appendResultSequence(data, { facts, caseNumber, parties, attachmentsCount: attachments.length });
+    saveToHistory({ type: currentType, stage: currentStage, facts, caseNumber, parties, attachmentsCount: attachments.length, result: data, ts: Date.now() });
     markUsed();
   } catch (err) {
     thinkingEl.remove();
-    appendErrorBubble(() => sendMessageRetry(facts, caseNumber, parties));
+    appendErrorBubble(() => sendMessageRetry(facts, caseNumber, parties, attachments));
   } finally {
-    sendBtn.disabled = factsInput.value.trim() === '';
+    updateSendButtonState();
   }
 }
  
-function sendMessageRetry(facts, caseNumber, parties) {
+function sendMessageRetry(facts, caseNumber, parties, attachments) {
   factsInput.value = facts;
   if (document.getElementById('caseNumberInput')) document.getElementById('caseNumberInput').value = caseNumber;
   if (document.getElementById('partiesInput')) document.getElementById('partiesInput').value = parties;
+  attachedFiles = (attachments || []).slice();
+  renderAttachStrip();
   sendMessage();
 }
  
-function appendUserBubble(text) {
+function appendUserBubble(text, attachments) {
   const el = document.createElement('div');
   el.className = 'msg msg-user';
-  el.innerHTML = `<div class="avatar avatar-user">أنت</div><div class="bubble">${escapeHTML(text)}</div>`;
+  const hasAttachments = Array.isArray(attachments) && attachments.length;
+  const thumbsHTML = hasAttachments ? `
+    <div class="bubble-attach-thumbs">
+      ${attachments.map(a => a.mimeType === 'application/pdf'
+        ? `<div class="bubble-attach-chip is-pdf">📄 ${escapeHTML(a.name.slice(0, 14))}</div>`
+        : `<img class="bubble-attach-chip" src="data:${a.mimeType};base64,${a.data}">`
+      ).join('')}
+    </div>` : '';
+  const textHTML = text ? escapeHTML(text) : (hasAttachments ? `<span class="bubble-attach-note">📎 تم إرفاق ${attachments.length} مستند${attachments.length > 1 ? 'ات' : ''} من غير نص إضافي</span>` : '');
+  el.innerHTML = `<div class="avatar avatar-user">أنت</div><div class="bubble">${thumbsHTML}${textHTML}</div>`;
   chatScroll.appendChild(el);
   scrollDown();
 }
@@ -1640,9 +2061,10 @@ function loadHistoryEntry(h) {
   chatScroll.innerHTML = '';
   currentType = h.type; currentStage = h.stage;
   renderIntake();
-  appendUserBubble(h.facts);
-  appendResultSequence(h.result, h, { prosecutionDone: !!h.prosecutionView }).then(async () => {
+  appendUserBubble(h.facts || (h.attachmentsCount ? `📎 تم التحليل اعتمادًا على ${h.attachmentsCount} مستند مرفق (المستندات نفسها مش متاحة للعرض تاني)` : ''));
+  appendResultSequence(h.result, h, { prosecutionDone: !!h.prosecutionView, memoDone: !!h.memo }).then(async () => {
     if (h.prosecutionView) await appendProsSequence(h.prosecutionView);
+    if (h.memo) appendMemoBubble(h.memo, h);
     let priorData = h.result;
     (h.conversation || []).forEach(turn => {
       appendUserBubble(turn.question);

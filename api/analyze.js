@@ -53,9 +53,23 @@ module.exports = async (req, res) => {
   const systemText = messages.filter(m => m.role === 'system').map(m => m.content).join('\n\n');
   const conversation = messages.filter(m => m.role !== 'system');
 
+  // محتوى الرسالة ممكن يكون نص عادي (string) أو مصفوفة أجزاء (نص + صور/PDF) لما فيه مستندات مرفقة
+  function toGeminiParts(content) {
+    if (typeof content === 'string') return [{ text: content }];
+    if (Array.isArray(content)) {
+      return content.map(part => {
+        if (part && part.type === 'image' && part.data) {
+          return { inlineData: { mimeType: part.mimeType || 'image/jpeg', data: part.data } };
+        }
+        return { text: String((part && part.text) || '') };
+      });
+    }
+    return [{ text: String(content || '') }];
+  }
+
   const contents = conversation.map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: String(m.content || '') }],
+    parts: toGeminiParts(m.content),
   }));
 
   const geminiBody = {
