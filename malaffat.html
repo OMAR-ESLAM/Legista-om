@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ملفات القضايا — LEGANO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { min-height: 100%; }
+body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--white); }
+
+.top-nav {
+  height: 56px; min-height: 56px; position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,13,0.9); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+}
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 5px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+.nav-back { font-size: 11px; color: var(--cyber); text-decoration: none; letter-spacing: 1px; border: 1px solid rgba(0,229,255,0.2); padding: 6px 14px; border-radius: 8px; transition: background .2s; }
+.nav-back:hover { background: rgba(0,229,255,0.07); }
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px 20px 80px; }
+
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+.page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+.page-sub { font-size: 12.5px; color: var(--gray); margin-top: 4px; }
+.new-case-btn { background: linear-gradient(135deg, var(--gold), #b8941a); color: #0A0A0D; border: none; padding: 12px 22px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 13.5px; font-weight: 900; cursor: pointer; transition: transform .15s; white-space: nowrap; }
+.new-case-btn:hover { transform: scale(1.03); }
+
+.search-row { margin-bottom: 20px; }
+.search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: var(--white); font-family: 'Cairo', sans-serif; font-size: 13.5px; outline: none; }
+.search-input:focus { border-color: rgba(212,175,55,0.4); }
+
+.cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.case-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; cursor: pointer; transition: border-color .2s, transform .15s; }
+.case-card:hover { border-color: rgba(212,175,55,0.4); transform: translateY(-2px); }
+.case-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.case-card-title { font-size: 15px; font-weight: 800; line-height: 1.4; }
+.case-status-badge { flex-shrink: 0; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.case-status-badge.مفتوحة { background: rgba(0,255,178,0.12); color: var(--success); }
+.case-status-badge.مغلقة { background: rgba(138,138,143,0.15); color: var(--gray); }
+.case-card-row { font-size: 12px; color: var(--gray); margin-bottom: 4px; display: flex; gap: 6px; }
+.case-card-row b { color: var(--white); font-weight: 600; }
+.case-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--gray); }
+.case-card-items { display: flex; align-items: center; gap: 5px; color: var(--gold); font-weight: 700; }
+
+.empty-state { text-align: center; padding: 70px 20px; color: var(--gray); }
+.empty-state-icon { font-size: 40px; margin-bottom: 14px; opacity: .6; }
+.empty-state-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.empty-state-sub { font-size: 12.5px; line-height: 1.8; }
+
+/* ---- detail view ---- */
+.detail-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--cyber); cursor: pointer; margin-bottom: 18px; }
+.detail-head { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px; margin-bottom: 20px; }
+.detail-head-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.detail-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.detail-actions { display: flex; gap: 8px; }
+.icon-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--gray); width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.icon-btn:hover { color: var(--white); border-color: rgba(212,175,55,0.3); }
+.icon-btn.danger:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
+.detail-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+.detail-meta-item { font-size: 12px; }
+.detail-meta-label { color: var(--gray); margin-bottom: 3px; }
+.detail-meta-val { font-weight: 700; }
+
+.timeline-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.timeline-title { font-size: 14px; font-weight: 800; }
+.add-note-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--gold-soft); padding: 8px 16px; border-radius: 10px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
+.add-note-btn:hover { border-color: rgba(212,175,55,0.4); }
+
+.item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; margin-bottom: 10px; }
+.item-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.item-type-badge { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; }
+.item-type-badge.document { background: rgba(0,229,255,0.1); color: var(--cyber); }
+.item-type-badge.analysis { background: rgba(212,175,55,0.12); color: var(--gold-soft); }
+.item-type-badge.note { background: rgba(138,138,143,0.15); color: var(--gray); }
+.item-date { font-size: 11px; color: var(--gray); }
+.item-title { font-size: 13.5px; font-weight: 700; margin-bottom: 6px; }
+.item-content { font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.8; white-space: pre-wrap; max-height: 90px; overflow: hidden; position: relative; }
+.item-content.expanded { max-height: none; }
+.item-expand-btn { font-size: 11px; color: var(--cyber); cursor: pointer; margin-top: 6px; display: inline-block; }
+.item-delete-btn { font-size: 11px; color: var(--gray); cursor: pointer; }
+.item-delete-btn:hover { color: #ff6b6b; }
+
+/* ---- modal ---- */
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 22px; padding: 30px; max-width: 460px; width: 100%; max-height: 88vh; overflow-y: auto; }
+.modal-title { font-size: 17px; font-weight: 800; margin-bottom: 18px; }
+.field { margin-bottom: 14px; }
+.field label { font-size: 12px; color: var(--gray); margin-bottom: 6px; display: block; font-weight: 600; }
+.field input, .field select, .field textarea { width: 100%; padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Cairo', sans-serif; font-size: 13px; outline: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(212,175,55,0.4); }
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.7; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-submit { width: 100%; background: linear-gradient(135deg, var(--gold), #b8941a); border: none; color: #0A0A0D; padding: 13px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 900; cursor: pointer; margin-top: 6px; }
+.modal-cancel { width: 100%; background: none; border: none; color: var(--gray); padding: 10px; font-size: 12.5px; cursor: pointer; margin-top: 6px; }
+
+.loading-line { text-align: center; padding: 40px; color: var(--gray); font-size: 13px; }
+
+#legistaToast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1A1A2E; color: #fff; padding: 12px 22px; border-radius: 10px; font-size: 13px; font-weight: 700; z-index: 99998; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html" class="nav-logo">LEGANO</a>
+  <a href="index.html" class="nav-back">→ الرئيسية</a>
+</div>
+
+<div class="wrap">
+
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="page-head">
+      <div>
+        <div class="page-title">📁 ملفات القضايا</div>
+        <div class="page-sub">كل قضاياك ومستنداتها وتحليلاتها في مكان واحد</div>
+      </div>
+      <button class="new-case-btn" id="openCreateBtn">+ قضية جديدة</button>
+    </div>
+    <div class="search-row">
+      <input type="text" class="search-input" id="searchInput" placeholder="ابحث بالاسم، الموكل، أو رقم القضية...">
+    </div>
+    <div id="casesContainer"><div class="loading-line">جارِ التحميل...</div></div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detailView" style="display:none">
+    <span class="detail-back" id="backToListBtn">← رجوع لكل القضايا</span>
+    <div id="detailContainer"><div class="loading-line">جارِ التحميل...</div></div>
+  </div>
+
+</div>
+
+<!-- CREATE/EDIT CASE MODAL -->
+<div class="modal-overlay" id="caseModal">
+  <div class="modal-box">
+    <div class="modal-title" id="caseModalTitle">قضية جديدة</div>
+    <form id="caseForm">
+      <div class="field">
+        <label>عنوان القضية *</label>
+        <input type="text" id="fTitle" required placeholder="مثال: نزاع عقد بيع شقة - كريم عبد الرحمن">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>اسم الموكل</label>
+          <input type="text" id="fClient">
+        </div>
+        <div class="field">
+          <label>اسم الخصم</label>
+          <input type="text" id="fOpponent">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>نوع القضية</label>
+          <select id="fType">
+            <option value="جنائي">جنائي</option>
+            <option value="مدني">مدني</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>المرحلة</label>
+          <select id="fStage">
+            <option value="تحقيق">تحقيق</option>
+            <option value="محاكمة">محاكمة</option>
+            <option value="استئناف">استئناف</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>رقم القضية</label>
+          <input type="text" id="fCaseNumber">
+        </div>
+        <div class="field">
+          <label>المحكمة</label>
+          <input type="text" id="fCourt">
+        </div>
+      </div>
+      <div class="field">
+        <label>الحالة</label>
+        <select id="fStatus">
+          <option value="مفتوحة">مفتوحة</option>
+          <option value="مغلقة">مغلقة</option>
+        </select>
+      </div>
+      <button type="submit" class="modal-submit">حفظ</button>
+      <button type="button" class="modal-cancel" id="cancelCaseModalBtn">إلغاء</button>
+    </form>
+  </div>
+</div>
+
+<!-- ADD NOTE MODAL -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal-box">
+    <div class="modal-title">إضافة ملاحظة</div>
+    <form id="noteForm">
+      <div class="field">
+        <label>عنوان الملاحظة</label>
+        <input type="text" id="nTitle" placeholder="مثال: نتيجة جلسة اليوم">
+      </div>
+      <div class="field">
+        <label>النص</label>
+        <textarea id="nContent" required placeholder="اكتب ملاحظتك هنا..."></textarea>
+      </div>
+      <button type="submit" class="modal-submit">إضافة</button>
+      <button type="button" class="modal-cancel" id="cancelNoteModalBtn">إلغاء</button>
+    </form>
+  </div>
+</div>
+
+<div id="legistaToast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, addDoc, getDocs, getDoc, updateDoc, deleteDoc,
+  query, where, orderBy, serverTimestamp, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC6PRK7EECoPF3qDawVSRYmMg0uufTs6Xw",
+  authDomain: "legista-o.firebaseapp.com",
+  projectId: "legista-o",
+  appId: "1:964258159036:web:a3a66d4f5ea38f9964f3b9"
+};
+const app = initializeApp(firebaseConfig, "legista-site");
+const db = getFirestore(app);
+
+window._db = db;
+window._fs = { collection, doc, addDoc, getDocs, getDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment };
+window.dispatchEvent(new Event('legista-firebase-ready'));
+</script>
+
+<script>
+function withLegistaDb(cb) {
+  if (window._db) { cb(); return; }
+  window.addEventListener('legista-firebase-ready', cb, { once: true });
+}
+function toast(msg) {
+  const t = document.getElementById('legistaToast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(-6px)';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  }, 2600);
+}
+
+/* ---------- auth guard ---------- */
+const saved = localStorage.getItem('legista_user');
+let currentUser = null;
+try { currentUser = saved ? JSON.parse(saved) : null; } catch (e) { currentUser = null; }
+if (!currentUser || !currentUser.email) {
+  window.location.href = 'login.html?next=' + encodeURIComponent('malaffat.html');
+}
+
+let allCases = [];
+let currentCaseId = null;
+
+/* ---------- list view ---------- */
+async function loadCases() {
+  const container = document.getElementById('casesContainer');
+  container.innerHTML = '<div class="loading-line">جارِ التحميل...</div>';
+  withLegistaDb(async () => {
+    const { collection, getDocs, query, where, orderBy } = window._fs;
+    try {
+      const q = query(collection(window._db, 'cases'), where('ownerEmail', '==', currentUser.email), orderBy('updatedAt', 'desc'));
+      const snap = await getDocs(q);
+      allCases = [];
+      snap.forEach(d => allCases.push({ id: d.id, ...d.data() }));
+      renderCasesList(allCases);
+    } catch (err) {
+      console.error('loadCases failed:', err);
+      container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">تعذّر تحميل القضايا</div><div class="empty-state-sub">${err.message || 'حصل خطأ غير متوقع'}</div></div>`;
+    }
+  });
+}
+
+function renderCasesList(cases) {
+  const container = document.getElementById('casesContainer');
+  if (!cases.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-title">لسه معملتش أي ملف قضية</div><div class="empty-state-sub">دوس "قضية جديدة" وابدأ تجمع فيها كل حاجة متعلقة بالقضية دي</div></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="cases-grid">${cases.map(c => `
+    <div class="case-card" data-id="${c.id}">
+      <div class="case-card-top">
+        <div class="case-card-title">${escapeHTML(c.title || 'بدون عنوان')}</div>
+        <span class="case-status-badge ${c.status || 'مفتوحة'}">${c.status || 'مفتوحة'}</span>
+      </div>
+      ${c.clientName ? `<div class="case-card-row">الموكل: <b>${escapeHTML(c.clientName)}</b></div>` : ''}
+      ${c.opponentName ? `<div class="case-card-row">الخصم: <b>${escapeHTML(c.opponentName)}</b></div>` : ''}
+      <div class="case-card-row">${escapeHTML(c.caseType || '')} ${c.caseType && c.stage ? '·' : ''} ${escapeHTML(c.stage || '')}</div>
+      <div class="case-card-foot">
+        <span>${c.caseNumber ? 'رقم: ' + escapeHTML(c.caseNumber) : ''}</span>
+        <span class="case-card-items">📎 ${c.itemsCount || 0}</span>
+      </div>
+    </div>`).join('')}</div>`;
+
+  container.querySelectorAll('.case-card').forEach(card => {
+    card.addEventListener('click', () => openCaseDetail(card.dataset.id));
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) { renderCasesList(allCases); return; }
+  const filtered = allCases.filter(c =>
+    (c.title || '').toLowerCase().includes(q) ||
+    (c.clientName || '').toLowerCase().includes(q) ||
+    (c.opponentName || '').toLowerCase().includes(q) ||
+    (c.caseNumber || '').toLowerCase().includes(q)
+  );
+  renderCasesList(filtered);
+});
+
+/* ---------- create/edit case ---------- */
+let editingCaseId = null;
+document.getElementById('openCreateBtn').addEventListener('click', () => openCaseModal(null));
+document.getElementById('cancelCaseModalBtn').addEventListener('click', () => closeCaseModal());
+document.getElementById('caseModal').addEventListener('click', (e) => { if (e.target.id === 'caseModal') closeCaseModal(); });
+
+function openCaseModal(caseData) {
+  editingCaseId = caseData ? caseData.id : null;
+  document.getElementById('caseModalTitle').textContent = caseData ? 'تعديل القضية' : 'قضية جديدة';
+  document.getElementById('fTitle').value = caseData?.title || '';
+  document.getElementById('fClient').value = caseData?.clientName || '';
+  document.getElementById('fOpponent').value = caseData?.opponentName || '';
+  document.getElementById('fType').value = caseData?.caseType || 'جنائي';
+  document.getElementById('fStage').value = caseData?.stage || 'تحقيق';
+  document.getElementById('fCaseNumber').value = caseData?.caseNumber || '';
+  document.getElementById('fCourt').value = caseData?.court || '';
+  document.getElementById('fStatus').value = caseData?.status || 'مفتوحة';
+  document.getElementById('caseModal').classList.add('show');
+}
+function closeCaseModal() {
+  document.getElementById('caseModal').classList.remove('show');
+}
+
+document.getElementById('caseForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('fTitle').value.trim();
+  if (!title) return;
+  const payload = {
+    ownerEmail: currentUser.email,
+    title,
+    clientName: document.getElementById('fClient').value.trim(),
+    opponentName: document.getElementById('fOpponent').value.trim(),
+    caseType: document.getElementById('fType').value,
+    stage: document.getElementById('fStage').value,
+    caseNumber: document.getElementById('fCaseNumber').value.trim(),
+    court: document.getElementById('fCourt').value.trim(),
+    status: document.getElementById('fStatus').value,
+  };
+  withLegistaDb(async () => {
+    const { collection, doc, addDoc, updateDoc, serverTimestamp } = window._fs;
+    try {
+      if (editingCaseId) {
+        await updateDoc(doc(window._db, 'cases', editingCaseId), { ...payload, updatedAt: serverTimestamp() });
+        toast('اتحدثت بيانات القضية ✓');
+        closeCaseModal();
+        openCaseDetail(editingCaseId);
+      } else {
+        const ref = await addDoc(collection(window._db, 'cases'), { ...payload, itemsCount: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        toast('اتعملت القضية ✓');
+        closeCaseModal();
+        loadCases();
+      }
+    } catch (err) {
+      console.error('save case failed:', err);
+      toast('حصل خطأ أثناء الحفظ، جرب تاني');
+    }
+  });
+});
+
+/* ---------- delete case ---------- */
+async function deleteCase(caseId) {
+  if (!confirm('متأكد إنك عايز تمسح القضية دي؟ كل المستندات والملاحظات المرتبطة بيها هتتمسح كمان.')) return;
+  withLegistaDb(async () => {
+    const { doc, deleteDoc, collection, getDocs } = window._fs;
+    try {
+      const itemsSnap = await getDocs(collection(window._db, 'cases', caseId, 'items'));
+      await Promise.all(itemsSnap.docs.map(d => deleteDoc(d.ref)));
+      await deleteDoc(doc(window._db, 'cases', caseId));
+      toast('اتمسحت القضية');
+      showListView();
+      loadCases();
+    } catch (err) {
+      console.error('delete case failed:', err);
+      toast('حصل خطأ أثناء المسح');
+    }
+  });
+}
+
+/* ---------- detail view ---------- */
+function showListView() {
+  document.getElementById('listView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+  currentCaseId = null;
+}
+document.getElementById('backToListBtn').addEventListener('click', showListView);
+
+async function openCaseDetail(caseId) {
+  currentCaseId = caseId;
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  document.getElementById('detailContainer').innerHTML = '<div class="loading-line">جارِ التحميل...</div>';
+
+  withLegistaDb(async () => {
+    const { doc, getDoc, collection, getDocs, query, orderBy } = window._fs;
+    try {
+      const caseSnap = await getDoc(doc(window._db, 'cases', caseId));
+      if (!caseSnap.exists()) { document.getElementById('detailContainer').innerHTML = '<div class="empty-state">القضية دي مش موجودة</div>'; return; }
+      const caseData = { id: caseSnap.id, ...caseSnap.data() };
+
+      const itemsQ = query(collection(window._db, 'cases', caseId, 'items'), orderBy('createdAt', 'desc'));
+      const itemsSnap = await getDocs(itemsQ);
+      const items = [];
+      itemsSnap.forEach(d => items.push({ id: d.id, ...d.data() }));
+
+      renderCaseDetail(caseData, items);
+    } catch (err) {
+      console.error('openCaseDetail failed:', err);
+      document.getElementById('detailContainer').innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-title">تعذّر تحميل القضية</div><div class="empty-state-sub">${err.message || ''}</div></div>`;
+    }
+  });
+}
+
+function renderCaseDetail(c, items) {
+  const container = document.getElementById('detailContainer');
+  container.innerHTML = `
+    <div class="detail-head">
+      <div class="detail-head-top">
+        <div>
+          <div class="detail-title">${escapeHTML(c.title || 'بدون عنوان')}</div>
+          <span class="case-status-badge ${c.status || 'مفتوحة'}">${c.status || 'مفتوحة'}</span>
+        </div>
+        <div class="detail-actions">
+          <button class="icon-btn" id="editCaseBtn" title="تعديل">✎</button>
+          <button class="icon-btn danger" id="deleteCaseBtn" title="مسح">🗑</button>
+        </div>
+      </div>
+      <div class="detail-meta-grid">
+        ${c.clientName ? `<div class="detail-meta-item"><div class="detail-meta-label">الموكل</div><div class="detail-meta-val">${escapeHTML(c.clientName)}</div></div>` : ''}
+        ${c.opponentName ? `<div class="detail-meta-item"><div class="detail-meta-label">الخصم</div><div class="detail-meta-val">${escapeHTML(c.opponentName)}</div></div>` : ''}
+        ${c.caseType ? `<div class="detail-meta-item"><div class="detail-meta-label">النوع</div><div class="detail-meta-val">${escapeHTML(c.caseType)}</div></div>` : ''}
+        ${c.stage ? `<div class="detail-meta-item"><div class="detail-meta-label">المرحلة</div><div class="detail-meta-val">${escapeHTML(c.stage)}</div></div>` : ''}
+        ${c.caseNumber ? `<div class="detail-meta-item"><div class="detail-meta-label">رقم القضية</div><div class="detail-meta-val">${escapeHTML(c.caseNumber)}</div></div>` : ''}
+        ${c.court ? `<div class="detail-meta-item"><div class="detail-meta-label">المحكمة</div><div class="detail-meta-val">${escapeHTML(c.court)}</div></div>` : ''}
+      </div>
+    </div>
+
+    <div class="timeline-head">
+      <div class="timeline-title">📎 كل حاجة متعلقة بالقضية دي (${items.length})</div>
+      <button class="add-note-btn" id="openNoteModalBtn">+ إضافة ملاحظة</button>
+    </div>
+    <div id="itemsContainer">${items.length ? items.map(renderItemCard).join('') : `<div class="empty-state"><div class="empty-state-icon">📎</div><div class="empty-state-title">لسه مفيش حاجة متربطة بالقضية دي</div><div class="empty-state-sub">أضف ملاحظة يدوي دلوقتي، أو استخدم زرار "احفظ في ملف قضية" جوه أي أداة (العقود، الإنذارات، تحليل القضايا...) واختار القضية دي</div></div>`}</div>
+  `;
+
+  document.getElementById('editCaseBtn').addEventListener('click', () => openCaseModal(c));
+  document.getElementById('deleteCaseBtn').addEventListener('click', () => deleteCase(c.id));
+  document.getElementById('openNoteModalBtn').addEventListener('click', () => document.getElementById('noteModal').classList.add('show'));
+
+  container.querySelectorAll('.item-expand-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const contentEl = btn.previousElementSibling;
+      contentEl.classList.toggle('expanded');
+      btn.textContent = contentEl.classList.contains('expanded') ? 'عرض أقل ↑' : 'عرض المزيد ↓';
+    });
+  });
+  container.querySelectorAll('.item-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteItem(btn.dataset.itemId));
+  });
+}
+
+const ITEM_TYPE_LABELS = { document: '📄 مستند', analysis: '🧠 تحليل قضية', note: '📝 ملاحظة' };
+function renderItemCard(item) {
+  const dateStr = item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+  return `
+    <div class="item-card">
+      <div class="item-card-top">
+        <span class="item-type-badge ${item.type || 'note'}">${ITEM_TYPE_LABELS[item.type] || item.type}</span>
+        <span class="item-date">${dateStr}</span>
+      </div>
+      ${item.title ? `<div class="item-title">${escapeHTML(item.title)}</div>` : ''}
+      <div class="item-content">${escapeHTML(item.content || '')}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+        <span class="item-expand-btn">عرض المزيد ↓</span>
+        <span class="item-delete-btn" data-item-id="${item.id}">حذف</span>
+      </div>
+    </div>`;
+}
+
+/* ---------- add note ---------- */
+document.getElementById('cancelNoteModalBtn').addEventListener('click', () => closeNoteModal());
+document.getElementById('noteModal').addEventListener('click', (e) => { if (e.target.id === 'noteModal') closeNoteModal(); });
+function closeNoteModal() {
+  document.getElementById('noteModal').classList.remove('show');
+  document.getElementById('noteForm').reset();
+}
+document.getElementById('noteForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('nTitle').value.trim();
+  const content = document.getElementById('nContent').value.trim();
+  if (!content) return;
+  await addItemToCase(currentCaseId, { type: 'note', sourceTool: 'manual', title, content });
+  closeNoteModal();
+  openCaseDetail(currentCaseId);
+});
+
+/* ---------- shared: add item to a case (used by this page + can be called from other tools) ---------- */
+async function addItemToCase(caseId, itemData) {
+  return new Promise((resolve, reject) => {
+    withLegistaDb(async () => {
+      const { collection, doc, addDoc, updateDoc, serverTimestamp, increment } = window._fs;
+      try {
+        await addDoc(collection(window._db, 'cases', caseId, 'items'), { ...itemData, createdAt: serverTimestamp() });
+        await updateDoc(doc(window._db, 'cases', caseId), { updatedAt: serverTimestamp(), itemsCount: increment(1) });
+        toast('اتحفظت ✓');
+        resolve(true);
+      } catch (err) {
+        console.error('addItemToCase failed:', err);
+        toast('حصل خطأ أثناء الحفظ');
+        reject(err);
+      }
+    });
+  });
+}
+window.legistaAddItemToCase = addItemToCase; // متاحة عشان صفحات تانية تقدر تستخدمها لو فُتحت في نفس السياق
+
+async function deleteItem(itemId) {
+  if (!confirm('متأكد إنك عايز تمسح العنصر ده؟')) return;
+  withLegistaDb(async () => {
+    const { doc, deleteDoc, updateDoc, increment } = window._fs;
+    try {
+      await deleteDoc(doc(window._db, 'cases', currentCaseId, 'items', itemId));
+      await updateDoc(doc(window._db, 'cases', currentCaseId), { itemsCount: increment(-1) });
+      openCaseDetail(currentCaseId);
+    } catch (err) {
+      console.error('deleteItem failed:', err);
+      toast('حصل خطأ أثناء الحذف');
+    }
+  });
+}
+
+function escapeHTML(str) { const div = document.createElement('div'); div.textContent = str == null ? '' : String(str); return div.innerHTML; }
+
+/* ---------- init ---------- */
+loadCases();
+</script>
+
+</body>
+</html>
