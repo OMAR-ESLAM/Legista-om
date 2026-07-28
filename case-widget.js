@@ -139,7 +139,7 @@ async function updateCase(caseId, fields) {
 
 async function deleteCaseFully(caseId) {
   try {
-    for (const sub of ['documents', 'analyses']) {
+    for (const sub of ['documents', 'analyses', 'stages']) {
       const snap = await getDocs(collection(db, 'cases', caseId, sub));
       if (snap.docs.length) {
         const batch = writeBatch(db);
@@ -198,6 +198,46 @@ async function deleteSubDoc(caseId, subName, docId) {
   }
 }
 
+// ═══ مراحل القضية (workflow) ═══
+// خطة افتراضية مقترحة لكل نوع قضية — المحامي يقدر يحمّلها كنقطة بداية،
+// وبعدين يعدّل/يضيف/يحذف مراحله الخاصة بحرية كاملة.
+const STAGE_TEMPLATES = {
+  'مدني': ['فحص المستندات والوقائع', 'تحرير وتقديم صحيفة الدعوى', 'إعلان الخصم', 'الجلسة الأولى ومتابعة الحضور', 'تبادل المذكرات', 'سماع الشهود (إن وجد)', 'حجز القضية للحكم', 'صدور الحكم', 'التنفيذ أو الاستئناف'],
+  'جنائي': ['تحرير المحضر / البلاغ', 'التحقيق في النيابة العامة', 'الإحالة إلى المحكمة المختصة', 'الجلسة الأولى', 'تقديم مذكرة الدفاع والدفوع', 'المرافعة الختامية', 'صدور الحكم', 'الطعن بالاستئناف (إن لزم)'],
+  'تجاري': ['فحص العقد والمستندات التجارية', 'الإنذار الرسمي (إن لزم)', 'تقديم صحيفة الدعوى التجارية', 'إعلان الخصم', 'الجلسة الأولى', 'ندب خبير (إن لزم)', 'المرافعة', 'صدور الحكم'],
+  'أحوال شخصية': ['فحص وثائق الحالة', 'محاولة الصلح (لجنة التوفيق الأسري)', 'تقديم الدعوى لمحكمة الأسرة', 'الجلسة الأولى', 'التحقيق ومحاضر الجلسات', 'صدور الحكم'],
+  'عمالي': ['فحص عقد العمل والمستندات', 'التقدم بشكوى لمكتب العمل', 'محاولة التسوية', 'تقديم الدعوى العمالية', 'الجلسة الأولى', 'صدور الحكم'],
+  'إداري': ['فحص القرار الإداري المطعون فيه', 'التظلم الإداري (إن لزم)', 'تقديم دعوى الإلغاء / التعويض', 'هيئة مفوضي الدولة', 'الجلسة أمام المحكمة', 'صدور الحكم'],
+  'أخرى': ['فحص الموقف القانوني', 'تحديد الإجراء المناسب', 'المتابعة حتى الحل'],
+};
+
+function getStageTemplate(caseType) {
+  return STAGE_TEMPLATES[caseType] || STAGE_TEMPLATES['أخرى'];
+}
+
+// بيحمّل خطة المراحل الافتراضية جوه القضية (أول مرحلة "جارية"، والباقي "لسه ماجاش عليها")
+async function seedStagesFromTemplate(caseId, caseType) {
+  const titles = getStageTemplate(caseType);
+  const created = [];
+  for (let i = 0; i < titles.length; i++) {
+    const row = await addSubDoc(caseId, 'stages', {
+      title: titles[i], order: i,
+      status: i === 0 ? 'جارية' : 'لسه',
+      isAuto: false, note: '',
+    });
+    created.push(row);
+  }
+  return created;
+}
+
+// بعد ما مرحلة تخلص، بيفعّل اللي بعدها تلقائيًا (لو كانت لسه معلّقة)
+async function advanceAfterStage(caseId, finishedOrder) {
+  const stages = await listSub(caseId, 'stages');
+  stages.sort((a, b) => a.order - b.order);
+  const next = stages.find(s => s.order > finishedOrder && s.status === 'لسه');
+  if (next) await updateSubDoc(caseId, 'stages', next.id, { status: 'جارية' });
+}
+
 // ═══ اختصارات لصفحات الأدوات الأربعة (عقود / إنذارات / جنح / تحليل) ═══
 // دي الدوال اللي زرار "حفظ في ملف قضية" في كل أداة هيناديها.
 
@@ -246,9 +286,10 @@ async function openSaveToCasePicker({ ownerEmail, onSave }) {
 }
 
 window.CaseWidget = {
-  CASE_TYPES, CASE_STATUSES,
+  CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES,
   escapeHTML, toast,
   listCases, getCase, createCase, updateCase, deleteCaseFully,
   listSub, addSubDoc, updateSubDoc, deleteSubDoc,
   saveDocumentToCase, saveAnalysisToCase, openSaveToCasePicker,
+  getStageTemplate, seedStagesFromTemplate, advanceAfterStage,
 };
