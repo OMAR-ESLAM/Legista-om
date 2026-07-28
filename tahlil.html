@@ -214,6 +214,19 @@ body::before {
 .pros-list li::before { color: var(--seal) !important; }
 .pros-risk { font-size: 13px; line-height: 1.85; color: var(--ink); background: rgba(216,67,75,0.08); border: 1px solid rgba(216,67,75,0.28); border-radius: 12px; padding: 12px 14px; }
  
+.memo-bubble { max-width: 640px; }
+.memo-title { font-size: 15px; font-weight: 800; text-align: center; color: var(--ink); margin-bottom: 2px; }
+.memo-intro { font-size: 13px; line-height: 1.95; text-align: justify; margin: 12px 0 6px; color: rgba(33,28,18,0.88); }
+.memo-section-heading { font-size: 12.5px; font-weight: 800; color: var(--accent-2); border-bottom: 1px solid var(--border-soft); padding-bottom: 6px; margin: 18px 0 10px; }
+.memo-facts { font-size: 13px; line-height: 1.95; text-align: justify; color: rgba(33,28,18,0.85); }
+.memo-arg { margin-bottom: 14px; }
+.memo-arg:last-child { margin-bottom: 0; }
+.memo-arg-heading { font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.memo-arg-body { font-size: 13px; line-height: 1.95; text-align: justify; color: rgba(33,28,18,0.85); }
+.memo-conclusion { font-size: 13px; line-height: 1.95; text-align: justify; color: rgba(33,28,18,0.85); margin-bottom: 8px; }
+.memo-requests { padding-inline-start: 20px; font-size: 13px; line-height: 1.95; color: rgba(33,28,18,0.88); }
+.memo-requests li { margin-bottom: 6px; }
+ 
 .error-bubble .bubble { border-color: rgba(240,85,90,0.35); background: rgba(240,85,90,0.08); color: var(--seal-soft); animation: msgIn .45s ease forwards, shakeX .4s ease .45s; }
 @keyframes shakeX { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 .retry-btn { margin-top: 8px; font-size: 11.5px; font-weight: 700; color: var(--seal-soft); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-family: 'Cairo', sans-serif; transition: opacity .15s; }
@@ -1110,6 +1123,10 @@ function appendOneResultBlock(block, isLast, fullData, meta, opts = {}) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l-3 5a4 4 0 0 0 8 0zM19 8l-3 5a4 4 0 0 0 8 0zM5 8h14"/></svg>
             ${opts.prosecutionDone ? 'رأي النيابة معروض بالأسفل ✓' : 'محاكاة عين النيابة'}
           </button>
+          <button class="action-btn memo-btn" ${opts.memoDone ? 'disabled' : ''}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+            ${opts.memoDone ? 'المذكرة جاهزة بالأسفل ✓' : 'توليد مذكرة دفاع كاملة'}
+          </button>
         </div>`;
     }
     el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="result-title">${block.title}</div>${block.html}${extra}</div>`;
@@ -1121,6 +1138,10 @@ function appendOneResultBlock(block, isLast, fullData, meta, opts = {}) {
       const prosBtn = el.querySelector('.pros-btn');
       if (prosBtn && !opts.prosecutionDone) {
         prosBtn.addEventListener('click', () => simulateProsecution(prosBtn, fullData, meta));
+      }
+      const memoBtn = el.querySelector('.memo-btn');
+      if (memoBtn && !opts.memoDone) {
+        memoBtn.addEventListener('click', () => generateMemo(memoBtn, fullData, meta));
       }
       el.querySelectorAll('.followup-chip').forEach(btn => {
         btn.addEventListener('click', () => askFollowUp(btn.textContent, fullData, meta, el.querySelectorAll('.followup-chip')));
@@ -1345,6 +1366,200 @@ async function simulateProsecution(btn, fullData, meta) {
   }
 }
 
+/* ---------- full defense memo generation ---------- */
+function buildMemoSystemPrompt(caseType, caseStage) {
+  return `أنت محامي مصري متمرّس في صياغة المذكرات القانونية الرسمية، تابع لمنصة LEGISTA. مطلوب منك تحوّل تحليل قانوني استرشادي جاهز (بنقاطه ودفوعه المرشحة) إلى مذكرة دفاع رسمية كاملة الصياغة، بالأسلوب القانوني المصري المعتاد (زي: "وحيث إن"، "ولما كان"، "الأمر الذي معه يضحى"، "ومن ثم")، لقضية (${CASE_TYPE_LABELS[caseType] || caseType} — ${CASE_STAGE_LABELS[caseStage] || caseStage}).
+
+قواعد صارمة:
+- اعتمد فقط على الوقائع والدفوع والتحليل المُعطى لك تحت. ممنوع تخترع دفوعًا جديدة أو مواد قانونية أو أحكام قضائية غير مذكورة أصلاً في التحليل المُعطى.
+- حوّل كل دفع من الدفوع المُعطاة إلى فقرة دفاعية رسمية متكاملة الصياغة (تبدأ بتأصيل المبدأ القانوني ثم تطبيقه على وقائع القضية تحديدًا)، ورتّبها من الأقوى للأضعف.
+- الصياغة يجب أن تكون احترافية جاهزة للتقديم الفعلي أمام جهة قضائية، بدون أي حشو أو عبارات عامة لا تضيف قيمة.
+- لا تفتِ نهائيًا نيابة عن المحكمة؛ المذكرة تعبّر عن وجهة نظر هيئة الدفاع فقط.
+- رد بصيغة JSON فقط بدون أي نص إضافي قبله أو بعده وبدون علامات \`\`\`، بالشكل ده بالظبط:
+{
+  "case_title": "عنوان المذكرة، مثال: مذكرة بدفاع المتهم/... في القضية رقم .../... لسنة ...",
+  "introduction": "فقرة افتتاحية رسمية تمهّد للمذكرة",
+  "facts_summary": "عرض الوقائع بصياغة قانونية رسمية منظمة ومرتبة زمنيًا (إعادة صياغة، مش نسخ حرفي)",
+  "legal_arguments": [ { "heading": "الدفع الأول: عنوان الدفع", "body": "شرح المبدأ القانوني ثم تطبيقه بالتفصيل على وقائع القضية" } ],
+  "conclusion": "فقرة ختامية قصيرة تمهّد للطلبات",
+  "requests": ["نص الطلب الأول كاملًا، مثال: قبول الدفع شكلًا وبراءة المتهم مما أُسند إليه", "..."]
+}`;
+}
+function buildMemoUserPrompt(data, meta) {
+  let out = `نوع القضية: ${CASE_TYPE_LABELS[currentType] || currentType}\n`;
+  out += `مرحلة القضية: ${CASE_STAGE_LABELS[currentStage] || currentStage}\n`;
+  if (meta.caseNumber) out += `رقم القضية: ${meta.caseNumber}\n`;
+  if (meta.parties) out += `الأطراف: ${meta.parties}\n`;
+  out += `\nوقائع القضية:\n${meta.facts}\n`;
+  if (data.summary) out += `\nملخص التحليل القانوني:\n${data.summary}\n`;
+  if (data.points?.length) out += `\nنقاط القوة والضعف:\n${data.points.map(p => '- ' + p).join('\n')}\n`;
+  if (data.defenses?.length) {
+    const sorted = [...data.defenses].sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1));
+    out += `\nالدفوع المرشحة (رتّبها في المذكرة من الأقوى للأضعف):\n${sorted.map(d => `- ${d.title} [أولوية: ${d.priority}]: ${d.reason}`).join('\n')}\n`;
+  }
+  if (data.scenarios?.length) out += `\nسيناريوهات محتملة (للاستئناس فقط، لا تُذكر حرفيًا في المذكرة):\n${data.scenarios.map(s => '- ' + s).join('\n')}\n`;
+  return out;
+}
+function normalizeMemo(parsed) {
+  return {
+    case_title: typeof parsed.case_title === 'string' && parsed.case_title.trim() ? parsed.case_title.trim().slice(0, 200) : 'مذكرة دفاع',
+    introduction: typeof parsed.introduction === 'string' ? parsed.introduction.trim().slice(0, 1200) : '',
+    facts_summary: typeof parsed.facts_summary === 'string' ? parsed.facts_summary.trim().slice(0, 2500) : '',
+    legal_arguments: Array.isArray(parsed.legal_arguments) ? parsed.legal_arguments
+      .filter(a => a && typeof a === 'object' && typeof a.body === 'string' && a.body.trim())
+      .map(a => ({ heading: typeof a.heading === 'string' ? a.heading.trim().slice(0, 200) : '', body: a.body.trim().slice(0, 2500) }))
+      .slice(0, 10) : [],
+    conclusion: typeof parsed.conclusion === 'string' ? parsed.conclusion.trim().slice(0, 800) : '',
+    requests: Array.isArray(parsed.requests) ? parsed.requests.filter(r => typeof r === 'string' && r.trim()).map(r => r.trim().slice(0, 400)).slice(0, 8) : [],
+  };
+}
+async function callMemoGeneration(data, meta) {
+  const sys = buildMemoSystemPrompt(currentType, currentStage);
+  const user = buildMemoUserPrompt(data, meta);
+  const parsed = await groqChatJSON(
+    [
+      { role: 'system', content: sys },
+      { role: 'user', content: user },
+    ],
+    { reasoningEffort: 'high', maxTokens: 3000 }
+  );
+  return normalizeMemo(parsed);
+}
+function appendMemoThinkingBubble() {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai thinking';
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="dot-flow"><span></span><span></span><span></span></div><span class="stage-text">بيصيغ مذكرة الدفاع كاملة...</span></div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+  return el;
+}
+function memoToText(memoData, meta) {
+  let out = `${memoData.case_title}\n`;
+  if (meta.caseNumber) out += `رقم القضية: ${meta.caseNumber}\n`;
+  if (meta.parties) out += `الأطراف: ${meta.parties}\n`;
+  out += `\n${memoData.introduction}\n`;
+  out += `\nأولًا: الوقائع\n${memoData.facts_summary}\n`;
+  out += `\nثانيًا: أوجه الدفاع\n`;
+  memoData.legal_arguments.forEach((a, i) => { out += `\n${a.heading || ('الدفع ' + (i + 1))}\n${a.body}\n`; });
+  out += `\nثالثًا: الطلبات\n${memoData.conclusion}\n`;
+  out += `\nبناءً على ما تقدم، تلتمس هيئة الدفاع من عدالة المحكمة:\n${memoData.requests.map((r, i) => `${i + 1}- ${r}`).join('\n')}\n`;
+  return out;
+}
+function openMemoPrintWindow(memoData, meta) {
+  const win = window.open('', '_blank');
+  if (!win) { toast('المتصفح منع فتح نافذة جديدة، اسمح بالنوافذ المنبثقة وجرب تاني'); return; }
+  const argumentsHTML = memoData.legal_arguments.map((a, i) => `
+    <div class="memo-arg">
+      <h3>${escapeHTML(a.heading || ('الدفع ' + (i + 1)))}</h3>
+      <p>${escapeHTML(a.body).replace(/\n/g, '<br>')}</p>
+    </div>`).join('');
+  const requestsHTML = memoData.requests.map(r => `<li>${escapeHTML(r)}</li>`).join('');
+  win.document.open();
+  win.document.write(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>${escapeHTML(memoData.case_title)}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Cairo', sans-serif; color: #1a1610; line-height: 2; padding: 40px 56px; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 19px; text-align: center; margin-bottom: 6px; }
+  .memo-meta { text-align: center; font-size: 12px; color: #666; margin-bottom: 30px; }
+  h2 { font-size: 14.5px; border-bottom: 2px solid #B8860B; padding-bottom: 6px; margin-top: 28px; }
+  h3 { font-size: 13px; margin-top: 16px; margin-bottom: 5px; }
+  p { font-size: 12.5px; text-align: justify; margin: 0 0 10px; }
+  ol { padding-inline-start: 22px; font-size: 12.5px; }
+  ol li { margin-bottom: 6px; }
+  .memo-sign { margin-top: 55px; font-size: 12.5px; }
+  @media print { body { padding: 14px 26px; } }
+</style>
+</head>
+<body>
+  <h1>${escapeHTML(memoData.case_title)}</h1>
+  <div class="memo-meta">${[meta.caseNumber ? `رقم القضية: ${escapeHTML(meta.caseNumber)}` : '', meta.parties ? `الأطراف: ${escapeHTML(meta.parties)}` : ''].filter(Boolean).join(' — ')}</div>
+  <p>${escapeHTML(memoData.introduction).replace(/\n/g, '<br>')}</p>
+  <h2>أولًا: الوقائع</h2>
+  <p>${escapeHTML(memoData.facts_summary).replace(/\n/g, '<br>')}</p>
+  <h2>ثانيًا: أوجه الدفاع</h2>
+  ${argumentsHTML}
+  <h2>ثالثًا: الطلبات</h2>
+  <p>${escapeHTML(memoData.conclusion).replace(/\n/g, '<br>')}</p>
+  <p>بناءً على ما تقدم، تلتمس هيئة الدفاع من عدالة المحكمة:</p>
+  <ol>${requestsHTML}</ol>
+  <div class="memo-sign">وكيل الدفاع<br>المحامي / ..........................</div>
+</body>
+</html>`);
+  win.document.close();
+  setTimeout(() => { win.focus(); win.print(); }, 400);
+}
+function appendMemoBubble(memoData, meta) {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai';
+  const argumentsHTML = memoData.legal_arguments.map((a, i) => `
+    <div class="memo-arg">
+      <div class="memo-arg-heading">${escapeHTML(a.heading || ('الدفع ' + (i + 1)))}</div>
+      <div class="memo-arg-body">${escapeHTML(a.body).replace(/\n/g, '<br>')}</div>
+    </div>`).join('');
+  const requestsHTML = memoData.requests.map(r => `<li>${escapeHTML(r)}</li>`).join('');
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble memo-bubble">
+    <div class="memo-title">${escapeHTML(memoData.case_title)}</div>
+    <div class="memo-intro">${escapeHTML(memoData.introduction).replace(/\n/g, '<br>')}</div>
+    <div class="memo-section-heading">أولًا: الوقائع</div>
+    <div class="memo-facts">${escapeHTML(memoData.facts_summary).replace(/\n/g, '<br>')}</div>
+    <div class="memo-section-heading">ثانيًا: أوجه الدفاع</div>
+    ${argumentsHTML}
+    <div class="memo-section-heading">ثالثًا: الطلبات</div>
+    <div class="memo-conclusion">${escapeHTML(memoData.conclusion).replace(/\n/g, '<br>')}</div>
+    <ol class="memo-requests">${requestsHTML}</ol>
+    <div class="msg-actions">
+      <button class="action-btn memo-copy-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        نسخ نص المذكرة
+      </button>
+      <button class="action-btn memo-print-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        فتح للطباعة / PDF
+      </button>
+    </div>
+  </div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+  el.querySelector('.memo-copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(memoToText(memoData, meta)).then(() => toast('اتنسخت المذكرة ✓'));
+  });
+  el.querySelector('.memo-print-btn').addEventListener('click', () => openMemoPrintWindow(memoData, meta));
+}
+function saveMemoToHistory(memoData) {
+  if (!activeHistoryId) return;
+  const entry = history.find(h => h.id === activeHistoryId);
+  if (!entry) return;
+  entry.memo = memoData;
+  localStorage.setItem('legista_tahlil_history', JSON.stringify(history));
+}
+async function generateMemo(btn, fullData, meta) {
+  await ensureSubscriptionChecked();
+  if (checkTrial() && !isUserSubscribed) { showPaywall(); return; }
+
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'بيصيغ المذكرة...';
+  const thinkingEl = appendMemoThinkingBubble();
+  try {
+    const memoData = await callMemoGeneration(fullData, meta);
+    thinkingEl.remove();
+    appendMemoBubble(memoData, meta);
+    btn.innerHTML = 'المذكرة جاهزة بالأسفل ✓';
+    saveMemoToHistory(memoData);
+    markUsed();
+  } catch (err) {
+    thinkingEl.remove();
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+    toast('حصل خطأ أثناء توليد المذكرة، جرّب تاني');
+  }
+}
+
 /* ---------- copy / pdf ---------- */
 function analysisToText(data, meta) {
   let out = `تحليل قضية — ${TYPE_LABELS[meta.type] || ''} — ${STAGE_LABELS[meta.stage] || ''}\n`;
@@ -1494,6 +1709,18 @@ function withLegistaDb(cb) {
 /* ══ SUBSCRIPTION STATUS CHECK (users/{email}.subscription === 'paid') ══ */
 let isUserSubscribed = false;
 let _subscriptionCheckDone = false;
+// subscriptionExpiry ممكن يتسجل في الفايرستور بأشكال مختلفة (رقم Unix ms، Firestore Timestamp،
+// تاريخ نصي، أو حتى Date عادي لو حد كتبها يدوي من الكونسول) — الدالة دي بتطبّعهم كلهم لرقم واحد
+// بدل ما نفترض شكل واحد بس ونفشل نقارن صح.
+function toMillisSafe(v) {
+  if (v === null || v === undefined) return 0;
+  if (typeof v === 'number') return v;
+  if (typeof v === 'string') { const t = Date.parse(v); return isNaN(t) ? 0 : t; }
+  if (v instanceof Date) return v.getTime();
+  if (typeof v.toMillis === 'function') return v.toMillis(); // Firestore Timestamp instance
+  if (typeof v.seconds === 'number') return v.seconds * 1000 + Math.floor((v.nanoseconds || 0) / 1e6); // plain {seconds, nanoseconds} object
+  return 0;
+}
 function ensureSubscriptionChecked() {
   if (_subscriptionCheckDone) return Promise.resolve();
   return new Promise(resolve => {
@@ -1504,10 +1731,20 @@ function ensureSubscriptionChecked() {
     withLegistaDb(async () => {
       try {
         const { doc, getDoc } = window._fs;
-        const snap = await getDoc(doc(window._db, 'users', user.email));
+        let snap = await getDoc(doc(window._db, 'users', user.email));
+        // فولباك: لو مفيش دوكيومنت بنفس الإيميل زي ما هو محفوظ محليًا، جرب النسخة بحروف صغيرة
+        // (بيحصل لو الإيميل اتسجل بحالة أحرف مختلفة وقت الدفع/الاعتماد اليدوي)
+        const normalizedEmail = user.email.trim().toLowerCase();
+        if (!snap.exists() && normalizedEmail !== user.email) {
+          snap = await getDoc(doc(window._db, 'users', normalizedEmail));
+        }
         if (snap.exists()) {
           const d = snap.data();
-          isUserSubscribed = d.subscription === 'paid' && !!d.subscriptionExpiry && d.subscriptionExpiry > Date.now();
+          const expiryMs = toMillisSafe(d.subscriptionExpiry);
+          isUserSubscribed = d.subscription === 'paid' && expiryMs > Date.now();
+          console.log('legista subscription check:', { email: user.email, subscription: d.subscription, subscriptionExpiryRaw: d.subscriptionExpiry, expiryMs, isUserSubscribed });
+        } else {
+          console.warn('legista subscription check: no user doc found for', user.email);
         }
       } catch (e) {
         console.error('legista subscription check failed', e);
