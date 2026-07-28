@@ -14,6 +14,12 @@
 //     - sourceTool, templateName, content, createdAt
 //   cases/{caseId}/analyses/{analysisId}
 //     - summary, points, defenses[], scenarios, selectedDefenses[], createdAt
+//   cases/{caseId}/stages/{stageId}
+//     - title, order, status ('لسه'|'جارية'|'مكتملة'), isAuto, note,
+//       isDecision (true لمرحلة قرار النيابة في القضايا الجنائية), branch, createdAt
+//   cases/{caseId}/evidence/{evidenceId}
+//     - kind ('محضر'|'حكم'|'عقد'|'أخرى'), name, mimeType, data (base64 مضغوط),
+//       notes (ملاحظات المحامي), gapAnalysis (نتيجة تحليل الذكاء الاصطناعي للثغرات إن وُجدت), createdAt
 // ══════════════════════════════════════════════════════════════════════════
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -139,7 +145,7 @@ async function updateCase(caseId, fields) {
 
 async function deleteCaseFully(caseId) {
   try {
-    for (const sub of ['documents', 'analyses', 'stages']) {
+    for (const sub of ['documents', 'analyses', 'stages', 'evidence']) {
       const snap = await getDocs(collection(db, 'cases', caseId, sub));
       if (snap.docs.length) {
         const batch = writeBatch(db);
@@ -201,14 +207,87 @@ async function deleteSubDoc(caseId, subName, docId) {
 // ═══ مراحل القضية (workflow) ═══
 // خطة افتراضية مقترحة لكل نوع قضية — المحامي يقدر يحمّلها كنقطة بداية،
 // وبعدين يعدّل/يضيف/يحذف مراحله الخاصة بحرية كاملة.
+// ملحوظة: القضايا الجنائية فيها نقطة تفرّع حقيقية (قرار النيابة: حفظ أم إحالة)،
+// فمش كل القضايا بتكمل بنفس المسار بعدها — ده بيتحدد ديناميكيًا بعد قرار النيابة
+// عن طريق branchStagesAfterDecision تحت، مش جزء ثابت من القالب.
+const DECISION_STAGE_TITLE = 'قرار النيابة: حفظ التحقيق أم الإحالة إلى المحكمة؟';
+
 const STAGE_TEMPLATES = {
-  'مدني': ['فحص المستندات والوقائع', 'تحرير وتقديم صحيفة الدعوى', 'إعلان الخصم', 'الجلسة الأولى ومتابعة الحضور', 'تبادل المذكرات', 'سماع الشهود (إن وجد)', 'حجز القضية للحكم', 'صدور الحكم', 'التنفيذ أو الاستئناف'],
-  'جنائي': ['تحرير المحضر / البلاغ', 'التحقيق في النيابة العامة', 'الإحالة إلى المحكمة المختصة', 'الجلسة الأولى', 'تقديم مذكرة الدفاع والدفوع', 'المرافعة الختامية', 'صدور الحكم', 'الطعن بالاستئناف (إن لزم)'],
-  'تجاري': ['فحص العقد والمستندات التجارية', 'الإنذار الرسمي (إن لزم)', 'تقديم صحيفة الدعوى التجارية', 'إعلان الخصم', 'الجلسة الأولى', 'ندب خبير (إن لزم)', 'المرافعة', 'صدور الحكم'],
-  'أحوال شخصية': ['فحص وثائق الحالة', 'محاولة الصلح (لجنة التوفيق الأسري)', 'تقديم الدعوى لمحكمة الأسرة', 'الجلسة الأولى', 'التحقيق ومحاضر الجلسات', 'صدور الحكم'],
-  'عمالي': ['فحص عقد العمل والمستندات', 'التقدم بشكوى لمكتب العمل', 'محاولة التسوية', 'تقديم الدعوى العمالية', 'الجلسة الأولى', 'صدور الحكم'],
-  'إداري': ['فحص القرار الإداري المطعون فيه', 'التظلم الإداري (إن لزم)', 'تقديم دعوى الإلغاء / التعويض', 'هيئة مفوضي الدولة', 'الجلسة أمام المحكمة', 'صدور الحكم'],
-  'أخرى': ['فحص الموقف القانوني', 'تحديد الإجراء المناسب', 'المتابعة حتى الحل'],
+  'مدني': [
+    'فحص المستندات والوقائع وتحديد سند الدعوى',
+    'تحرير وتقديم صحيفة الدعوى وقيدها بالمحكمة المختصة',
+    'سداد الرسوم القضائية وإعلان الخصم بالصحيفة',
+    'الجلسة الأولى ومتابعة الحضور والغياب',
+    'تبادل المذكرات والمستندات بين الخصوم',
+    'ندب خبير (إن لزم) ومتابعة تقرير الخبرة',
+    'سماع الشهود (إن وجد)',
+    'المرافعة الختامية وحجز القضية للحكم',
+    'صدور الحكم',
+    'التنفيذ الجبري أو الطعن بالاستئناف خلال المواعيد القانونية',
+  ],
+  'جنائي': [
+    'تحرير المحضر بمعرفة الشرطة أو تقديم البلاغ للنيابة مباشرة',
+    'عرض المحضر على النيابة العامة والتحقيق (استجواب، سماع شهود، معاينة)',
+    DECISION_STAGE_TITLE,
+    // الخطوات اللي بعد كده بتتحدد تلقائيًا حسب قرار النيابة (حفظ / إحالة) — شوف BRANCH_TEMPLATES
+  ],
+  'تجاري': [
+    'فحص العقد والمستندات التجارية وتحديد سند المطالبة',
+    'توجيه إنذار رسمي على يد محضر (إجراء غالبًا لازم قبل رفع الدعوى التجارية)',
+    'تحرير وتقديم صحيفة الدعوى التجارية وقيدها',
+    'إعلان الخصم ومتابعة الجلسة الأولى',
+    'ندب خبير حسابي/فني (شائع جدًا في المنازعات التجارية)',
+    'تبادل المذكرات والمرافعة',
+    'صدور الحكم',
+    'التنفيذ أو الطعن بالاستئناف',
+  ],
+  'أحوال شخصية': [
+    'فحص وثائق الحالة (عقد الزواج، قسائم الطلاق، مستندات النسب أو النفقة)',
+    'التوجه للجنة تسوية المنازعات الأسرية (إجراء إلزامي قبل رفع أغلب دعاوى الأسرة)',
+    'محضر عدم التسوية (لو فشلت المحاولة) وتقديم الدعوى لمحكمة الأسرة',
+    'الجلسة الأولى ومتابعة الإعلانات',
+    'التحقيق ومحاضر الجلسات (سماع شهود، مأمورية إن لزم)',
+    'صدور الحكم',
+    'الطعن أمام محكمة استئناف الأسرة (إن لزم)',
+  ],
+  'عمالي': [
+    'فحص عقد العمل والمستندات (تأمينات، مفردات مرتب، إنذارات)',
+    'التقدم بشكوى لمكتب العمل المختص ومحاولة التسوية الودية',
+    'محضر عدم التسوية (لو فشلت التسوية الودية) خلال المدة القانونية',
+    'تقديم الدعوى العمالية للمحكمة العمالية المختصة',
+    'الجلسة الأولى ومتابعة الحضور',
+    'تبادل المذكرات والمرافعة',
+    'صدور الحكم',
+  ],
+  'إداري': [
+    'فحص القرار الإداري المطعون فيه وتاريخ العلم اليقيني به',
+    'التظلم الإداري (اختياري، وبيوقف ميعاد الطعن القضائي مؤقتًا)',
+    'تقديم دعوى الإلغاء أو التعويض أمام مجلس الدولة خلال المواعيد القانونية',
+    'عرض الدعوى على هيئة مفوضي الدولة وإعداد التقرير',
+    'الجلسة أمام المحكمة الإدارية المختصة',
+    'صدور الحكم',
+    'الطعن بالنقض أمام المحكمة الإدارية العليا (إن لزم)',
+  ],
+  'أخرى': ['فحص الموقف القانوني وتحديد الجهة المختصة', 'تحديد الإجراء المناسب واتخاذه', 'المتابعة حتى الحل'],
+};
+
+// خطط الفروع بعد قرار النيابة في القضايا الجنائية
+const BRANCH_TEMPLATES = {
+  // النيابة قررت إحالة القضية للمحكمة المختصة
+  referral: [
+    'الإحالة إلى المحكمة المختصة وقيد الجنحة/الجناية',
+    'الجلسة الأولى ومتابعة الحضور',
+    'تقديم مذكرة الدفاع والدفوع',
+    'سماع الشهود والمرافعة',
+    'صدور الحكم',
+    'الطعن بالاستئناف خلال المواعيد القانونية (إن لزم)',
+  ],
+  // النيابة قررت حفظ التحقيق
+  dismissal: [
+    'كتابة وتقديم التظلم من قرار الحفظ لرئاسة النيابة المختصة',
+    'متابعة الرد على التظلم',
+    'تحريك الدعوى الجنائية بطريق الادعاء المباشر (لو استمر الحفظ ورأى المحامي أن الأدلة كافية)',
+  ],
 };
 
 function getStageTemplate(caseType) {
@@ -224,6 +303,7 @@ async function seedStagesFromTemplate(caseId, caseType) {
       title: titles[i], order: i,
       status: i === 0 ? 'جارية' : 'لسه',
       isAuto: false, note: '',
+      isDecision: titles[i] === DECISION_STAGE_TITLE,
     });
     created.push(row);
   }
@@ -236,6 +316,25 @@ async function advanceAfterStage(caseId, finishedOrder) {
   stages.sort((a, b) => a.order - b.order);
   const next = stages.find(s => s.order > finishedOrder && s.status === 'لسه');
   if (next) await updateSubDoc(caseId, 'stages', next.id, { status: 'جارية' });
+}
+
+// بعد قرار النيابة (حفظ/إحالة)، بنمسح أي مراحل قديمة بعد نقطة القرار (لو اتغيّر القرار)
+// ونضيف مسار الفرع الصحيح، أول مرحلة فيه بتبقى "جارية" تلقائيًا
+async function branchStagesAfterDecision(caseId, decisionOrder, branchKey) {
+  const titles = BRANCH_TEMPLATES[branchKey] || [];
+  const existing = await listSub(caseId, 'stages');
+  const stale = existing.filter(s => s.order > decisionOrder);
+  for (const s of stale) await deleteSubDoc(caseId, 'stages', s.id);
+  const created = [];
+  for (let i = 0; i < titles.length; i++) {
+    const row = await addSubDoc(caseId, 'stages', {
+      title: titles[i], order: decisionOrder + i + 1,
+      status: i === 0 ? 'جارية' : 'لسه',
+      isAuto: false, note: '', branch: branchKey,
+    });
+    created.push(row);
+  }
+  return created;
 }
 
 // ═══ اختصارات لصفحات الأدوات الأربعة (عقود / إنذارات / جنح / تحليل) ═══
@@ -253,6 +352,18 @@ function saveAnalysisToCase(caseId, analysisData) {
   return addSubDoc(caseId, 'analyses', {
     ...analysisData,
     selectedDefenses: analysisData.selectedDefenses || [],
+  });
+}
+
+// حفظ مستند/صورة دليل (زي صورة محضر، حكم، عقد) في القضية
+function saveEvidenceToCase(caseId, { kind, name, mimeType, data, notes, gapAnalysis }) {
+  return addSubDoc(caseId, 'evidence', {
+    kind: kind || 'أخرى',
+    name: name || '',
+    mimeType: mimeType || '',
+    data: data || '',
+    notes: notes || '',
+    gapAnalysis: gapAnalysis || null,
   });
 }
 
@@ -286,10 +397,10 @@ async function openSaveToCasePicker({ ownerEmail, onSave }) {
 }
 
 window.CaseWidget = {
-  CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES,
+  CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES, BRANCH_TEMPLATES, DECISION_STAGE_TITLE,
   escapeHTML, toast,
   listCases, getCase, createCase, updateCase, deleteCaseFully,
   listSub, addSubDoc, updateSubDoc, deleteSubDoc,
-  saveDocumentToCase, saveAnalysisToCase, openSaveToCasePicker,
-  getStageTemplate, seedStagesFromTemplate, advanceAfterStage,
+  saveDocumentToCase, saveAnalysisToCase, saveEvidenceToCase, openSaveToCasePicker,
+  getStageTemplate, seedStagesFromTemplate, advanceAfterStage, branchStagesAfterDecision,
 };
