@@ -195,6 +195,25 @@ body::before {
 .action-btn:hover { color: var(--ink); border-color: var(--border); background: var(--surface-2); }
 .action-btn svg { width: 13px; height: 13px; }
  
+.followup-wrap { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-soft); }
+.followup-label { font-size: 10.5px; font-weight: 800; color: var(--muted-2); letter-spacing: .3px; margin-bottom: 8px; }
+.followup-chips { display: flex; flex-direction: column; gap: 7px; }
+.followup-chip { display: flex; align-items: center; gap: 8px; text-align: right; padding: 9px 13px; border-radius: 12px; border: 1px solid var(--border-soft); background: var(--bg-2); color: var(--ink); font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 600; line-height: 1.6; cursor: pointer; transition: all .18s, transform .12s; }
+.followup-chip:hover { border-color: var(--accent); background: var(--surface-2); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.followup-chip:active { transform: scale(0.98); }
+.followup-chip::before { content: '↩'; flex-shrink: 0; color: var(--accent); font-weight: 900; transform: scaleX(-1); }
+.followup-chip:disabled { opacity: .5; cursor: default; transform: none; }
+ 
+.pros-msg .avatar-ai { background: radial-gradient(circle at 35% 30%, var(--seal), var(--seal-soft) 70%); box-shadow: 0 0 0 3px rgba(216,67,75,0.18), var(--shadow-sm); }
+.pros-bubble { border-color: rgba(216,67,75,0.3) !important; background: linear-gradient(180deg, rgba(216,67,75,0.05), var(--surface)) !important; }
+.pros-title { color: var(--seal); }
+.pros-card { padding: 13px 14px; background: rgba(216,67,75,0.05); border: 1px solid rgba(216,67,75,0.22); border-radius: 14px; margin-bottom: 9px; }
+.pros-card:last-child { margin-bottom: 0; }
+.pros-defense-name { font-size: 12.5px; font-weight: 800; color: var(--ink); display: block; }
+.pros-rebuttal { font-size: 13px; line-height: 1.8; color: rgba(33,28,18,0.82); margin-top: 6px; }
+.pros-list li::before { color: var(--seal) !important; }
+.pros-risk { font-size: 13px; line-height: 1.85; color: var(--ink); background: rgba(216,67,75,0.08); border: 1px solid rgba(216,67,75,0.28); border-radius: 12px; padding: 12px 14px; }
+ 
 .error-bubble .bubble { border-color: rgba(240,85,90,0.35); background: rgba(240,85,90,0.08); color: var(--seal-soft); animation: msgIn .45s ease forwards, shakeX .4s ease .45s; }
 @keyframes shakeX { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 .retry-btn { margin-top: 8px; font-size: 11.5px; font-weight: 700; color: var(--seal-soft); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-family: 'Cairo', sans-serif; transition: opacity .15s; }
@@ -596,10 +615,12 @@ ${library}
     { "key": "butlan", "title": "اسم الدفع بالتحديد", "reason": "اذكر أولًا المبدأ المرجعي الفعلي من المكتبة اللي بيسنده، ثم اربطه بتفصيلة محددة من وقائع القضية", "priority": "قوي" }
   ],
   "scenarios": ["سيناريو محتمل 1 لمسار القضية مبني على التحليل أعلاه", "سيناريو محتمل 2", "..."],
-  "missing_info": ["معلومة أساسية ناقصة تؤثر على دقة التحليل لو وجدت، وإلا اترك المصفوفة فاضية"]
+  "missing_info": ["معلومة أساسية ناقصة تؤثر على دقة التحليل لو وجدت، وإلا اترك المصفوفة فاضية"],
+  "follow_ups": ["سؤال متابعة قصير (٣-٩ كلمات) يفيد المحامي فعلاً بناءً على تفاصيل هذه القضية تحديدًا، مثال: تفصيل دفع بعينه، أو توضيح سيناريو، أو خطوة إجرائية تالية", "سؤال متابعة قصير آخر مختلف", "سؤال متابعة ثالث (اختياري)"]
 }
 6. اكتب كل المحتوى بالعربية الفصحى المبسطة المناسبة لمحامٍ محترف، بدون حشو أو عبارات عامة لا تضيف قيمة.
-7. لا تفتِ بشكل قاطع نهائي؛ التحليل استرشادي أولي فقط ولا يغني عن تقدير المحامي المهني.${isComplex ? '\n8. هذه قضية معقدة أو حساسة (وقائع طويلة/جناية/استئناف) — خصص وقت تفكير أطول وتحليل أعمق للتفاصيل الدقيقة والإجراءات قبل الإخراج النهائي.' : ''}`;
+7. لا تفتِ بشكل قاطع نهائي؛ التحليل استرشادي أولي فقط ولا يغني عن تقدير المحامي المهني.
+8. حقل "follow_ups": اقترح 2 إلى 3 أسئلة متابعة قصيرة جدًا (مش فقرات) تخص هذه القضية بالتحديد فقط (زي أسماء الدفوع أو الوقائع المذكورة فعلاً) — ممنوع أسئلة عامة ممكن تتكرر في أي قضية زي "هل يوجد دفوع إضافية؟".${isComplex ? '\n9. هذه قضية معقدة أو حساسة (وقائع طويلة/جناية/استئناف) — خصص وقت تفكير أطول وتحليل أعمق للتفاصيل الدقيقة والإجراءات قبل الإخراج النهائي.' : ''}`;
 }
 function buildUserPrompt({ type, stage, caseNumber, parties, facts }) {
   let out = `نوع القضية: ${CASE_TYPE_LABELS[type] || type}\n`;
@@ -718,6 +739,7 @@ function normalizeAnalysis(parsed, caseType) {
     defenses: sanitizeDefenses(parsed.defenses, caseType),
     scenarios: Array.isArray(parsed.scenarios) ? parsed.scenarios.filter(s => typeof s === 'string').slice(0, 6) : [],
     missing_info: Array.isArray(parsed.missing_info) ? parsed.missing_info.filter(m => typeof m === 'string').slice(0, 6) : [],
+    follow_ups: Array.isArray(parsed.follow_ups) ? parsed.follow_ups.filter(f => typeof f === 'string' && f.trim()).map(f => f.trim().slice(0, 160)).slice(0, 3) : [],
   };
 }
 
@@ -1013,7 +1035,7 @@ function appendErrorBubble(retryFn) {
   scrollDown();
 }
  
-async function appendResultSequence(data, meta) {
+async function appendResultSequence(data, meta, opts = {}) {
   const blocks = [];
  
   if (data.summary) blocks.push({
@@ -1053,18 +1075,27 @@ async function appendResultSequence(data, meta) {
   });
  
   for (let i = 0; i < blocks.length; i++) {
-    await appendOneResultBlock(blocks[i], i === blocks.length - 1, data, meta);
+    await appendOneResultBlock(blocks[i], i === blocks.length - 1, data, meta, opts);
     await sleep(280);
   }
 }
  
-function appendOneResultBlock(block, isLast, fullData, meta) {
+function appendOneResultBlock(block, isLast, fullData, meta, opts = {}) {
   return new Promise((resolve) => {
     const el = document.createElement('div');
     el.className = 'msg msg-ai';
     let extra = '';
     if (isLast) {
+      const followUps = Array.isArray(fullData.follow_ups) ? fullData.follow_ups : [];
+      const followupHTML = followUps.length ? `
+        <div class="followup-wrap">
+          <div class="followup-label">ممكن كمان تسأل عن:</div>
+          <div class="followup-chips">
+            ${followUps.map((q, i) => `<button class="followup-chip" data-fu-idx="${i}">${escapeHTML(q)}</button>`).join('')}
+          </div>
+        </div>` : '';
       extra = `
+        ${followupHTML}
         <div class="disclaimer-line">تحليل استرشادي أولي بالذكاء الاصطناعي بناءً على وصفك للوقائع، ولا يُعد استشارة قانونية نهائية ولا بديلاً عن التقدير المهني للمحامي.</div>
         <div class="msg-actions">
           <button class="action-btn copy-btn">
@@ -1075,6 +1106,10 @@ function appendOneResultBlock(block, isLast, fullData, meta) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             تحميل PDF
           </button>
+          <button class="action-btn pros-btn" ${opts.prosecutionDone ? 'disabled' : ''}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l-3 5a4 4 0 0 0 8 0zM19 8l-3 5a4 4 0 0 0 8 0zM5 8h14"/></svg>
+            ${opts.prosecutionDone ? 'رأي النيابة معروض بالأسفل ✓' : 'محاكاة عين النيابة'}
+          </button>
         </div>`;
     }
     el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="result-title">${block.title}</div>${block.html}${extra}</div>`;
@@ -1083,11 +1118,233 @@ function appendOneResultBlock(block, isLast, fullData, meta) {
     if (isLast) {
       el.querySelector('.copy-btn').addEventListener('click', () => copyAnalysis(fullData, meta));
       el.querySelector('.pdf-btn').addEventListener('click', () => downloadPDF(fullData, meta));
+      const prosBtn = el.querySelector('.pros-btn');
+      if (prosBtn && !opts.prosecutionDone) {
+        prosBtn.addEventListener('click', () => simulateProsecution(prosBtn, fullData, meta));
+      }
+      el.querySelectorAll('.followup-chip').forEach(btn => {
+        btn.addEventListener('click', () => askFollowUp(btn.textContent, fullData, meta, el.querySelectorAll('.followup-chip')));
+      });
     }
     setTimeout(resolve, 60);
   });
 }
  
+/* ---------- follow-up conversation ---------- */
+function buildFollowUpSystemPrompt(caseType, caseStage) {
+  return `أنت مستشار قانوني مصري خبير تابع لمنصة LEGISTA، وكنت أعطيت محاميًا تحليلًا استرشاديًا لقضية (${CASE_TYPE_LABELS[caseType] || caseType} — ${CASE_STAGE_LABELS[caseStage] || caseStage}). دلوقتي المحامي بيسألك سؤال متابعة عن نفس القضية بالظبط، وهتلاقي تحت وقائع القضية الأصلية والتحليل اللي قدمته سابقًا كسياق.
+
+قواعد الرد:
+- جاوب على سؤال المتابعة تحديدًا، بالاعتماد فقط على الوقائع والتحليل المذكورين تحت، من غير ما تخترع وقائع أو مواد قانونية جديدة مش متأكد منها.
+- لو السؤال محتاج معلومة مش موجودة في الوقائع، قول كده صراحة واقترح ايه المطلوب لتوضيحه.
+- لا تفتِ بشكل قاطع نهائي؛ ردك استرشادي فقط.
+- رد بصيغة JSON فقط بدون أي نص إضافي قبله أو بعده وبدون علامات \`\`\`، بالشكل ده بالظبط:
+{
+  "answer": "الرد الكامل على سؤال المتابعة، بالعربية الفصحى المبسطة، فقرة أو أكتر حسب الحاجة",
+  "follow_ups": ["سؤال متابعة قصير جديد ومختلف يخص نفس القضية (اختياري)", "سؤال تاني (اختياري)"]
+}`;
+}
+function buildFollowUpUserPrompt(question, priorData, meta) {
+  let out = `وقائع القضية الأصلية:\n${meta.facts}\n`;
+  if (priorData.summary) out += `\nملخص التحليل السابق:\n${priorData.summary}\n`;
+  if (priorData.points?.length) out += `\nنقاط القوة والضعف اللي ذكرتها سابقًا:\n${priorData.points.map(p => '- ' + p).join('\n')}\n`;
+  if (priorData.defenses?.length) out += `\nالدفوع اللي رشحتها سابقًا:\n${priorData.defenses.map(d => `- ${d.title}: ${d.reason}`).join('\n')}\n`;
+  if (priorData.scenarios?.length) out += `\nالسيناريوهات المحتملة اللي ذكرتها:\n${priorData.scenarios.map(s => '- ' + s).join('\n')}\n`;
+  out += `\nسؤال المتابعة من المحامي:\n${question}`;
+  return out;
+}
+async function callFollowUpAnswer(question, priorData, meta) {
+  const sys = buildFollowUpSystemPrompt(currentType, currentStage);
+  const user = buildFollowUpUserPrompt(question, priorData, meta);
+  const parsed = await groqChatJSON(
+    [
+      { role: 'system', content: sys },
+      { role: 'user', content: user },
+    ],
+    { reasoningEffort: 'medium', maxTokens: 1200 }
+  );
+  return {
+    answer: typeof parsed.answer === 'string' ? parsed.answer : '',
+    follow_ups: Array.isArray(parsed.follow_ups) ? parsed.follow_ups.filter(f => typeof f === 'string' && f.trim()).map(f => f.trim().slice(0, 160)).slice(0, 3) : [],
+  };
+}
+function appendFollowUpThinkingBubble() {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai thinking';
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="dot-flow"><span></span><span></span><span></span></div><span class="stage-text">بجاوب على سؤالك...</span></div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+  return el;
+}
+function appendFollowUpAnswerBubble(answer, followUps, retryCtx) {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai';
+  const followupHTML = followUps.length ? `
+    <div class="followup-wrap">
+      <div class="followup-label">ممكن كمان تسأل عن:</div>
+      <div class="followup-chips">
+        ${followUps.map((q, i) => `<button class="followup-chip" data-fu-idx="${i}">${escapeHTML(q)}</button>`).join('')}
+      </div>
+    </div>` : '';
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div>${escapeHTML(answer).replace(/\n/g, '<br>')}</div>${followupHTML}</div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+  el.querySelectorAll('.followup-chip').forEach(btn => {
+    btn.addEventListener('click', () => askFollowUp(btn.textContent, retryCtx.priorData, retryCtx.meta, el.querySelectorAll('.followup-chip')));
+  });
+  return el;
+}
+async function askFollowUp(question, priorData, meta, chipButtonsToDisable) {
+  if (chipButtonsToDisable) chipButtonsToDisable.forEach(b => b.disabled = true);
+
+  await ensureSubscriptionChecked();
+  if (checkTrial() && !isUserSubscribed) { showPaywall(); return; }
+
+  appendUserBubble(question);
+  const thinkingEl = appendFollowUpThinkingBubble();
+  try {
+    const { answer, follow_ups } = await callFollowUpAnswer(question, priorData, meta);
+    thinkingEl.remove();
+    // ندمج المتابعة الجديدة في نفس بيانات التحليل عشان لو حصل سؤال متابعة تاني يفضل السياق كامل
+    const mergedPrior = { ...priorData, summary: priorData.summary ? `${priorData.summary}\n\n[متابعة: ${question}]\n${answer}` : answer };
+    appendFollowUpAnswerBubble(answer || 'معلش، مقدرتش أجاوب على السؤال ده دلوقتي. جرّب تصيغه بشكل تاني.', follow_ups, { priorData: mergedPrior, meta });
+    appendFollowUpToHistory(question, answer || 'معلش، مقدرتش أجاوب على السؤال ده دلوقتي. جرّب تصيغه بشكل تاني.', follow_ups);
+    markUsed();
+  } catch (err) {
+    thinkingEl.remove();
+    appendErrorBubble(() => askFollowUp(question, priorData, meta));
+  }
+}
+
+/* ---------- prosecution-eye simulation ---------- */
+function buildProsecutionSystemPrompt(caseType, caseStage) {
+  return `أنت وكيل نيابة/ممثل اتهام مصري متمرّس تابع لمنصة LEGISTA، بتراجع دلوقتي وقائع قضية (${CASE_TYPE_LABELS[caseType] || caseType} — ${CASE_STAGE_LABELS[caseStage] || caseStage}) وتحليل دفاع قدّمه محامي الطرف التاني، وعايز تحط نفسك مكان جهة الاتهام بالظبط: إزاي هيّا هترد على كل دفع من دفوع الدفاع، وإيه أقوى نقاطها، وإيه أخطر حاجة على الدفاع لو محدش استعد لها.
+
+قواعد صارمة:
+- اتكلم من منظور الاتهام فقط، بواقعية، وبدون أي مجاملة لتحليل الدفاع.
+- لكل دفع مذكور من الدفاع، اكتب ردًا واقعيًا ومحددًا ليه (مش رد عام شائع)، مبني على تفاصيل الوقائع نفسها.
+- ممنوع تخترع أرقام مواد قانونية أو نصوص تشريعية مش متأكد منها تمامًا.
+- لو دفع معين فعلاً ضعيف قانونيًا وسهل رده، قول كده صراحة بدل ما تجامل أو تخفف من قوة رد الاتهام.
+- رد بصيغة JSON فقط بدون أي نص إضافي قبله أو بعده وبدون علامات \`\`\`، بالشكل ده بالظبط:
+{
+  "prosecution_stance": "ملخص موقف النيابة العام تجاه هذه القضية، في فقرة أو فقرتين",
+  "rebuttals": [
+    { "defense_key": "نفس قيمة key المذكورة قدام كل دفع في المدخلات بالظبط", "rebuttal": "رد النيابة المحدد على هذا الدفع بالذات" }
+  ],
+  "prosecution_strengths": ["أقوى نقطة في صالح الاتهام 1", "..."],
+  "risk_warning": "أخطر حاجة لازم الدفاع يستعد لها أو يواجهها قبل الجلسة"
+}`;
+}
+function buildProsecutionUserPrompt(data, meta) {
+  let out = `وقائع القضية:\n${meta.facts}\n`;
+  if (data.summary) out += `\nملخص تحليل الدفاع:\n${data.summary}\n`;
+  if (data.points?.length) out += `\nنقاط قوة/ضعف ذكرها الدفاع:\n${data.points.map(p => '- ' + p).join('\n')}\n`;
+  if (data.defenses?.length) out += `\nدفوع الدفاع المقترحة (استخدم قيمة key بالظبط في ردك):\n${data.defenses.map(d => `- key: "${d.key}" | ${d.title}: ${d.reason}`).join('\n')}\n`;
+  return out;
+}
+function normalizeProsecution(parsed, originalData) {
+  const defenseByKey = new Map((originalData.defenses || []).map(d => [d.key, d]));
+  const rebuttals = Array.isArray(parsed.rebuttals) ? parsed.rebuttals
+    .filter(r => r && typeof r === 'object' && typeof r.rebuttal === 'string' && r.rebuttal.trim())
+    .map(r => ({
+      defense_title: defenseByKey.get(r.defense_key)?.title || '',
+      rebuttal: r.rebuttal.trim().slice(0, 700),
+    }))
+    .slice(0, 8) : [];
+  return {
+    prosecution_stance: typeof parsed.prosecution_stance === 'string' ? parsed.prosecution_stance.slice(0, 1200) : '',
+    rebuttals,
+    prosecution_strengths: Array.isArray(parsed.prosecution_strengths) ? parsed.prosecution_strengths.filter(s => typeof s === 'string').slice(0, 6) : [],
+    risk_warning: typeof parsed.risk_warning === 'string' ? parsed.risk_warning.slice(0, 500) : '',
+  };
+}
+async function callProsecutionSimulation(data, meta) {
+  const sys = buildProsecutionSystemPrompt(currentType, currentStage);
+  const user = buildProsecutionUserPrompt(data, meta);
+  const parsed = await groqChatJSON(
+    [
+      { role: 'system', content: sys },
+      { role: 'user', content: user },
+    ],
+    { reasoningEffort: 'medium', maxTokens: 1600 }
+  );
+  return normalizeProsecution(parsed, data);
+}
+function appendProsThinkingBubble() {
+  const el = document.createElement('div');
+  el.className = 'msg msg-ai thinking pros-msg';
+  el.innerHTML = `${aiAvatarSVG()}<div class="bubble"><div class="dot-flow"><span></span><span></span><span></span></div><span class="stage-text">بحاكي رأي النيابة في القضية...</span></div>`;
+  chatScroll.appendChild(el);
+  scrollDown();
+  return el;
+}
+function appendProsBlock(block) {
+  return new Promise(resolve => {
+    const el = document.createElement('div');
+    el.className = 'msg msg-ai pros-msg';
+    el.innerHTML = `${aiAvatarSVG()}<div class="bubble pros-bubble"><div class="result-title pros-title">${block.title}</div>${block.html}</div>`;
+    chatScroll.appendChild(el);
+    scrollDown();
+    setTimeout(resolve, 60);
+  });
+}
+async function appendProsSequence(prosData) {
+  const blocks = [];
+  if (prosData.prosecution_stance) blocks.push({
+    title: '⚖️ موقف النيابة المتوقع',
+    html: `<div>${escapeHTML(prosData.prosecution_stance)}</div>`
+  });
+  if (prosData.rebuttals.length) blocks.push({
+    title: '🗣️ رد النيابة المتوقع على كل دفع',
+    html: prosData.rebuttals.map(r => `
+      <div class="pros-card">
+        <span class="pros-defense-name">${escapeHTML(r.defense_title || 'دفع الدفاع')}</span>
+        <div class="pros-rebuttal">${escapeHTML(r.rebuttal)}</div>
+      </div>`).join('')
+  });
+  if (prosData.prosecution_strengths.length) blocks.push({
+    title: '🎯 أقوى نقاط الاتهام',
+    html: `<ul class="result-list pros-list">${prosData.prosecution_strengths.map(s => `<li>${escapeHTML(s)}</li>`).join('')}</ul>`
+  });
+  if (prosData.risk_warning) blocks.push({
+    title: '🚨 أخطر حاجة لازم الدفاع يستعد لها',
+    html: `<div class="pros-risk">${escapeHTML(prosData.risk_warning)}</div>`
+  });
+  for (const block of blocks) {
+    await appendProsBlock(block);
+    await sleep(280);
+  }
+}
+function saveProsecutionToHistory(prosData) {
+  if (!activeHistoryId) return;
+  const entry = history.find(h => h.id === activeHistoryId);
+  if (!entry) return;
+  entry.prosecutionView = prosData;
+  localStorage.setItem('legista_tahlil_history', JSON.stringify(history));
+}
+async function simulateProsecution(btn, fullData, meta) {
+  await ensureSubscriptionChecked();
+  if (checkTrial() && !isUserSubscribed) { showPaywall(); return; }
+
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'بيحلل رأي النيابة...';
+  const thinkingEl = appendProsThinkingBubble();
+  try {
+    const prosData = await callProsecutionSimulation(fullData, meta);
+    thinkingEl.remove();
+    await appendProsSequence(prosData);
+    btn.innerHTML = 'رأي النيابة معروض بالأسفل ✓';
+    saveProsecutionToHistory(prosData);
+    markUsed();
+  } catch (err) {
+    thinkingEl.remove();
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+    toast('حصل خطأ أثناء محاكاة رأي النيابة، جرّب تاني');
+  }
+}
+
 /* ---------- copy / pdf ---------- */
 function analysisToText(data, meta) {
   let out = `تحليل قضية — ${TYPE_LABELS[meta.type] || ''} — ${STAGE_LABELS[meta.stage] || ''}\n`;
@@ -1131,11 +1388,20 @@ function toast(msg) {
 /* ---------- history ---------- */
 function saveToHistory(entry) {
   entry.id = 'h_' + Date.now();
+  entry.conversation = entry.conversation || [];
   history.unshift(entry);
   history = history.slice(0, 30);
   localStorage.setItem('legista_tahlil_history', JSON.stringify(history));
   activeHistoryId = entry.id;
   renderHistoryList();
+}
+function appendFollowUpToHistory(question, answer, follow_ups) {
+  if (!activeHistoryId) return;
+  const entry = history.find(h => h.id === activeHistoryId);
+  if (!entry) return;
+  entry.conversation = entry.conversation || [];
+  entry.conversation.push({ question, answer, follow_ups: follow_ups || [] });
+  localStorage.setItem('legista_tahlil_history', JSON.stringify(history));
 }
 function renderHistoryList() {
   historyList.innerHTML = '';
@@ -1160,7 +1426,15 @@ function loadHistoryEntry(h) {
   currentType = h.type; currentStage = h.stage;
   renderIntake();
   appendUserBubble(h.facts);
-  appendResultSequence(h.result, h);
+  appendResultSequence(h.result, h, { prosecutionDone: !!h.prosecutionView }).then(async () => {
+    if (h.prosecutionView) await appendProsSequence(h.prosecutionView);
+    let priorData = h.result;
+    (h.conversation || []).forEach(turn => {
+      appendUserBubble(turn.question);
+      priorData = { ...priorData, summary: priorData.summary ? `${priorData.summary}\n\n[متابعة: ${turn.question}]\n${turn.answer}` : turn.answer };
+      appendFollowUpAnswerBubble(turn.answer, turn.follow_ups || [], { priorData, meta: h });
+    });
+  });
   sidebar.classList.remove('open');
 }
 function formatDate(ts) {
