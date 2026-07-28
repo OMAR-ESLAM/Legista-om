@@ -306,12 +306,13 @@ body::before {
 
 .scanner-crop-wrap { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 12px; }
 .scanner-crop-wrap img { max-width: 100%; max-height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
-.scanner-crop-box { position: absolute; border: 2px solid var(--accent, #B8860B); box-shadow: 0 0 0 2000px rgba(0,0,0,0.55); touch-action: none; }
-.crop-handle { position: absolute; width: 22px; height: 22px; background: var(--accent, #B8860B); border: 2px solid #fff; border-radius: 50%; touch-action: none; }
-.crop-handle[data-h="tl"] { top: -11px; left: -11px; cursor: nwse-resize; }
-.crop-handle[data-h="tr"] { top: -11px; right: -11px; cursor: nesw-resize; }
-.crop-handle[data-h="bl"] { bottom: -11px; left: -11px; cursor: nesw-resize; }
-.crop-handle[data-h="br"] { bottom: -11px; right: -11px; cursor: nwse-resize; }
+.scanner-crop-box { position: absolute; inset: 0; touch-action: none; pointer-events: none; }
+.scanner-crop-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.scanner-crop-svg polygon { fill: rgba(184,134,11,0.16); stroke: var(--accent, #B8860B); stroke-width: 2.5; }
+.crop-handle { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; background: var(--accent, #B8860B); border: 3px solid #fff; border-radius: 50%; touch-action: none; pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+.scanner-detect-badge { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(20,16,8,0.75); color: #fff; font-family: 'Cairo', sans-serif; font-size: 11.5px; font-weight: 700; padding: 6px 14px; border-radius: 20px; z-index: 4; display: none; align-items: center; gap: 6px; }
+.scanner-detect-badge.show { display: flex; }
+.scanner-detect-badge.auto { color: #8ce29a; }
 .scanner-review-bar { position: relative; z-index: 3; padding: 12px 16px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; background: #12100a; }
 .scanner-mode-toggle { display: flex; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 3px; }
 .scanner-mode-btn { flex: 1; padding: 9px; border: none; background: none; color: rgba(255,255,255,0.6); font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; border-radius: 9px; cursor: pointer; }
@@ -521,7 +522,9 @@ body::before {
     </div>
     <div class="scanner-crop-wrap" id="scannerCropWrap">
       <img id="scannerCropImg">
+      <span class="scanner-detect-badge" id="scannerDetectBadge">⏳ بندوّر على حواف المستند...</span>
       <div class="scanner-crop-box" id="scannerCropBox">
+        <svg class="scanner-crop-svg"><polygon id="scannerCropPolygon" points=""></polygon></svg>
         <span class="crop-handle" data-h="tl"></span><span class="crop-handle" data-h="tr"></span>
         <span class="crop-handle" data-h="bl"></span><span class="crop-handle" data-h="br"></span>
       </div>
@@ -1258,7 +1261,137 @@ function renderScannerThumbs() {
   document.getElementById('scannerFinishCount').textContent = count;
 }
 
-/* ---- scanner: capture + crop + enhance ---- */
+/* ---- automatic document edge detection (OpenCV.js) ---- */
+let opencvLoadPromise = null;
+function loadOpenCV() {
+  if (window.cv && window.cv.Mat) return Promise.resolve();
+  if (opencvLoadPromise) return opencvLoadPromise;
+  opencvLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://docs.opencv.org/4.8.0/opencv.js';
+    script.async = true;
+    script.onload = () => {
+      if (window.cv && typeof window.cv.then === 'function') {
+        // بعض النسخ بترجع Promise
+        window.cv.then((cvInstance) => { window.cv = cvInstance; resolve(); });
+      } else if (window.cv && window.cv.Mat) {
+        resolve();
+      } else if (window.cv) {
+        window.cv['onRuntimeInitialized'] = () => resolve();
+      } else {
+        reject(new Error('opencv failed to attach to window'));
+      }
+    };
+    script.onerror = () => reject(new Error('failed to load opencv.js'));
+    document.head.appendChild(script);
+  });
+  return opencvLoadPromise;
+}
+
+// بيرتب 4 نقاط بأي ترتيب عشوائي إلى: فوق-يسار، فوق-يمين، تحت-يمين، تحت-يسار
+function orderQuadPoints(pts) {
+  const bySum = [...pts].sort((a, b) => (a.x + a.y) - (b.x + b.y));
+  const tl = bySum[0], br = bySum[3];
+  const byDiff = [...pts].sort((a, b) => (a.y - a.x) - (b.y - b.x));
+  const tr = byDiff[0], bl = byDiff[3];
+  return { tl, tr, br, bl };
+}
+
+// بيدوّر على أكبر شكل رباعي (المستند) في الصورة ويرجع 4 نقاط إحداثياتها بمقاس الكانفاس الأصلي، أو null لو ملقاش حاجة واضحة
+function detectDocumentCorners(canvas) {
+  if (!window.cv || !window.cv.Mat) return null;
+  let src, gray, blurred, edged, dilated, kernel, contours, hierarchy;
+  try {
+    src = cv.imread(canvas);
+    gray = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    blurred = new cv.Mat();
+    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+    edged = new cv.Mat();
+    cv.Canny(blurred, edged, 50, 150);
+    dilated = new cv.Mat();
+    kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+    cv.dilate(edged, dilated, kernel);
+
+    contours = new cv.MatVector();
+    hierarchy = new cv.Mat();
+    cv.findContours(dilated, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+
+    const imgArea = canvas.width * canvas.height;
+    let bestQuad = null;
+    let bestArea = 0;
+
+    for (let i = 0; i < contours.size(); i++) {
+      const cnt = contours.get(i);
+      const peri = cv.arcLength(cnt, true);
+      const approx = new cv.Mat();
+      cv.approxPolyDP(cnt, approx, 0.02 * peri, true);
+      if (approx.rows === 4) {
+        const area = Math.abs(cv.contourArea(approx));
+        // نتجاهل أي حاجة صغيرة جدًا (مش المستند) أو كبيرة جدًا (إطار الصورة كله)
+        if (area > bestArea && area > imgArea * 0.15 && area < imgArea * 0.98) {
+          bestArea = area;
+          const pts = [];
+          for (let j = 0; j < 4; j++) pts.push({ x: approx.data32S[j * 2], y: approx.data32S[j * 2 + 1] });
+          bestQuad = pts;
+        }
+      }
+      approx.delete();
+      cnt.delete();
+    }
+
+    return bestQuad ? orderQuadPoints(bestQuad) : null;
+  } catch (e) {
+    console.error('document edge detection failed:', e);
+    return null;
+  } finally {
+    [src, gray, blurred, edged, dilated, kernel, contours, hierarchy].forEach(m => m && m.delete && m.delete());
+  }
+}
+
+// بيحوّل الرباعي (اللي ممكن يكون مايل بسبب زاوية الكاميرا) لمستطيل مستوي ومصحّح تمامًا،
+// زي أي سكانر حقيقي — مش مجرد قص المستطيل المحيط
+function warpQuadToRect(sourceCanvas, quad) {
+  const { tl, tr, br, bl } = quad;
+  const widthTop = Math.hypot(tr.x - tl.x, tr.y - tl.y);
+  const widthBottom = Math.hypot(br.x - bl.x, br.y - bl.y);
+  const heightLeft = Math.hypot(bl.x - tl.x, bl.y - tl.y);
+  const heightRight = Math.hypot(br.x - tr.x, br.y - tr.y);
+  const outW = Math.max(1, Math.round(Math.max(widthTop, widthBottom)));
+  const outH = Math.max(1, Math.round(Math.max(heightLeft, heightRight)));
+
+  const out = document.createElement('canvas');
+  out.width = outW; out.height = outH;
+
+  if (!window.cv || !window.cv.Mat) {
+    // OpenCV مش متاح لأي سبب — نرجع لقص مستطيل بسيط بدل التصحيح الكامل، أحسن من ما يبوّظ خالص
+    const ctx = out.getContext('2d');
+    const sx = Math.min(tl.x, bl.x), sy = Math.min(tl.y, tr.y);
+    ctx.drawImage(sourceCanvas, sx, sy, outW, outH, 0, 0, outW, outH);
+    return out;
+  }
+
+  let src, dst, srcTri, dstTri, M;
+  try {
+    src = cv.imread(sourceCanvas);
+    dst = new cv.Mat();
+    srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y]);
+    dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, outW, 0, outW, outH, 0, outH]);
+    M = cv.getPerspectiveTransform(srcTri, dstTri);
+    cv.warpPerspective(src, dst, M, new cv.Size(outW, outH));
+    cv.imshow(out, dst);
+    return out;
+  } catch (e) {
+    console.error('perspective warp failed, falling back to simple crop:', e);
+    const ctx = out.getContext('2d');
+    const sx = Math.min(tl.x, bl.x), sy = Math.min(tl.y, tr.y);
+    ctx.drawImage(sourceCanvas, sx, sy, outW, outH, 0, 0, outW, outH);
+    return out;
+  } finally {
+    [src, dst, srcTri, dstTri, M].forEach(m => m && m.delete && m.delete());
+  }
+}
+
 document.getElementById('scannerCaptureBtn').addEventListener('click', () => {
   const video = document.getElementById('scannerVideo');
   if (!video.videoWidth) return;
@@ -1282,60 +1415,111 @@ function showReviewScreen(dataUrl) {
   img.onload = () => initCropBox();
   img.src = dataUrl;
 }
-function initCropBox() {
+
+// نقط الرباعي الحالية بمقاس الصورة الأصلية (px في canvas الالتقاط)، وده اللي بنعتمد عليه وقت التصحيح
+let cropQuadCanvasPts = null;
+
+async function initCropBox() {
   const wrap = document.getElementById('scannerCropWrap');
   const img = document.getElementById('scannerCropImg');
   const box = document.getElementById('scannerCropBox');
-  requestAnimationFrame(() => {
-    const imgRect = img.getBoundingClientRect();
-    const wrapRect = wrap.getBoundingClientRect();
-    const inset = 0.05;
-    const imgLeft = imgRect.left - wrapRect.left;
-    const imgTop = imgRect.top - wrapRect.top;
-    box.dataset.imgLeft = imgLeft; box.dataset.imgTop = imgTop;
-    box.dataset.imgWidth = imgRect.width; box.dataset.imgHeight = imgRect.height;
-    box.style.left = (imgLeft + imgRect.width * inset) + 'px';
-    box.style.top = (imgTop + imgRect.height * inset) + 'px';
-    box.style.width = (imgRect.width * (1 - inset * 2)) + 'px';
-    box.style.height = (imgRect.height * (1 - inset * 2)) + 'px';
-  });
+  const badge = document.getElementById('scannerDetectBadge');
+
+  await new Promise(r => requestAnimationFrame(r));
+  const imgRect = img.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  const imgLeft = imgRect.left - wrapRect.left;
+  const imgTop = imgRect.top - wrapRect.top;
+  box.dataset.imgLeft = imgLeft; box.dataset.imgTop = imgTop;
+  box.dataset.imgWidth = imgRect.width; box.dataset.imgHeight = imgRect.height;
+
+  const scaleX = currentCaptureCanvas.width / imgRect.width;
+  const scaleY = currentCaptureCanvas.height / imgRect.height;
+
+  // افتراضي احتياطي (لو الاكتشاف التلقائي فشل): مستطيل بهامش 5%
+  const fallbackInset = 0.05;
+  const fallbackQuad = {
+    tl: { x: currentCaptureCanvas.width * fallbackInset, y: currentCaptureCanvas.height * fallbackInset },
+    tr: { x: currentCaptureCanvas.width * (1 - fallbackInset), y: currentCaptureCanvas.height * fallbackInset },
+    br: { x: currentCaptureCanvas.width * (1 - fallbackInset), y: currentCaptureCanvas.height * (1 - fallbackInset) },
+    bl: { x: currentCaptureCanvas.width * fallbackInset, y: currentCaptureCanvas.height * (1 - fallbackInset) },
+  };
+
+  badge.textContent = '⏳ بندوّر على حواف المستند...';
+  badge.className = 'scanner-detect-badge show';
+  applyQuadToScreen(fallbackQuad, imgLeft, imgTop, scaleX, scaleY); // نظهر حاجة على طول بدل ما الشاشة تفضل فاضية وقت الانتظار
+
+  let detected = null;
+  try {
+    await loadOpenCV();
+    detected = detectDocumentCorners(currentCaptureCanvas);
+  } catch (e) {
+    console.error('opencv load failed:', e);
+  }
+
+  if (detected) {
+    cropQuadCanvasPts = detected;
+    applyQuadToScreen(detected, imgLeft, imgTop, scaleX, scaleY);
+    badge.textContent = '✓ اتحددت حواف المستند تلقائيًا — اسحب النقط لو محتاج تظبطها';
+    badge.className = 'scanner-detect-badge show auto';
+  } else {
+    cropQuadCanvasPts = fallbackQuad;
+    badge.textContent = 'اسحب النقط الأربعة على حواف المستند';
+    badge.className = 'scanner-detect-badge show';
+  }
+  setTimeout(() => badge.classList.remove('show'), 2600);
 }
+
+// بيرسم النقط الأربعة والمضلع على الشاشة بناءً على نقط بمقاس الكانفاس
+function applyQuadToScreen(quad, imgLeft, imgTop, scaleX, scaleY) {
+  const box = document.getElementById('scannerCropBox');
+  const toScreen = (p) => ({ x: imgLeft + p.x / scaleX, y: imgTop + p.y / scaleY });
+  const screenPts = { tl: toScreen(quad.tl), tr: toScreen(quad.tr), br: toScreen(quad.br), bl: toScreen(quad.bl) };
+  ['tl', 'tr', 'br', 'bl'].forEach(k => {
+    const handle = box.querySelector(`.crop-handle[data-h="${k}"]`);
+    handle.style.left = screenPts[k].x + 'px';
+    handle.style.top = screenPts[k].y + 'px';
+  });
+  updateCropPolygon(screenPts);
+}
+function updateCropPolygon(screenPts) {
+  const poly = document.getElementById('scannerCropPolygon');
+  poly.setAttribute('points', `${screenPts.tl.x},${screenPts.tl.y} ${screenPts.tr.x},${screenPts.tr.y} ${screenPts.br.x},${screenPts.br.y} ${screenPts.bl.x},${screenPts.bl.y}`);
+}
+
 (function setupCropDrag() {
   const box = document.getElementById('scannerCropBox');
-  let dragging = null, start = null;
+  let dragging = null;
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
   box.querySelectorAll('.crop-handle').forEach(handle => {
     handle.addEventListener('pointerdown', (e) => {
       e.preventDefault(); e.stopPropagation();
       dragging = handle.dataset.h;
       handle.setPointerCapture(e.pointerId);
-      start = { x: e.clientX, y: e.clientY, left: parseFloat(box.style.left), top: parseFloat(box.style.top), width: parseFloat(box.style.width), height: parseFloat(box.style.height) };
     });
     handle.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      const dx = e.clientX - start.x, dy = e.clientY - start.y;
+      if (dragging !== handle.dataset.h) return;
+      const wrap = document.getElementById('scannerCropWrap');
+      const wrapRect = wrap.getBoundingClientRect();
       const imgLeft = parseFloat(box.dataset.imgLeft), imgTop = parseFloat(box.dataset.imgTop);
       const imgWidth = parseFloat(box.dataset.imgWidth), imgHeight = parseFloat(box.dataset.imgHeight);
-      const minSize = 40;
-      let { left, top, width, height } = start;
-      if (dragging === 'tl') {
-        left = clamp(start.left + dx, imgLeft, start.left + width - minSize);
-        top = clamp(start.top + dy, imgTop, start.top + height - minSize);
-        width = start.left + start.width - left; height = start.top + start.height - top;
-      } else if (dragging === 'tr') {
-        top = clamp(start.top + dy, imgTop, start.top + height - minSize);
-        width = clamp(start.width + dx, minSize, imgLeft + imgWidth - start.left);
-        height = start.top + start.height - top;
-      } else if (dragging === 'bl') {
-        left = clamp(start.left + dx, imgLeft, start.left + width - minSize);
-        width = start.left + start.width - left;
-        height = clamp(start.height + dy, minSize, imgTop + imgHeight - start.top);
-      } else if (dragging === 'br') {
-        width = clamp(start.width + dx, minSize, imgLeft + imgWidth - start.left);
-        height = clamp(start.height + dy, minSize, imgTop + imgHeight - start.top);
-      }
-      box.style.left = left + 'px'; box.style.top = top + 'px';
-      box.style.width = width + 'px'; box.style.height = height + 'px';
+      let x = clamp(e.clientX - wrapRect.left, imgLeft, imgLeft + imgWidth);
+      let y = clamp(e.clientY - wrapRect.top, imgTop, imgTop + imgHeight);
+      handle.style.left = x + 'px';
+      handle.style.top = y + 'px';
+
+      // نحدّث نقط الكانفاس المخزّنة (لازمة وقت التصحيح) + المضلع على الشاشة
+      const scaleX = currentCaptureCanvas.width / imgWidth;
+      const scaleY = currentCaptureCanvas.height / imgHeight;
+      cropQuadCanvasPts[dragging] = { x: (x - imgLeft) * scaleX, y: (y - imgTop) * scaleY };
+
+      const screenPts = {};
+      ['tl', 'tr', 'br', 'bl'].forEach(k => {
+        const h = box.querySelector(`.crop-handle[data-h="${k}"]`);
+        screenPts[k] = { x: parseFloat(h.style.left), y: parseFloat(h.style.top) };
+      });
+      updateCropPolygon(screenPts);
     });
     handle.addEventListener('pointerup', () => { dragging = null; });
     handle.addEventListener('pointercancel', () => { dragging = null; });
@@ -1348,22 +1532,21 @@ document.querySelectorAll('.scanner-mode-btn').forEach(btn => {
   });
 });
 document.getElementById('scannerConfirmBtn').addEventListener('click', async () => {
-  const box = document.getElementById('scannerCropBox');
-  const imgLeft = parseFloat(box.dataset.imgLeft), imgTop = parseFloat(box.dataset.imgTop);
-  const imgWidth = parseFloat(box.dataset.imgWidth), imgHeight = parseFloat(box.dataset.imgHeight);
-  const boxLeft = parseFloat(box.style.left), boxTop = parseFloat(box.style.top);
-  const boxWidth = parseFloat(box.style.width), boxHeight = parseFloat(box.style.height);
-  const scaleX = currentCaptureCanvas.width / imgWidth, scaleY = currentCaptureCanvas.height / imgHeight;
-  const sx = (boxLeft - imgLeft) * scaleX, sy = (boxTop - imgTop) * scaleY;
-  const sw = boxWidth * scaleX, sh = boxHeight * scaleY;
-  const out = document.createElement('canvas');
-  out.width = Math.max(1, Math.round(sw));
-  out.height = Math.max(1, Math.round(sh));
+  const out = warpQuadToRect(currentCaptureCanvas, cropQuadCanvasPts);
   const ctx = out.getContext('2d');
-  if (cropSelectedMode === 'scan') ctx.filter = 'grayscale(1) contrast(1.55) brightness(1.08)';
-  ctx.drawImage(currentCaptureCanvas, sx, sy, sw, sh, 0, 0, out.width, out.height);
+  if (cropSelectedMode === 'scan') {
+    // نطبّق فلتر التحسين بعد التصحيح مباشرة على نفس الكانفاس المصحّح
+    const enhanced = document.createElement('canvas');
+    enhanced.width = out.width; enhanced.height = out.height;
+    const ectx = enhanced.getContext('2d');
+    ectx.filter = 'grayscale(1) contrast(1.55) brightness(1.08)';
+    ectx.drawImage(out, 0, 0);
+    var finalCanvas = enhanced;
+  } else {
+    var finalCanvas = out;
+  }
   // نصغّر الناتج قبل الحفظ — التقاط الكاميرا بيبقى بدقة الفيديو الكاملة، وده ممكن يبقى تقيل جدًا لو اتبعت زي ما هو
-  const downscaled = await downscaleImageDataUrl(out.toDataURL('image/jpeg', 0.92), 1600, 0.85);
+  const downscaled = await downscaleImageDataUrl(finalCanvas.toDataURL('image/jpeg', 0.92), 1600, 0.85);
   scannedPages.push({ dataUrl: downscaled });
   renderScannerThumbs();
   document.getElementById('scannerReviewView').style.display = 'none';
