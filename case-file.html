@@ -39,18 +39,58 @@ a{color:inherit;}
 .filter-chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--gray);cursor:pointer;background:transparent;font-family:'Cairo',sans-serif;}
 .filter-chip.active{border-color:var(--cyber);color:var(--cyber);background:rgba(0,229,255,0.06);}
 
-.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
-.case-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:border-color .15s,transform .15s;}
-.case-card:hover{border-color:var(--gold);transform:translateY(-2px);}
-.case-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;}
-.case-card-title{font-size:15px;font-weight:800;line-height:1.4;}
-.status-badge{font-size:10px;padding:3px 10px;border-radius:12px;white-space:nowrap;}
-.status-نشطة{background:rgba(0,255,178,0.1);color:var(--success);}
-.status-معلّقة{background:rgba(212,175,55,0.12);color:var(--gold);}
-.status-مغلقة{background:rgba(138,138,143,0.15);color:var(--gray);}
-.case-card-meta{font-size:12px;color:var(--gray);margin-bottom:12px;}
-.case-card-meta div{margin-bottom:3px;}
-.case-card-counts{display:flex;gap:14px;font-size:11px;color:var(--cyber);border-top:1px solid var(--border);padding-top:10px;}
+.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:28px 22px;padding-top:10px;}
+
+/* ═══ الملف/الفولدر المتحرك ═══ */
+.case-folder{
+  position:relative; cursor:pointer; padding:30px 16px 16px;
+  background:linear-gradient(160deg,#1d1c1a,#171614);
+  border:1px solid rgba(212,175,55,0.18);
+  border-radius:3px 14px 14px 14px;
+  box-shadow:0 1px 0 rgba(0,0,0,.5), 0 14px 26px -14px rgba(0,0,0,.75);
+  transform-origin:bottom center;
+  animation:folderIn .55s cubic-bezier(.2,.8,.2,1) both;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+}
+.case-grid .case-folder:nth-child(1){animation-delay:.02s}
+.case-grid .case-folder:nth-child(2){animation-delay:.08s}
+.case-grid .case-folder:nth-child(3){animation-delay:.14s}
+.case-grid .case-folder:nth-child(4){animation-delay:.20s}
+.case-grid .case-folder:nth-child(5){animation-delay:.26s}
+.case-grid .case-folder:nth-child(6){animation-delay:.32s}
+.case-grid .case-folder:nth-child(n+7){animation-delay:.36s}
+@keyframes folderIn{from{opacity:0;transform:translateY(26px) rotate(-4deg) scale(.94);}to{opacity:1;transform:translateY(0) rotate(0) scale(1);}}
+
+.case-folder::before{ /* لسان الفولدر */
+  content:'';position:absolute;top:-13px;right:20px;width:64px;height:16px;
+  background:linear-gradient(160deg,#252420,#1d1c1a);
+  border-radius:7px 7px 0 0;
+  clip-path:polygon(12% 100%,0 0,100% 0,88% 100%);
+  border:1px solid rgba(212,175,55,0.18);border-bottom:none;
+}
+.case-folder::after{ /* ورق مكدّس وراه */
+  content:'';position:absolute;inset:5px -5px -5px 5px;z-index:-1;
+  background:#141312;border-radius:3px 14px 14px 14px;opacity:.65;
+}
+.case-folder:hover{transform:translateY(-9px) rotate(-1.4deg);box-shadow:0 26px 40px -16px rgba(212,175,55,0.22),0 2px 0 rgba(0,0,0,.5);border-color:rgba(212,175,55,0.4);}
+.case-folder:active,.case-folder.opening{transform:translateY(-2px) scale(.97) rotate(0deg);}
+.case-folder.opening{transition:transform .22s ease;}
+
+.folder-ribbon{position:absolute;top:14px;left:14px;font-size:9px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.5px;}
+.folder-ribbon.status-نشطة{background:rgba(0,255,178,0.14);color:var(--success);}
+.folder-ribbon.status-معلّقة{background:rgba(212,175,55,0.16);color:var(--gold);}
+.folder-ribbon.status-مغلقة{background:rgba(138,138,143,0.18);color:var(--gray);}
+.case-folder-title{font-size:14.5px;font-weight:800;line-height:1.45;margin-top:20px;min-height:42px;}
+.case-folder-meta{font-size:11.5px;color:var(--gray);margin-top:10px;border-top:1px dashed rgba(212,175,55,0.15);padding-top:9px;}
+.case-folder-meta div{margin-bottom:3px;display:flex;gap:5px;align-items:center;}
+.case-folder-progress{margin-top:10px;height:4px;border-radius:3px;background:rgba(255,255,255,0.06);overflow:hidden;}
+.case-folder-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-soft));border-radius:3px;transition:width .4s;}
+.case-folder-next{font-size:10.5px;color:var(--cyber);margin-top:7px;}
+
+@media (prefers-reduced-motion: reduce){
+  .case-folder{animation:none;}
+  .case-folder,.case-folder:hover{transition:none;transform:none;}
+}
 
 .empty-state{text-align:center;padding:80px 20px;color:var(--gray);}
 .empty-state .icon{font-size:44px;margin-bottom:12px;}
@@ -70,6 +110,39 @@ a{color:inherit;}
 .tab.active{color:var(--gold);border-color:var(--gold);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
+
+.tab-panel.paper{background:repeating-linear-gradient(var(--bg) 0px,var(--bg) 26px,rgba(212,175,55,0.045) 27px);border-radius:10px;padding:18px 18px 6px;position:relative;}
+.tab-panel.paper::before{content:'';position:absolute;top:0;bottom:0;right:46px;width:1px;background:rgba(255,90,90,0.18);}
+
+.next-step-box{background:linear-gradient(120deg,rgba(212,175,55,0.1),rgba(212,175,55,0.03));border:1px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px 18px;margin-bottom:20px;}
+.next-step-box .lbl{font-size:10px;color:var(--gold);letter-spacing:1px;font-weight:800;margin-bottom:4px;}
+.next-step-box .val{font-size:15px;font-weight:800;}
+.next-step-box .sub{font-size:12px;color:var(--gray);margin-top:5px;line-height:1.7;}
+.btn-load-template{margin-top:10px;background:transparent;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;}
+
+.stage-add-row{display:flex;gap:8px;margin-bottom:18px;}
+.stage-add-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;}
+.stage-add-row button{background:var(--cyber);color:#03181a;border:none;padding:0 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+
+.stage-line{position:relative;padding-inline-start:26px;}
+.stage-item{position:relative;padding-bottom:22px;padding-inline-start:6px;}
+.stage-item::before{content:'';position:absolute;top:20px;bottom:-2px;right:-20px;width:1px;background:var(--border);}
+.stage-item:last-child::before{display:none;}
+.stage-dot{position:absolute;top:2px;right:-25px;width:11px;height:11px;border-radius:50%;background:var(--bg2);border:2px solid var(--gray);}
+.stage-item[data-status="مكتملة"] .stage-dot{background:var(--success);border-color:var(--success);}
+.stage-item[data-status="جارية"] .stage-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,0.2);}
+.stage-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.stage-item[data-status="مكتملة"] .stage-card{opacity:.55;}
+.stage-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.stage-title{font-size:13.5px;font-weight:800;}
+.stage-status-badge{font-size:10px;padding:2px 9px;border-radius:9px;white-space:nowrap;}
+.stage-status-badge.لسه{background:rgba(138,138,143,0.15);color:var(--gray);}
+.stage-status-badge.جارية{background:rgba(212,175,55,0.14);color:var(--gold);}
+.stage-status-badge.مكتملة{background:rgba(0,255,178,0.12);color:var(--success);}
+.stage-actions{display:flex;gap:10px;margin-top:9px;flex-wrap:wrap;align-items:center;}
+.stage-actions .link-btn{font-size:11.5px;}
+.stage-auto-toggle{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray);cursor:pointer;}
+.stage-run-auto{background:linear-gradient(90deg,var(--cyber),#00b8cc);color:#03181a;border:none;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;}
 
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;}
 @media (max-width:640px){.info-grid{grid-template-columns:1fr;}}
@@ -150,12 +223,32 @@ a{color:inherit;}
       </div>
     </div>
     <div class="tabs">
-      <div class="tab active" data-tab="info">بيانات القضية</div>
+      <div class="tab active" data-tab="stages">مراحل القضية</div>
+      <div class="tab" data-tab="info">بيانات القضية</div>
       <div class="tab" data-tab="documents">المستندات</div>
       <div class="tab" data-tab="analyses">التحليل والدفوع</div>
     </div>
 
-    <div class="tab-panel active" id="panel-info">
+    <div class="tab-panel paper active" id="panel-stages">
+      <div id="nextStepBox" class="next-step-box" style="display:none;">
+        <div class="lbl">◈ الخطوة الجاية</div>
+        <div class="val" id="nextStepVal">—</div>
+        <div class="sub" id="nextStepSub"></div>
+      </div>
+      <div id="stagesEmpty" class="empty-state" style="display:none;">
+        <div class="icon">🧭</div>
+        <div class="t">مفيش خطة مراحل للقضية دي لسه</div>
+        <div>حمّل خطة المراحل المقترحة حسب نوع القضية، أو ابدأ تضيف مراحلك بنفسك.</div>
+        <button class="btn-load-template" id="btnLoadTemplate">حمّل خطة المراحل المقترحة ✨</button>
+      </div>
+      <div class="stage-add-row">
+        <input id="newStageTitle" placeholder="اكتب اسم مرحلة جديدة وضيفها للخطة...">
+        <button id="btnAddStage">+ إضافة</button>
+      </div>
+      <div id="stagesList" class="stage-line"></div>
+    </div>
+
+    <div class="tab-panel paper" id="panel-info">
       <div class="info-grid">
         <div class="cw-field"><label>عنوان القضية</label><input id="fTitle"></div>
         <div class="cw-field"><label>نوع القضية</label><select id="fType"></select></div>
@@ -167,7 +260,7 @@ a{color:inherit;}
       <button class="btn-save-info" id="btnSaveInfo">حفظ البيانات</button>
     </div>
 
-    <div class="tab-panel" id="panel-documents">
+    <div class="tab-panel paper" id="panel-documents">
       <div id="docsList"></div>
       <div id="docsEmpty" class="empty-state" style="display:none;">
         <div class="icon">📄</div>
@@ -176,7 +269,7 @@ a{color:inherit;}
       </div>
     </div>
 
-    <div class="tab-panel" id="panel-analyses">
+    <div class="tab-panel paper" id="panel-analyses">
       <div id="analysesList"></div>
       <div id="analysesEmpty" class="empty-state" style="display:none;">
         <div class="icon">🛡️</div>
@@ -224,19 +317,26 @@ function renderList() {
   const grid = document.getElementById('caseGrid');
   const filtered = activeStatus === 'الكل' ? allCases : allCases.filter(c => c.status === activeStatus);
   document.getElementById('emptyState').style.display = filtered.length ? 'none' : 'block';
-  grid.innerHTML = filtered.map(c => `
-    <div class="case-card" data-id="${c.id}">
-      <div class="case-card-top">
-        <div class="case-card-title">${window.CaseWidget.escapeHTML(c.title)}</div>
-        <div class="status-badge status-${c.status}">${c.status}</div>
-      </div>
-      <div class="case-card-meta">
+  grid.innerHTML = filtered.map(c => {
+    const prog = c.stageProgress || null;
+    const pct = prog && prog.total ? Math.round((prog.done / prog.total) * 100) : 0;
+    return `
+    <div class="case-folder" data-id="${c.id}">
+      <div class="folder-ribbon status-${c.status}">${c.status}</div>
+      <div class="case-folder-title">${window.CaseWidget.escapeHTML(c.title)}</div>
+      <div class="case-folder-meta">
         <div>◈ ${window.CaseWidget.escapeHTML(c.caseType || '—')}</div>
         ${c.clientName ? `<div>👤 ${window.CaseWidget.escapeHTML(c.clientName)}</div>` : ''}
       </div>
-    </div>`).join('');
-  grid.querySelectorAll('.case-card').forEach(card => {
-    card.addEventListener('click', () => openDetail(card.dataset.id));
+      ${prog ? `<div class="case-folder-progress"><div class="case-folder-progress-bar" style="width:${pct}%"></div></div>
+      <div class="case-folder-next">${c.currentStageTitle ? '◈ ' + window.CaseWidget.escapeHTML(c.currentStageTitle) : 'كل المراحل خلصت 🎉'}</div>` : ''}
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.case-folder').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.add('opening');
+      setTimeout(() => openDetail(card.dataset.id), 180);
+    });
   });
 }
 
@@ -275,7 +375,11 @@ async function openDetail(caseId) {
   document.getElementById('fOpponent').value = c.opponentName || '';
   document.getElementById('fCourt').value = c.courtName || '';
 
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'stages'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-stages'));
+
   history.replaceState(null, '', `case-file.html?case=${caseId}`);
+  await loadStages(caseId, c.caseType);
   await loadDocuments(caseId);
   await loadAnalyses(caseId);
 }
@@ -400,6 +504,128 @@ async function loadAnalyses(caseId) {
     });
   });
 }
+
+async function loadStages(caseId, caseType) {
+  let stages = await window.CaseWidget.listSub(caseId, 'stages');
+  stages.sort((a, b) => a.order - b.order);
+
+  document.getElementById('stagesEmpty').style.display = stages.length ? 'none' : 'block';
+  document.getElementById('btnLoadTemplate').onclick = async () => {
+    document.getElementById('btnLoadTemplate').disabled = true;
+    await window.CaseWidget.seedStagesFromTemplate(caseId, caseType);
+    await loadStages(caseId, caseType);
+  };
+
+  renderStages(caseId, stages);
+  await syncCaseProgress(caseId, stages);
+}
+
+function renderStages(caseId, stages) {
+  const active = stages.find(s => s.status === 'جارية');
+  const nextBox = document.getElementById('nextStepBox');
+  if (active) {
+    nextBox.style.display = 'block';
+    document.getElementById('nextStepVal').textContent = active.title;
+    const after = stages.filter(s => s.order > active.order && s.status === 'لسه')[0];
+    document.getElementById('nextStepSub').textContent = after
+      ? `دي المرحلة الجارية دلوقتي. لما تخلّصها، الخطوة اللي بعدها هتبقى: "${after.title}".`
+      : 'دي آخر مرحلة في الخطة — لما تخلّصها هتكون القضية خلصت كل مراحلها.';
+  } else if (stages.length) {
+    nextBox.style.display = 'block';
+    document.getElementById('nextStepVal').textContent = 'كل المراحل خلصت 🎉';
+    document.getElementById('nextStepSub').textContent = 'تقدر تضيف مرحلة جديدة لو فيه إجراء تاني مطلوب.';
+  } else {
+    nextBox.style.display = 'none';
+  }
+
+  const list = document.getElementById('stagesList');
+  list.innerHTML = stages.map(s => `
+    <div class="stage-item" data-id="${s.id}" data-status="${s.status}" data-order="${s.order}">
+      <div class="stage-dot"></div>
+      <div class="stage-card">
+        <div class="stage-top">
+          <div class="stage-title">${window.CaseWidget.escapeHTML(s.title)}</div>
+          <div class="stage-status-badge ${s.status}">${s.status}</div>
+        </div>
+        <div class="stage-actions">
+          ${s.status !== 'مكتملة' ? `<button class="link-btn done-btn">✓ اعتبرها خلصت</button>` : `<button class="link-btn reopen-btn">↺ رجّعها جارية</button>`}
+          <label class="stage-auto-toggle"><input type="checkbox" class="auto-check" ${s.isAuto ? 'checked' : ''}> تنفيذ تلقائي</label>
+          ${s.isAuto && s.status !== 'مكتملة' ? `<button class="stage-run-auto run-btn">⚡ نفّذها دلوقتي</button>` : ''}
+          <button class="link-btn danger stage-del-btn">حذف</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  list.querySelectorAll('.stage-item').forEach(item => {
+    const id = item.dataset.id;
+    const order = parseInt(item.dataset.order);
+
+    item.querySelector('.done-btn')?.addEventListener('click', async () => {
+      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { status: 'مكتملة' });
+      await window.CaseWidget.advanceAfterStage(caseId, order);
+      window.CaseWidget.toast('تمام، المرحلة خلصت ✓');
+      loadStages(caseId, currentCaseType());
+    });
+    item.querySelector('.reopen-btn')?.addEventListener('click', async () => {
+      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { status: 'جارية' });
+      loadStages(caseId, currentCaseType());
+    });
+    item.querySelector('.auto-check').addEventListener('change', async (e) => {
+      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { isAuto: e.target.checked });
+      loadStages(caseId, currentCaseType());
+    });
+    item.querySelector('.run-btn')?.addEventListener('click', async () => {
+      const btn = item.querySelector('.run-btn');
+      btn.disabled = true; btn.textContent = 'جارِ التنفيذ...';
+      const title = item.querySelector('.stage-title').textContent;
+      await window.CaseWidget.saveDocumentToCase(caseId, {
+        sourceTool: 'auto-stage',
+        templateName: title,
+        content: `📌 تنفيذ تلقائي للمرحلة: ${title}\n\nدي مسودة أولية مبدئية — التوليد الفعلي (ربط تحليل القضايا وصياغة العقود/الإنذارات) هيتفعّل في التحديث الجاي، وبعدها هتتولّد هنا محتوى حقيقي بدل المسودة دي.`,
+      });
+      await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { status: 'مكتملة' });
+      await window.CaseWidget.advanceAfterStage(caseId, order);
+      window.CaseWidget.toast('تم التنفيذ (نسخة أولية) وحُفظت في المستندات ✓');
+      loadStages(caseId, currentCaseType());
+      loadDocuments(caseId);
+    });
+    item.querySelector('.stage-del-btn').addEventListener('click', async () => {
+      if (!confirm('حذف المرحلة دي؟')) return;
+      await window.CaseWidget.deleteSubDoc(caseId, 'stages', id);
+      loadStages(caseId, currentCaseType());
+    });
+  });
+}
+
+function currentCaseType() {
+  return document.getElementById('fType').value;
+}
+
+async function syncCaseProgress(caseId, stages) {
+  const done = stages.filter(s => s.status === 'مكتملة').length;
+  const active = stages.find(s => s.status === 'جارية');
+  await window.CaseWidget.updateCase(caseId, {
+    stageProgress: { done, total: stages.length },
+    currentStageTitle: active ? active.title : (stages.length ? '' : ''),
+  });
+  const idx = allCases.findIndex(c => c.id === caseId);
+  if (idx > -1) {
+    allCases[idx].stageProgress = { done, total: stages.length };
+    allCases[idx].currentStageTitle = active ? active.title : '';
+  }
+}
+
+document.getElementById('btnAddStage').addEventListener('click', async () => {
+  const input = document.getElementById('newStageTitle');
+  const title = input.value.trim();
+  if (!title) return;
+  const existing = await window.CaseWidget.listSub(currentCaseId, 'stages');
+  await window.CaseWidget.addSubDoc(currentCaseId, 'stages', {
+    title, order: existing.length, status: existing.length ? 'لسه' : 'جارية', isAuto: false, note: '',
+  });
+  input.value = '';
+  loadStages(currentCaseId, currentCaseType());
+});
 
 boot();
 </script>
