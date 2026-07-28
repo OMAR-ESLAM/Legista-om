@@ -175,6 +175,38 @@ a{color:inherit;}
 
 .login-gate{text-align:center;padding:100px 20px;}
 .login-gate .icon{font-size:48px;margin-bottom:14px;}
+
+/* ═══ evidence / attachments tab ═══ */
+.evidence-upload-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.evidence-kind-select{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;}
+.btn-upload-evidence{background:var(--cyber);color:#03181a;border:none;padding:10px 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;}
+.btn-upload-evidence:disabled{opacity:.5;cursor:default;}
+.evidence-hint{font-size:11px;color:var(--gray);width:100%;}
+.evidence-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
+.evidence-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.evidence-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
+.evidence-kind-badge{font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(212,175,55,0.14);color:var(--gold);white-space:nowrap;}
+.evidence-thumb{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#000;}
+.evidence-thumb.is-pdf{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--gray);}
+.evidence-name{font-size:11.5px;color:var(--gray);margin-bottom:8px;word-break:break-all;}
+.evidence-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.gap-analysis-box{margin-top:10px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.8;}
+.gap-analysis-box .lbl{font-size:10px;color:var(--cyber);font-weight:800;letter-spacing:.5px;margin-bottom:6px;}
+.gap-analysis-box ul{padding-inline-start:18px;margin-top:4px;}
+.gap-analysis-box li{margin-bottom:4px;}
+.gap-analyzing{font-size:11.5px;color:var(--cyber);margin-top:8px;}
+
+/* ═══ branch decision modal ═══ */
+.cw-modal-overlay{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;padding:20px;}
+.cw-modal-overlay.show{display:flex;}
+.cw-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:26px 22px;max-width:420px;width:100%;text-align:center;}
+.cw-modal .t{font-size:16px;font-weight:900;margin-bottom:8px;}
+.cw-modal .sub{font-size:12.5px;color:var(--gray);line-height:1.8;margin-bottom:20px;}
+.cw-modal-actions{display:flex;flex-direction:column;gap:10px;}
+.cw-modal-btn{padding:13px;border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;border:none;}
+.cw-modal-btn.referral{background:linear-gradient(90deg,var(--success),#00d99a);color:#03181a;}
+.cw-modal-btn.dismissal{background:linear-gradient(90deg,#ff8a5c,#ff6b6b);color:#1a0a06;}
+.cw-modal-btn.cancel{background:transparent;border:1px solid var(--border);color:var(--gray);}
 </style>
 </head>
 <body>
@@ -219,6 +251,7 @@ a{color:inherit;}
     <div class="detail-head">
       <div class="detail-title" id="detailTitle"></div>
       <div class="detail-actions">
+        <button class="btn-sm" id="btnShareLink">🔗 رابط للموكل</button>
         <button class="btn-sm danger" id="btnDeleteCase">حذف القضية</button>
       </div>
     </div>
@@ -227,6 +260,7 @@ a{color:inherit;}
       <div class="tab" data-tab="info">بيانات القضية</div>
       <div class="tab" data-tab="documents">المستندات</div>
       <div class="tab" data-tab="analyses">التحليل والدفوع</div>
+      <div class="tab" data-tab="evidence">المرفقات والأدلة</div>
     </div>
 
     <div class="tab-panel paper active" id="panel-stages">
@@ -277,8 +311,41 @@ a{color:inherit;}
         <div>حلل القضية من صفحة "تحليل القضايا" واحفظ النتيجة هنا.</div>
       </div>
     </div>
+
+    <div class="tab-panel paper" id="panel-evidence">
+      <div class="evidence-upload-row">
+        <select class="evidence-kind-select" id="evidenceKindSelect">
+          <option value="محضر">محضر</option>
+          <option value="حكم">حكم</option>
+          <option value="عقد">عقد</option>
+          <option value="أخرى">مستند آخر</option>
+        </select>
+        <input type="file" id="evidenceFileInput" accept="image/*,application/pdf" multiple style="display:none">
+        <button class="btn-upload-evidence" id="btnUploadEvidence">+ رفع مستند/صورة</button>
+        <div class="evidence-hint">صور المحاضر والأحكام والعقود — أقصى حجم للملف الواحد بعد الضغط حوالي 700 كيلوبايت</div>
+      </div>
+      <div id="evidenceGrid" class="evidence-grid"></div>
+      <div id="evidenceEmpty" class="empty-state" style="display:none;">
+        <div class="icon">📎</div>
+        <div class="t">مفيش مرفقات في القضية دي لسه</div>
+        <div>ارفع صورة المحضر أو الحكم أو أي مستند تاني، ولو كان محضر تقدر تطلب تحليل ثغراته بالذكاء الاصطناعي.</div>
+      </div>
+    </div>
   </div>
 
+</div>
+
+<!-- BRANCH DECISION MODAL (يظهر لما تخلّص مرحلة "قرار النيابة" في قضية جنائية) -->
+<div class="cw-modal-overlay" id="branchModalOverlay">
+  <div class="cw-modal">
+    <div class="t">قرار النيابة إيه؟</div>
+    <div class="sub">حسب قرار النيابة، خطة مراحل القضية بعد كده هتختلف — اختار اللي حصل فعلًا عشان نبني الخطوات الجاية صح.</div>
+    <div class="cw-modal-actions">
+      <button class="cw-modal-btn referral" id="btnBranchReferral">تمت الإحالة للمحكمة</button>
+      <button class="cw-modal-btn dismissal" id="btnBranchDismissal">تم حفظ التحقيق</button>
+      <button class="cw-modal-btn cancel" id="btnBranchCancel">إلغاء</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -382,6 +449,7 @@ async function openDetail(caseId) {
   await loadStages(caseId, c.caseType);
   await loadDocuments(caseId);
   await loadAnalyses(caseId);
+  await loadEvidence(caseId);
 }
 
 document.getElementById('btnBackToList').addEventListener('click', () => {
@@ -540,7 +608,7 @@ function renderStages(caseId, stages) {
 
   const list = document.getElementById('stagesList');
   list.innerHTML = stages.map(s => `
-    <div class="stage-item" data-id="${s.id}" data-status="${s.status}" data-order="${s.order}">
+    <div class="stage-item" data-id="${s.id}" data-status="${s.status}" data-order="${s.order}" data-decision="${s.isDecision ? '1' : '0'}">
       <div class="stage-dot"></div>
       <div class="stage-card">
         <div class="stage-top">
@@ -561,6 +629,10 @@ function renderStages(caseId, stages) {
     const order = parseInt(item.dataset.order);
 
     item.querySelector('.done-btn')?.addEventListener('click', async () => {
+      if (item.dataset.decision === '1') {
+        openBranchModal(caseId, id, order);
+        return;
+      }
       await window.CaseWidget.updateSubDoc(caseId, 'stages', id, { status: 'مكتملة' });
       await window.CaseWidget.advanceAfterStage(caseId, order);
       window.CaseWidget.toast('تمام، المرحلة خلصت ✓');
@@ -626,6 +698,209 @@ document.getElementById('btnAddStage').addEventListener('click', async () => {
   input.value = '';
   loadStages(currentCaseId, currentCaseType());
 });
+
+/* ---------- branch decision modal (قرار النيابة) ---------- */
+function openBranchModal(caseId, stageId, order) {
+  const overlay = document.getElementById('branchModalOverlay');
+  overlay.classList.add('show');
+  const close = () => overlay.classList.remove('show');
+  document.getElementById('btnBranchCancel').onclick = close;
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  document.getElementById('btnBranchReferral').onclick = async () => {
+    close();
+    await window.CaseWidget.updateSubDoc(caseId, 'stages', stageId, { status: 'مكتملة' });
+    await window.CaseWidget.branchStagesAfterDecision(caseId, order, 'referral');
+    window.CaseWidget.toast('تمام، اتسجلت الإحالة وبُنيت خطوات مرحلة المحكمة ✓');
+    loadStages(caseId, currentCaseType());
+  };
+  document.getElementById('btnBranchDismissal').onclick = async () => {
+    close();
+    await window.CaseWidget.updateSubDoc(caseId, 'stages', stageId, { status: 'مكتملة' });
+    await window.CaseWidget.branchStagesAfterDecision(caseId, order, 'dismissal');
+    window.CaseWidget.toast('تمام، اتسجل الحفظ وبُنيت خطوات التظلم ✓');
+    loadStages(caseId, currentCaseType());
+  };
+}
+
+/* ---------- client share link ---------- */
+document.getElementById('btnShareLink').addEventListener('click', () => {
+  const url = `${location.origin}/case-status.html?id=${currentCaseId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    window.CaseWidget.toast('اتنسخ اللينك ✓ ابعته للموكل يتابع منه حالة القضية');
+  }).catch(() => {
+    prompt('انسخ اللينك ده وابعته للموكل:', url);
+  });
+});
+
+/* ---------- evidence / attachments tab ---------- */
+const EVIDENCE_MAX_BYTES = 700 * 1024; // أقصى حجم بعد الضغط عشان يفضل بعيد عن حد الـ 1MB بتاع مستند الفايرستور
+let evidenceIdSeq = 0;
+
+function downscaleEvidenceImage(dataUrl, maxDim, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+async function compressEvidenceImage(file) {
+  const raw = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  // نحاول بجودة/أبعاد بتقل تدريجيًا لحد ما نوصل تحت الحد الأقصى
+  const attempts = [[1400, 0.75], [1100, 0.65], [800, 0.55], [600, 0.45]];
+  for (const [maxDim, quality] of attempts) {
+    const out = await downscaleEvidenceImage(raw, maxDim, quality);
+    if (!out) break;
+    const base64Len = out.split(',')[1]?.length || 0;
+    if (base64Len * 0.75 <= EVIDENCE_MAX_BYTES) return out;
+  }
+  return null; // معرفناش نضغطها كفاية
+}
+
+document.getElementById('btnUploadEvidence').addEventListener('click', () => {
+  document.getElementById('evidenceFileInput').click();
+});
+document.getElementById('evidenceFileInput').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  const kind = document.getElementById('evidenceKindSelect').value;
+  const btn = document.getElementById('btnUploadEvidence');
+  btn.disabled = true;
+  for (const file of files) {
+    try {
+      let mimeType = file.type || 'application/octet-stream';
+      let base64;
+      if (mimeType.startsWith('image/')) {
+        const compressed = await compressEvidenceImage(file);
+        if (!compressed) { window.CaseWidget.toast(`الصورة "${file.name}" كبيرة جدًا حتى بعد الضغط`); continue; }
+        mimeType = 'image/jpeg';
+        base64 = compressed.split(',')[1];
+      } else {
+        if (file.size > EVIDENCE_MAX_BYTES) { window.CaseWidget.toast(`الملف "${file.name}" أكبر من الحد المسموح (700 كيلوبايت)`); continue; }
+        base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result).split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+      await window.CaseWidget.saveEvidenceToCase(currentCaseId, { kind, name: file.name, mimeType, data: base64 });
+    } catch (err) {
+      console.error('evidence upload error', err);
+      window.CaseWidget.toast('حصل خطأ أثناء رفع مستند');
+    }
+  }
+  btn.disabled = false;
+  e.target.value = '';
+  loadEvidence(currentCaseId);
+});
+
+function buildGapAnalysisPrompt() {
+  return `أنت محامٍ جنائي مصري خبير في فحص محاضر الشرطة والنيابة. مطلوب منك تفحص صورة المحضر المرفقة بدقة وتحدد أي ثغرات أو نقاط ضعف إجرائية أو موضوعية فيها ممكن الدفاع يستفيد منها — زي عيوب في إجراءات القبض أو التفتيش، تناقضات بين أقوال الشهود، غياب توقيعات أو اعتماد رسمي، عدم إثبات إذن النيابة أو التلبس بشكل صحيح، أو أي بيانات جوهرية ناقصة.
+
+اعتمد فقط على اللي تقدر تقرأه فعلًا من الصورة، ولو جزء غير واضح قول كده صراحة بدل ما تخمّن.
+
+رد بصيغة JSON فقط بدون أي نص إضافي قبله أو بعده وبدون علامات \`\`\`، بالشكل ده بالظبط:
+{
+  "readable": true,
+  "summary": "ملخص موجز لمحتوى المحضر كما تقرأه من الصورة",
+  "gaps": ["ثغرة أو نقطة ضعف محددة يستفيد منها الدفاع", "..."],
+  "missing_elements": ["بيان أو إجراء جوهري ناقص إن وُجد", "..."]
+}
+لو الصورة مش واضحة خالص أو مش محضر أصلًا، رجّع "readable": false مع "summary" يوضح ليه.`;
+}
+async function analyzeEvidenceGaps(caseId, evidenceItem, btn, box) {
+  btn.disabled = true;
+  box.style.display = 'block';
+  box.innerHTML = `<div class="gap-analyzing">بيحلل ثغرات المحضر...</div>`;
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_completion_tokens: 1200,
+        messages: [
+          { role: 'system', content: buildGapAnalysisPrompt() },
+          { role: 'user', content: [{ type: 'image', mimeType: evidenceItem.mimeType, data: evidenceItem.data }] },
+        ],
+      }),
+    });
+    const data = await res.json();
+    const raw = data?.choices?.[0]?.message?.content || '';
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+    if (!parsed) throw new Error('bad_response');
+    await window.CaseWidget.updateSubDoc(caseId, 'evidence', evidenceItem.id, { gapAnalysis: parsed });
+    renderGapAnalysisBox(box, parsed);
+    btn.style.display = 'none';
+  } catch (err) {
+    console.error('gap analysis error', err);
+    box.innerHTML = `<div class="gap-analyzing" style="color:#ff8a5c">حصل خطأ أثناء التحليل، جرّب تاني</div>`;
+    btn.disabled = false;
+  }
+}
+function renderGapAnalysisBox(box, g) {
+  if (!g.readable) {
+    box.innerHTML = `<div class="gap-analysis-box"><div class="lbl">⚠ تعذّر التحليل</div>${window.CaseWidget.escapeHTML(g.summary || 'الصورة غير واضحة بما يكفي')}</div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="gap-analysis-box">
+      <div class="lbl">◈ تحليل ثغرات المحضر</div>
+      ${g.summary ? `<p>${window.CaseWidget.escapeHTML(g.summary)}</p>` : ''}
+      ${(g.gaps || []).length ? `<div style="margin-top:6px;font-weight:800;">ثغرات يستفيد منها الدفاع:</div><ul>${g.gaps.map(x => `<li>${window.CaseWidget.escapeHTML(x)}</li>`).join('')}</ul>` : ''}
+      ${(g.missing_elements || []).length ? `<div style="margin-top:6px;font-weight:800;">عناصر ناقصة:</div><ul>${g.missing_elements.map(x => `<li>${window.CaseWidget.escapeHTML(x)}</li>`).join('')}</ul>` : ''}
+    </div>`;
+}
+
+async function loadEvidence(caseId) {
+  const items = await window.CaseWidget.listSub(caseId, 'evidence');
+  const grid = document.getElementById('evidenceGrid');
+  document.getElementById('evidenceEmpty').style.display = items.length ? 'none' : 'block';
+  grid.innerHTML = items.map(it => `
+    <div class="evidence-card" data-id="${it.id}">
+      <div class="evidence-card-top">
+        <span class="evidence-kind-badge">${window.CaseWidget.escapeHTML(it.kind)}</span>
+      </div>
+      ${it.mimeType === 'application/pdf'
+        ? `<div class="evidence-thumb is-pdf">📄</div>`
+        : `<img class="evidence-thumb" src="data:${it.mimeType};base64,${it.data}">`}
+      <div class="evidence-name">${window.CaseWidget.escapeHTML(it.name || '')}</div>
+      <div class="evidence-actions">
+        ${it.kind === 'محضر' && it.mimeType !== 'application/pdf' && !it.gapAnalysis ? `<button class="link-btn analyze-btn">🔍 تحليل الثغرات بالذكاء الاصطناعي</button>` : ''}
+        <button class="link-btn danger del-evidence-btn">حذف</button>
+      </div>
+      <div class="gap-box" style="display:${it.gapAnalysis ? 'block' : 'none'}"></div>
+    </div>`).join('');
+
+  grid.querySelectorAll('.evidence-card').forEach(card => {
+    const id = card.dataset.id;
+    const item = items.find(x => x.id === id);
+    const box = card.querySelector('.gap-box');
+    if (item.gapAnalysis) renderGapAnalysisBox(box, item.gapAnalysis);
+    card.querySelector('.analyze-btn')?.addEventListener('click', (e) => analyzeEvidenceGaps(caseId, item, e.target, box));
+    card.querySelector('.del-evidence-btn').addEventListener('click', async () => {
+      if (!confirm('حذف المرفق ده؟')) return;
+      await window.CaseWidget.deleteSubDoc(caseId, 'evidence', id);
+      loadEvidence(caseId);
+    });
+  });
+}
 
 boot();
 </script>
