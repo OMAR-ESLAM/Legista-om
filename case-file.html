@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>ملفات القضايا | LEGANO</title>
+<meta name="description" content="ملف قضية موحّد يجمع بيانات القضية، المستندات المولّدة، وتحليل الذكاء الاصطناعي في مكان واحد.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.legano.site/case-file.html">
+<meta name="theme-color" content="#0A0A0D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
+a{color:inherit;}
+
+.top-nav{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
+.nav-back{font-size:11px;color:var(--cyber);text-decoration:none;letter-spacing:1px;border:1px solid rgba(0,229,255,0.2);padding:6px 14px;border-radius:8px;}
+.nav-back:hover{background:rgba(0,229,255,0.07);}
+.nav-section{font-size:11px;letter-spacing:3px;color:var(--gray);font-weight:600;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:5px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px 80px;}
+
+/* ═══ LIST VIEW ═══ */
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.list-title{font-size:20px;font-weight:900;}
+.list-title span{color:var(--gold);}
+.btn-new-case{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:11px 20px;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-chip{font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--gray);cursor:pointer;background:transparent;font-family:'Cairo',sans-serif;}
+.filter-chip.active{border-color:var(--cyber);color:var(--cyber);background:rgba(0,229,255,0.06);}
+
+.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.case-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:border-color .15s,transform .15s;}
+.case-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.case-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;}
+.case-card-title{font-size:15px;font-weight:800;line-height:1.4;}
+.status-badge{font-size:10px;padding:3px 10px;border-radius:12px;white-space:nowrap;}
+.status-نشطة{background:rgba(0,255,178,0.1);color:var(--success);}
+.status-معلّقة{background:rgba(212,175,55,0.12);color:var(--gold);}
+.status-مغلقة{background:rgba(138,138,143,0.15);color:var(--gray);}
+.case-card-meta{font-size:12px;color:var(--gray);margin-bottom:12px;}
+.case-card-meta div{margin-bottom:3px;}
+.case-card-counts{display:flex;gap:14px;font-size:11px;color:var(--cyber);border-top:1px solid var(--border);padding-top:10px;}
+
+.empty-state{text-align:center;padding:80px 20px;color:var(--gray);}
+.empty-state .icon{font-size:44px;margin-bottom:12px;}
+.empty-state .t{font-size:15px;font-weight:800;color:var(--white);margin-bottom:6px;}
+
+/* ═══ DETAIL VIEW ═══ */
+#detailView{display:none;}
+.detail-back{display:inline-block;margin-bottom:18px;font-size:12px;color:var(--cyber);cursor:pointer;}
+.detail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.detail-title{font-size:22px;font-weight:900;}
+.detail-actions{display:flex;gap:8px;}
+.btn-sm{font-size:12px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--white);cursor:pointer;font-family:'Cairo',sans-serif;}
+.btn-sm.danger{color:#ff6b6b;border-color:rgba(255,107,107,0.3);}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px;}
+.tab{padding:10px 18px;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--gold);border-color:var(--gold);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;}
+@media (max-width:640px){.info-grid{grid-template-columns:1fr;}}
+.cw-field label{display:block;font-size:11px;color:var(--gray);margin-bottom:5px;}
+.cw-field input,.cw-field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.cw-field input:focus,.cw-field select:focus{border-color:var(--cyber);}
+.cw-field{margin-bottom:6px;}
+.btn-save-info{margin-top:16px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:10px 22px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;}
+
+.doc-card,.analysis-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+.doc-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;}
+.tool-badge{font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(0,229,255,0.1);color:var(--cyber);}
+.doc-time{font-size:11px;color:var(--gray);}
+.doc-content{font-size:13px;line-height:1.9;color:var(--white);white-space:pre-wrap;max-height:180px;overflow:hidden;position:relative;}
+.doc-content.expanded{max-height:none;}
+.doc-fade{position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--bg2));}
+.doc-actions{display:flex;gap:8px;margin-top:10px;}
+.link-btn{font-size:12px;color:var(--cyber);cursor:pointer;background:none;border:none;font-family:'Cairo',sans-serif;}
+.link-btn.danger{color:#ff6b6b;}
+
+.defense-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;}
+.defense-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;}
+.defense-name{font-size:13px;font-weight:700;}
+.priority-badge{font-size:10px;padding:3px 9px;border-radius:8px;}
+.priority-badge.قوي{background:rgba(0,255,178,0.12);color:var(--success);}
+.priority-badge.متوسط{background:rgba(212,175,55,0.12);color:var(--gold);}
+.priority-badge.ضعيف{background:rgba(138,138,143,0.15);color:var(--gray);}
+.defense-why{font-size:12px;color:var(--gray);line-height:1.7;margin-bottom:6px;}
+.defense-select{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--white);cursor:pointer;}
+
+.login-gate{text-align:center;padding:100px 20px;}
+.login-gate .icon{font-size:48px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html" class="nav-back">← الرئيسية</a>
+  <span class="nav-section">◈ ملفات القضايا</span>
+  <a href="index.html" class="nav-logo">LEGISTA</a>
+</div>
+
+<div class="wrap">
+
+  <div id="loginGate" class="login-gate" style="display:none;">
+    <div class="icon">🔒</div>
+    <div class="list-title">سجّل الدخول لعرض ملفات قضاياك</div>
+    <p style="color:var(--gray);font-size:13px;margin-top:8px;">ملفات القضايا خاصة بكل محامٍ مسجّل على حسابه.</p>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="list-header">
+      <div class="list-title">ملفات <span>القضايا</span></div>
+      <button class="btn-new-case" id="btnNewCase">+ قضية جديدة</button>
+    </div>
+    <div class="filters" id="statusFilters">
+      <button class="filter-chip active" data-status="الكل">الكل</button>
+      <button class="filter-chip" data-status="نشطة">نشطة</button>
+      <button class="filter-chip" data-status="معلّقة">معلّقة</button>
+      <button class="filter-chip" data-status="مغلقة">مغلقة</button>
+    </div>
+    <div id="caseGrid" class="case-grid"></div>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <div class="icon">📁</div>
+      <div class="t">مفيش قضايا محفوظة لسه</div>
+      <div>ابدأ بإنشاء أول ملف قضية، وبعدين اربطه بالعقود والإنذارات والتحليل اللي بتولّده.</div>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detailView">
+    <div class="detail-back" id="btnBackToList">← رجوع لكل القضايا</div>
+    <div class="detail-head">
+      <div class="detail-title" id="detailTitle"></div>
+      <div class="detail-actions">
+        <button class="btn-sm danger" id="btnDeleteCase">حذف القضية</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" data-tab="info">بيانات القضية</div>
+      <div class="tab" data-tab="documents">المستندات</div>
+      <div class="tab" data-tab="analyses">التحليل والدفوع</div>
+    </div>
+
+    <div class="tab-panel active" id="panel-info">
+      <div class="info-grid">
+        <div class="cw-field"><label>عنوان القضية</label><input id="fTitle"></div>
+        <div class="cw-field"><label>نوع القضية</label><select id="fType"></select></div>
+        <div class="cw-field"><label>الحالة</label><select id="fStatus"></select></div>
+        <div class="cw-field"><label>اسم العميل</label><input id="fClient"></div>
+        <div class="cw-field"><label>اسم الخصم</label><input id="fOpponent"></div>
+        <div class="cw-field"><label>المحكمة</label><input id="fCourt"></div>
+      </div>
+      <button class="btn-save-info" id="btnSaveInfo">حفظ البيانات</button>
+    </div>
+
+    <div class="tab-panel" id="panel-documents">
+      <div id="docsList"></div>
+      <div id="docsEmpty" class="empty-state" style="display:none;">
+        <div class="icon">📄</div>
+        <div class="t">مفيش مستندات محفوظة في القضية دي لسه</div>
+        <div>لما تولّد عقد أو إنذار أو صيغة جنحة، دوس "حفظ في ملف قضية" وهيظهر هنا.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-analyses">
+      <div id="analysesList"></div>
+      <div id="analysesEmpty" class="empty-state" style="display:none;">
+        <div class="icon">🛡️</div>
+        <div class="t">مفيش تحليل محفوظ في القضية دي لسه</div>
+        <div>حلل القضية من صفحة "تحليل القضايا" واحفظ النتيجة هنا.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import './case-widget.js';
+
+let allCases = [];
+let activeStatus = 'الكل';
+let currentCaseId = null;
+
+function getUser() {
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) return null;
+  try { return JSON.parse(saved); } catch (e) { return null; }
+}
+
+async function boot() {
+  const user = getUser();
+  if (!user) {
+    document.getElementById('loginGate').style.display = 'block';
+    document.getElementById('listView').style.display = 'none';
+    return;
+  }
+  await refreshCases();
+  const params = new URLSearchParams(location.search);
+  const caseId = params.get('case');
+  if (caseId) openDetail(caseId);
+}
+
+async function refreshCases() {
+  const user = getUser();
+  allCases = await window.CaseWidget.listCases(user.email);
+  renderList();
+}
+
+function renderList() {
+  const grid = document.getElementById('caseGrid');
+  const filtered = activeStatus === 'الكل' ? allCases : allCases.filter(c => c.status === activeStatus);
+  document.getElementById('emptyState').style.display = filtered.length ? 'none' : 'block';
+  grid.innerHTML = filtered.map(c => `
+    <div class="case-card" data-id="${c.id}">
+      <div class="case-card-top">
+        <div class="case-card-title">${window.CaseWidget.escapeHTML(c.title)}</div>
+        <div class="status-badge status-${c.status}">${c.status}</div>
+      </div>
+      <div class="case-card-meta">
+        <div>◈ ${window.CaseWidget.escapeHTML(c.caseType || '—')}</div>
+        ${c.clientName ? `<div>👤 ${window.CaseWidget.escapeHTML(c.clientName)}</div>` : ''}
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('.case-card').forEach(card => {
+    card.addEventListener('click', () => openDetail(card.dataset.id));
+  });
+}
+
+document.getElementById('statusFilters').addEventListener('click', (e) => {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeStatus = chip.dataset.status;
+  renderList();
+});
+
+document.getElementById('btnNewCase').addEventListener('click', async () => {
+  const user = getUser();
+  const title = prompt('عنوان القضية الجديدة:');
+  if (!title || !title.trim()) return;
+  const created = await window.CaseWidget.createCase({ ownerEmail: user.email, title: title.trim() });
+  await refreshCases();
+  openDetail(created.id);
+});
+
+async function openDetail(caseId) {
+  currentCaseId = caseId;
+  const c = await window.CaseWidget.getCase(caseId);
+  if (!c) { alert('القضية دي غير موجودة أو محذوفة'); return; }
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  document.getElementById('detailTitle').textContent = c.title;
+
+  const typeSel = document.getElementById('fType');
+  typeSel.innerHTML = window.CaseWidget.CASE_TYPES.map(t => `<option ${t === c.caseType ? 'selected' : ''}>${t}</option>`).join('');
+  const statusSel = document.getElementById('fStatus');
+  statusSel.innerHTML = window.CaseWidget.CASE_STATUSES.map(s => `<option ${s === c.status ? 'selected' : ''}>${s}</option>`).join('');
+  document.getElementById('fTitle').value = c.title || '';
+  document.getElementById('fClient').value = c.clientName || '';
+  document.getElementById('fOpponent').value = c.opponentName || '';
+  document.getElementById('fCourt').value = c.courtName || '';
+
+  history.replaceState(null, '', `case-file.html?case=${caseId}`);
+  await loadDocuments(caseId);
+  await loadAnalyses(caseId);
+}
+
+document.getElementById('btnBackToList').addEventListener('click', () => {
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+  history.replaceState(null, '', 'case-file.html');
+  refreshCases();
+});
+
+document.getElementById('btnSaveInfo').addEventListener('click', async () => {
+  const btn = document.getElementById('btnSaveInfo');
+  btn.disabled = true; btn.textContent = 'جارِ الحفظ...';
+  await window.CaseWidget.updateCase(currentCaseId, {
+    title: document.getElementById('fTitle').value.trim() || 'قضية بدون عنوان',
+    caseType: document.getElementById('fType').value,
+    status: document.getElementById('fStatus').value,
+    clientName: document.getElementById('fClient').value.trim(),
+    opponentName: document.getElementById('fOpponent').value.trim(),
+    courtName: document.getElementById('fCourt').value.trim(),
+  });
+  document.getElementById('detailTitle').textContent = document.getElementById('fTitle').value.trim();
+  btn.disabled = false; btn.textContent = 'حفظ البيانات';
+  window.CaseWidget.toast('تم حفظ بيانات القضية ✓');
+});
+
+document.getElementById('btnDeleteCase').addEventListener('click', async () => {
+  if (!confirm('هتحذف القضية دي وكل المستندات والتحليلات المحفوظة فيها. متأكد؟')) return;
+  await window.CaseWidget.deleteCaseFully(currentCaseId);
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+  history.replaceState(null, '', 'case-file.html');
+  refreshCases();
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+const TOOL_LABELS = { '3oqood': 'صياغة عقود', 'inzarat': 'إنذارات', 'junah': 'صيغ جنح', 'tahlil': 'تحليل قضايا' };
+
+async function loadDocuments(caseId) {
+  const docs = await window.CaseWidget.listSub(caseId, 'documents');
+  const list = document.getElementById('docsList');
+  document.getElementById('docsEmpty').style.display = docs.length ? 'none' : 'block';
+  list.innerHTML = docs.map(d => `
+    <div class="doc-card" data-id="${d.id}">
+      <div class="doc-card-top">
+        <span class="tool-badge">${TOOL_LABELS[d.sourceTool] || d.sourceTool}${d.templateName ? ' · ' + window.CaseWidget.escapeHTML(d.templateName) : ''}</span>
+        <span class="doc-time">${new Date(d.createdAt).toLocaleString('ar-EG')}</span>
+      </div>
+      <div class="doc-content">${window.CaseWidget.escapeHTML(d.content)}<div class="doc-fade"></div></div>
+      <div class="doc-actions">
+        <button class="link-btn expand-btn">عرض كامل</button>
+        <button class="link-btn copy-btn">نسخ</button>
+        <button class="link-btn danger del-btn">حذف</button>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('.doc-card').forEach(card => {
+    const id = card.dataset.id;
+    card.querySelector('.expand-btn').addEventListener('click', () => {
+      const box = card.querySelector('.doc-content');
+      box.classList.toggle('expanded');
+      card.querySelector('.expand-btn').textContent = box.classList.contains('expanded') ? 'طيّ' : 'عرض كامل';
+    });
+    card.querySelector('.copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(card.querySelector('.doc-content').textContent);
+      window.CaseWidget.toast('تم النسخ ✓');
+    });
+    card.querySelector('.del-btn').addEventListener('click', async () => {
+      if (!confirm('حذف المستند ده؟')) return;
+      await window.CaseWidget.deleteSubDoc(caseId, 'documents', id);
+      loadDocuments(caseId);
+    });
+  });
+}
+
+async function loadAnalyses(caseId) {
+  const analyses = await window.CaseWidget.listSub(caseId, 'analyses');
+  const list = document.getElementById('analysesList');
+  document.getElementById('analysesEmpty').style.display = analyses.length ? 'none' : 'block';
+  list.innerHTML = analyses.map(a => `
+    <div class="analysis-card" data-id="${a.id}">
+      <div class="doc-card-top">
+        <span class="tool-badge">تحليل الذكاء الاصطناعي</span>
+        <span class="doc-time">${new Date(a.createdAt).toLocaleString('ar-EG')}</span>
+      </div>
+      ${a.summary ? `<p style="font-size:13px;line-height:1.8;margin-bottom:10px;">${window.CaseWidget.escapeHTML(a.summary)}</p>` : ''}
+      ${(a.defenses || []).map((d, i) => `
+        <div class="defense-card">
+          <div class="defense-top">
+            <span class="defense-name">${window.CaseWidget.escapeHTML(d.title || '')}</span>
+            <span class="priority-badge ${d.priority || 'متوسط'}">${d.priority || 'متوسط'}</span>
+          </div>
+          <div class="defense-why">${window.CaseWidget.escapeHTML(d.reason || '')}</div>
+          <label class="defense-select"><input type="checkbox" class="defense-check" data-idx="${i}" ${((a.selectedDefenses || []).includes(i)) ? 'checked' : ''}> اعتمد هذا الدفع في القضية</label>
+        </div>`).join('')}
+      <div class="doc-actions">
+        <button class="link-btn danger del-analysis-btn">حذف التحليل</button>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('.analysis-card').forEach(card => {
+    const id = card.dataset.id;
+    card.querySelectorAll('.defense-check').forEach(chk => {
+      chk.addEventListener('change', async () => {
+        const checks = card.querySelectorAll('.defense-check');
+        const selected = Array.from(checks).filter(c => c.checked).map(c => parseInt(c.dataset.idx));
+        await window.CaseWidget.updateSubDoc(caseId, 'analyses', id, { selectedDefenses: selected });
+        window.CaseWidget.toast('تم تحديث الدفوع المعتمدة ✓');
+      });
+    });
+    card.querySelector('.del-analysis-btn').addEventListener('click', async () => {
+      if (!confirm('حذف التحليل ده؟')) return;
+      await window.CaseWidget.deleteSubDoc(caseId, 'analyses', id);
+      loadAnalyses(caseId);
+    });
+  });
+}
+
+boot();
+</script>
+</body>
+</html>
