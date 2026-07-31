@@ -47,6 +47,47 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
 .empty-state, .error-state{text-align:center;padding:80px 20px;color:var(--gray);}
 .empty-state .icon, .error-state .icon{font-size:44px;margin-bottom:12px;}
 .footnote{text-align:center;font-size:11px;color:var(--gray);margin-top:30px;}
+
+.section-block{margin-top:34px;}
+.section-heading{font-size:13.5px;font-weight:800;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ═══ fees ═══ */
+.fee-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+@media (max-width:420px){.fee-grid{grid-template-columns:1fr;}}
+.fee-stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.fee-stat .lbl{font-size:10.5px;color:var(--gray);margin-bottom:6px;}
+.fee-stat .val{font-size:16px;font-weight:900;}
+.fee-stat.paid .val{color:var(--success);}
+.fee-stat.remaining .val{color:var(--gold);}
+.payment-row{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:7px;font-size:12.5px;}
+.payment-row .amt{font-weight:800;color:var(--success);}
+.payment-row .meta{font-size:11px;color:var(--gray);}
+
+/* ═══ document requests ═══ */
+.docreq-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.docreq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.docreq-title{font-size:13.5px;font-weight:800;}
+.docreq-note{font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;}
+.docreq-badge{font-size:10px;padding:3px 10px;border-radius:9px;font-weight:800;white-space:nowrap;}
+.docreq-badge.pending{background:rgba(255,167,38,0.14);color:#ffa726;}
+.docreq-badge.uploaded{background:rgba(0,255,178,0.12);color:var(--success);}
+.docreq-upload-btn{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:9px 18px;border-radius:9px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif;}
+.docreq-upload-btn:disabled{opacity:.5;}
+.docreq-filename{font-size:12px;color:var(--cyber);margin-top:4px;}
+
+/* ═══ chat / ask the lawyer ═══ */
+.chat-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.chat-messages{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.chat-empty{text-align:center;color:var(--gray);font-size:12.5px;padding:20px 10px;}
+.chat-msg{max-width:78%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.7;}
+.chat-msg .chat-msg-time{font-size:10px;opacity:.6;margin-top:3px;}
+.chat-msg.client{align-self:flex-end;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.22);}
+.chat-msg.lawyer{align-self:flex-start;background:linear-gradient(120deg,rgba(212,175,55,0.18),rgba(212,175,55,0.06));border:1px solid rgba(212,175,55,0.28);}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.chat-input-row input:focus{border-color:var(--cyber);}
+.chat-input-row button{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:0 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+.chat-input-row button:disabled{opacity:.5;}
 </style>
 </head>
 <body>
@@ -62,6 +103,23 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
 <script type="module">
 import './case-widget.js';
 
+const UPLOAD_MAX_BYTES = 700 * 1024;
+let currentCaseId = null;
+
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('ar-EG');
+}
+function fmtMoney(n) {
+  return (Number(n) || 0).toLocaleString('ar-EG') + ' ج.م';
+}
+function fmtTime(ms) {
+  if (!ms) return '';
+  return new Date(ms).toLocaleString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
 async function boot() {
   const params = new URLSearchParams(location.search);
   const caseId = params.get('id');
@@ -75,6 +133,7 @@ async function boot() {
     content.innerHTML = `<div class="error-state"><div class="icon">⚠️</div>القضية دي مش موجودة أو الرابط غير صحيح</div>`;
     return;
   }
+  currentCaseId = caseId;
   const stages = await window.CaseWidget.listSub(caseId, 'stages');
   stages.sort((a, b) => a.order - b.order);
   const done = stages.filter(s => s.status === 'مكتملة').length;
@@ -96,6 +155,28 @@ async function boot() {
     </div>
     <div class="stage-line" id="stagesList"></div>
     ` : `<div class="empty-state"><div class="icon">🧭</div>لسه مفيش خطة مراحل متاحة لمتابعة القضية دي</div>`}
+
+    <div class="section-block">
+      <div class="section-heading">💰 الأتعاب</div>
+      <div id="feesBlock"></div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-heading">📄 مستندات مطلوبة منك</div>
+      <div id="docreqBlock"></div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-heading">💬 اسأل المحامي</div>
+      <div class="chat-box">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input id="chatInput" placeholder="اكتب سؤالك هنا...">
+          <button id="btnSendChat">ابعت</button>
+        </div>
+      </div>
+    </div>
+
     <div class="footnote">آخر تحديث: ${new Date(c.updatedAt || Date.now()).toLocaleString('ar-EG')}</div>
   `;
 
@@ -109,7 +190,169 @@ async function boot() {
         </div>
       </div>`).join('');
   }
+
+  await renderFees(caseId, c);
+  await renderDocRequests(caseId);
+  await renderChat(caseId);
+
+  document.getElementById('btnSendChat').addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendChatMessage();
+  });
 }
+
+/* ---------- fees ---------- */
+async function renderFees(caseId, c) {
+  const payments = await window.CaseWidget.listSub(caseId, 'payments');
+  payments.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  const agreed = Number(c.feeAgreed) || 0;
+  const total = payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const block = document.getElementById('feesBlock');
+  if (!agreed && !payments.length) {
+    block.innerHTML = `<div class="empty-state" style="padding:30px 20px;"><div class="icon">💰</div>لسه مفيش تفاصيل أتعاب متسجّلة للقضية دي</div>`;
+    return;
+  }
+  block.innerHTML = `
+    <div class="fee-grid">
+      <div class="fee-stat"><div class="lbl">الأتعاب المتفق عليها</div><div class="val">${fmtMoney(agreed)}</div></div>
+      <div class="fee-stat paid"><div class="lbl">إجمالي المدفوع</div><div class="val">${fmtMoney(total)}</div></div>
+      <div class="fee-stat remaining"><div class="lbl">المتبقي</div><div class="val">${fmtMoney(agreed - total)}</div></div>
+    </div>
+    ${payments.length ? payments.map(p => `
+      <div class="payment-row">
+        <span class="amt">${fmtMoney(p.amount)}</span>
+        <span class="meta">${p.note ? window.CaseWidget.escapeHTML(p.note) + ' — ' : ''}${fmtDate(p.date)}</span>
+      </div>`).join('') : ''}
+  `;
+}
+
+/* ---------- document requests ---------- */
+function downscaleClientImage(dataUrl, maxDim, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+async function compressClientImage(file) {
+  const raw = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  const attempts = [[1400, 0.75], [1100, 0.65], [800, 0.55], [600, 0.45]];
+  for (const [maxDim, quality] of attempts) {
+    const out = await downscaleClientImage(raw, maxDim, quality);
+    if (!out) break;
+    const base64Len = out.split(',')[1]?.length || 0;
+    if (base64Len * 0.75 <= UPLOAD_MAX_BYTES) return out;
+  }
+  return null;
+}
+
+async function renderDocRequests(caseId) {
+  const requests = await window.CaseWidget.listSub(caseId, 'portalRequests');
+  requests.sort((a, b) => window.CaseWidget.toMillis(b.createdAt) - window.CaseWidget.toMillis(a.createdAt));
+  const block = document.getElementById('docreqBlock');
+  if (!requests.length) {
+    block.innerHTML = `<div class="empty-state" style="padding:30px 20px;"><div class="icon">📄</div>مفيش مستندات مطلوبة منك دلوقتي</div>`;
+    return;
+  }
+  block.innerHTML = requests.map(r => `
+    <div class="docreq-card" data-id="${r.id}">
+      <div class="docreq-top">
+        <div>
+          <div class="docreq-title">${window.CaseWidget.escapeHTML(r.title)}</div>
+        </div>
+        <span class="docreq-badge ${r.status}">${r.status === 'uploaded' ? 'اترفع ✓' : 'مطلوب'}</span>
+      </div>
+      ${r.note ? `<div class="docreq-note">${window.CaseWidget.escapeHTML(r.note)}</div>` : ''}
+      ${r.status === 'uploaded'
+        ? `<div class="docreq-filename">📎 اترفع: ${window.CaseWidget.escapeHTML(r.fileName || 'ملف')}</div>
+           <input type="file" class="docreq-file-input" accept="image/*,application/pdf" style="display:none">
+           <button class="docreq-upload-btn" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--gray);">استبدال الملف</button>`
+        : `<input type="file" class="docreq-file-input" accept="image/*,application/pdf" style="display:none">
+           <button class="docreq-upload-btn">📎 رفع الملف</button>`}
+    </div>`).join('');
+
+  block.querySelectorAll('.docreq-card').forEach(card => {
+    const id = card.dataset.id;
+    const fileInput = card.querySelector('.docreq-file-input');
+    const btn = card.querySelector('.docreq-upload-btn');
+    btn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      btn.disabled = true;
+      btn.textContent = 'جارِ الرفع...';
+      try {
+        let mimeType = file.type || 'application/octet-stream';
+        let base64;
+        if (mimeType.startsWith('image/')) {
+          const compressed = await compressClientImage(file);
+          if (!compressed) { window.CaseWidget.toast('الصورة كبيرة جدًا حتى بعد الضغط'); btn.disabled = false; return; }
+          mimeType = 'image/jpeg';
+          base64 = compressed.split(',')[1];
+        } else {
+          if (file.size > UPLOAD_MAX_BYTES) { window.CaseWidget.toast('الملف أكبر من الحد المسموح (700 كيلوبايت)'); btn.disabled = false; return; }
+          base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result).split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
+        await window.CaseWidget.uploadClientDocument(caseId, id, { fileName: file.name, mimeType, data: base64 });
+        window.CaseWidget.toast('تم رفع المستند ✓');
+        renderDocRequests(caseId);
+      } catch (err) {
+        console.error('client upload error', err);
+        window.CaseWidget.toast('حصل خطأ أثناء رفع الملف');
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+/* ---------- chat ---------- */
+async function renderChat(caseId) {
+  const messages = await window.CaseWidget.listSub(caseId, 'messages');
+  messages.sort((a, b) => window.CaseWidget.toMillis(a.createdAt) - window.CaseWidget.toMillis(b.createdAt));
+  const box = document.getElementById('chatMessages');
+  box.innerHTML = messages.length ? messages.map(m => `
+    <div class="chat-msg ${m.sender === 'client' ? 'client' : 'lawyer'}">
+      <div>${window.CaseWidget.escapeHTML(m.text)}</div>
+      <div class="chat-msg-time">${m.sender === 'client' ? 'انت' : 'المحامي'} · ${fmtTime(window.CaseWidget.toMillis(m.createdAt))}</div>
+    </div>`).join('') : `<div class="chat-empty">مفيش رسايل لسه — ابعت سؤالك للمحامي وهيرد عليك هنا</div>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || !currentCaseId) return;
+  const btn = document.getElementById('btnSendChat');
+  btn.disabled = true;
+  await window.CaseWidget.sendPortalMessage(currentCaseId, { sender: 'client', text });
+  input.value = '';
+  btn.disabled = false;
+  window.CaseWidget.toast('اتبعتت رسالتك للمحامي ✓');
+  renderChat(currentCaseId);
+}
+
 boot();
 </script>
 </body>
