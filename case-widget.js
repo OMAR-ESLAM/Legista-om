@@ -439,6 +439,37 @@ function saveEvidenceToCase(caseId, { kind, name, mimeType, data, notes, gapAnal
   });
 }
 
+// ═══ بوابة العميل (Client Portal) ═══
+// cases/{caseId}/portalRequests/{id}: مستند مطلوب من العميل
+//   - title, note, status ('pending'|'uploaded'), fileName, mimeType, data (base64), uploadedAt, createdAt
+// cases/{caseId}/messages/{id}: رسائل بين المحامي والعميل
+//   - sender ('lawyer'|'client'), text, createdAt
+
+// المحامي بيطلب مستند من العميل (بيظهر في بوابة العميل كطلب "معلّق")
+function requestDocumentFromClient(caseId, { title, note }) {
+  return addSubDoc(caseId, 'portalRequests', {
+    title: (title || '').trim(),
+    note: (note || '').trim(),
+    status: 'pending',
+    fileName: '', mimeType: '', data: '', uploadedAt: null,
+  });
+}
+
+// العميل بيرفع المستند اللي اتطلب منه
+function uploadClientDocument(caseId, requestId, { fileName, mimeType, data }) {
+  return updateSubDoc(caseId, 'portalRequests', requestId, {
+    status: 'uploaded',
+    fileName: fileName || '', mimeType: mimeType || '', data: data || '',
+    uploadedAt: Date.now(),
+  });
+}
+
+// إرسال رسالة في بوابة العميل — من المحامي أو من العميل
+function sendPortalMessage(caseId, { sender, text }) {
+  if (!text || !text.trim()) return null;
+  return addSubDoc(caseId, 'messages', { sender: sender === 'client' ? 'client' : 'lawyer', text: text.trim() });
+}
+
 // واجهة بسيطة (prompt-based) لاختيار قضية موجودة أو إنشاء واحدة جديدة بسرعة،
 // عشان الأربع أدوات تستخدمها من غير ما تبني UI منفصل لكل واحدة.
 // onSave: async (caseId) => { ... } بتتنفذ بعد ما يتحدد caseId.
@@ -476,4 +507,5 @@ window.CaseWidget = {
   saveDocumentToCase, saveAnalysisToCase, saveEvidenceToCase, openSaveToCasePicker,
   getStageTemplate, seedStagesFromTemplate, advanceAfterStage, branchStagesAfterDecision,
   computeDeadlineInfo, getDashboardSummary,
+  requestDocumentFromClient, uploadClientDocument, sendPortalMessage,
 };
