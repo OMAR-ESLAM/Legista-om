@@ -241,6 +241,31 @@ a{color:inherit;}
 .evidence-hint{font-size:11px;color:var(--gray);width:100%;}
 .evidence-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
 .evidence-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;}
+
+/* ═══ client portal tab (lawyer side) ═══ */
+.portal-share-row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:26px;flex-wrap:wrap;}
+.portal-share-lbl{font-size:12px;color:var(--gray);max-width:520px;line-height:1.7;}
+.portal-sub-title{font-size:13.5px;font-weight:800;color:var(--gold);margin-bottom:12px;}
+.portal-request-form{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.portal-request-form input{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;}
+.portal-request-form input#prTitle{flex:1;min-width:200px;}
+.portal-request-form input#prNote{flex:1;min-width:180px;}
+.portal-request-form button{background:var(--cyber);color:#03181a;border:none;padding:0 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+.portal-request-card{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;gap:10px;flex-wrap:wrap;}
+.portal-request-title{font-size:13px;font-weight:700;}
+.portal-request-note{font-size:11.5px;color:var(--gray);margin-top:3px;}
+.portal-request-right{display:flex;align-items:center;gap:10px;}
+.portal-request-badge{font-size:10px;padding:3px 10px;border-radius:9px;font-weight:800;white-space:nowrap;}
+.portal-request-badge.pending{background:rgba(212,175,55,0.14);color:var(--gold);}
+.portal-request-badge.uploaded{background:rgba(0,255,178,0.12);color:var(--success);}
+.portal-messages{max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;padding:4px 2px;}
+.portal-msg{max-width:70%;padding:9px 14px;border-radius:12px;font-size:13px;line-height:1.7;}
+.portal-msg .portal-msg-time{font-size:10px;opacity:.6;margin-top:3px;}
+.portal-msg.lawyer{align-self:flex-start;background:linear-gradient(120deg,rgba(212,175,55,0.16),rgba(212,175,55,0.06));border:1px solid rgba(212,175,55,0.25);}
+.portal-msg.client{align-self:flex-end;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);}
+.portal-reply-row{display:flex;gap:8px;}
+.portal-reply-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;}
+.portal-reply-row button{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:0 20px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;}
 .evidence-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
 .evidence-kind-badge{font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(212,175,55,0.14);color:var(--gold);white-space:nowrap;}
 .evidence-thumb{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#000;}
@@ -337,6 +362,7 @@ a{color:inherit;}
       <div class="tab" data-tab="documents">المستندات</div>
       <div class="tab" data-tab="analyses">التحليل والدفوع</div>
       <div class="tab" data-tab="evidence">المرفقات والأدلة</div>
+      <div class="tab" data-tab="portal">بوابة العميل</div>
       <div class="tab" data-tab="notes">ملاحظات</div>
     </div>
 
@@ -451,6 +477,37 @@ a{color:inherit;}
         <div class="icon">📎</div>
         <div class="t">مفيش مرفقات في القضية دي لسه</div>
         <div>ارفع صورة المحضر أو الحكم أو أي مستند تاني، ولو كان محضر تقدر تطلب تحليل ثغراته بالذكاء الاصطناعي.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel paper" id="panel-portal">
+      <div class="portal-share-row">
+        <div class="portal-share-lbl">رابط بوابة العميل — شاركه مع موكلك عشان يشوف حالة قضيته ويرفع مستندات ويكلّمك</div>
+        <button class="btn-sm" id="btnCopyPortalLink">🔗 نسخ الرابط</button>
+      </div>
+
+      <div class="portal-sub-title">📄 مستندات مطلوبة من العميل</div>
+      <div class="portal-request-form">
+        <input id="prTitle" placeholder="اسم المستند المطلوب (مثال: صورة البطاقة، عقد الإيجار...)">
+        <input id="prNote" placeholder="ملاحظة توضيحية (اختياري)">
+        <button id="btnAddPortalRequest">+ طلب مستند</button>
+      </div>
+      <div id="portalRequestsList"></div>
+      <div id="portalRequestsEmpty" class="empty-state" style="display:none;">
+        <div class="icon">📄</div>
+        <div class="t">مفيش مستندات متطلوبة من العميل لسه</div>
+        <div>اطلب أي مستند محتاجه من الموكل، وهيقدر يرفعه من بوابة المتابعة بتاعته مباشرة.</div>
+      </div>
+
+      <div class="portal-sub-title" style="margin-top:30px;">💬 المحادثة مع العميل</div>
+      <div id="portalMessagesList" class="portal-messages"></div>
+      <div id="portalMessagesEmpty" class="empty-state" style="display:none;padding:30px 20px;">
+        <div class="icon">💬</div>
+        <div>مفيش رسايل لسه — لو العميل بعت سؤال هيظهر هنا.</div>
+      </div>
+      <div class="portal-reply-row">
+        <input id="portalReplyInput" placeholder="اكتب رد للعميل...">
+        <button id="btnSendPortalReply">إرسال</button>
       </div>
     </div>
 
@@ -701,6 +758,7 @@ async function openDetail(caseId) {
   await loadEvidence(caseId);
   await loadHearings(caseId);
   await loadFees(caseId, c);
+  await loadPortalTab(caseId);
   loadNotes(c);
 }
 
@@ -1185,6 +1243,88 @@ async function loadEvidence(caseId) {
     });
   });
 }
+
+/* ---------- portal tab (client portal) ---------- */
+document.getElementById('btnCopyPortalLink').addEventListener('click', () => {
+  const url = `${location.origin}/case-status.html?id=${currentCaseId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    window.CaseWidget.toast('اتنسخ لينك بوابة العميل ✓');
+  }).catch(() => {
+    prompt('انسخ اللينك ده وابعته للموكل:', url);
+  });
+});
+
+function fmtPortalTime(ms) {
+  if (!ms) return '';
+  return new Date(ms).toLocaleString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+async function loadPortalTab(caseId) {
+  const requests = await window.CaseWidget.listSub(caseId, 'portalRequests');
+  requests.sort((a, b) => window.CaseWidget.toMillis(b.createdAt) - window.CaseWidget.toMillis(a.createdAt));
+  const reqList = document.getElementById('portalRequestsList');
+  document.getElementById('portalRequestsEmpty').style.display = requests.length ? 'none' : 'block';
+  reqList.innerHTML = requests.map(r => `
+    <div class="portal-request-card" data-id="${r.id}">
+      <div class="row-main">
+        <div class="portal-request-title">${window.CaseWidget.escapeHTML(r.title)}</div>
+        ${r.note ? `<div class="portal-request-note">${window.CaseWidget.escapeHTML(r.note)}</div>` : ''}
+        ${r.status === 'uploaded' && r.fileName ? `<div class="portal-request-note">📎 ${window.CaseWidget.escapeHTML(r.fileName)}</div>` : ''}
+      </div>
+      <div class="portal-request-right">
+        ${r.status === 'uploaded' && r.data ? `<button class="link-btn view-upload-btn">عرض</button>` : ''}
+        <span class="portal-request-badge ${r.status}">${r.status === 'uploaded' ? 'اترفع ✓' : 'مستنيين العميل'}</span>
+        <button class="link-btn danger del-request-btn">حذف</button>
+      </div>
+    </div>`).join('');
+  reqList.querySelectorAll('.portal-request-card').forEach(card => {
+    const id = card.dataset.id;
+    const item = requests.find(x => x.id === id);
+    card.querySelector('.view-upload-btn')?.addEventListener('click', () => {
+      const win = window.open('');
+      win.document.write(`<img src="data:${item.mimeType};base64,${item.data}" style="max-width:100%">`);
+    });
+    card.querySelector('.del-request-btn').addEventListener('click', async () => {
+      if (!confirm('حذف طلب المستند ده؟')) return;
+      await window.CaseWidget.deleteSubDoc(caseId, 'portalRequests', id);
+      loadPortalTab(caseId);
+    });
+  });
+
+  const messages = await window.CaseWidget.listSub(caseId, 'messages');
+  messages.sort((a, b) => window.CaseWidget.toMillis(a.createdAt) - window.CaseWidget.toMillis(b.createdAt));
+  const msgList = document.getElementById('portalMessagesList');
+  document.getElementById('portalMessagesEmpty').style.display = messages.length ? 'none' : 'block';
+  msgList.innerHTML = messages.map(m => `
+    <div class="portal-msg ${m.sender === 'client' ? 'client' : 'lawyer'}">
+      <div>${window.CaseWidget.escapeHTML(m.text)}</div>
+      <div class="portal-msg-time">${m.sender === 'client' ? 'الموكل' : 'انت'} · ${fmtPortalTime(window.CaseWidget.toMillis(m.createdAt))}</div>
+    </div>`).join('');
+  msgList.scrollTop = msgList.scrollHeight;
+}
+
+document.getElementById('btnAddPortalRequest').addEventListener('click', async () => {
+  const title = document.getElementById('prTitle').value.trim();
+  if (!title) { window.CaseWidget.toast('لازم تكتب اسم المستند المطلوب'); return; }
+  const note = document.getElementById('prNote').value.trim();
+  await window.CaseWidget.requestDocumentFromClient(currentCaseId, { title, note });
+  document.getElementById('prTitle').value = '';
+  document.getElementById('prNote').value = '';
+  window.CaseWidget.toast('تم إرسال الطلب للعميل ✓');
+  loadPortalTab(currentCaseId);
+});
+
+document.getElementById('btnSendPortalReply').addEventListener('click', async () => {
+  const input = document.getElementById('portalReplyInput');
+  const text = input.value.trim();
+  if (!text) return;
+  await window.CaseWidget.sendPortalMessage(currentCaseId, { sender: 'lawyer', text });
+  input.value = '';
+  loadPortalTab(currentCaseId);
+});
+document.getElementById('portalReplyInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('btnSendPortalReply').click();
+});
 
 /* ---------- hearings tab ---------- */
 async function loadHearings(caseId) {
