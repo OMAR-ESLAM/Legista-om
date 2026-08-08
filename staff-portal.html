@@ -69,6 +69,24 @@ a{color:inherit;}
 .fin-stat .lbl{font-size:11px;color:var(--gray);margin-bottom:6px;}
 .fin-stat .val{font-size:17px;font-weight:900;color:var(--gold);}
 
+/* ═══ salary widget ═══ */
+.salary-base-box{display:flex;gap:8px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:20px;flex-wrap:wrap;}
+.salary-base-box label{font-size:12px;color:var(--gray);white-space:nowrap;}
+.salary-base-box input{flex:1;min-width:100px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:ltr;text-align:center;outline:none;}
+.salary-base-box input:focus{border-color:var(--cyber);}
+.salary-base-box button{background:var(--gold);color:#0A0A0D;border:none;padding:9px 16px;border-radius:9px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+.pay-add-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.pay-add-row input{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.pay-add-row input:focus{border-color:var(--cyber);}
+.pay-add-row .pay-amount{width:110px;direction:ltr;text-align:center;}
+.pay-add-row .pay-note{flex:1;min-width:140px;}
+.pay-add-row button{background:var(--cyber);color:#03181a;border:none;padding:0 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+.pay-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;flex-wrap:wrap;}
+.pay-row .amt{font-weight:900;color:var(--gold);font-size:14px;white-space:nowrap;}
+.pay-row .note{flex:1;font-size:12.5px;color:var(--gray);min-width:0;}
+.pay-row .date{font-size:11px;color:var(--gray);white-space:nowrap;}
+.pay-row .del{color:#ff6b6b;background:none;border:none;font-size:11.5px;cursor:pointer;font-family:'Cairo',sans-serif;}
+
 /* ═══ generic link-out panel ═══ */
 .linkout-box{text-align:center;padding:36px 20px;background:var(--bg2);border:1px dashed var(--border);border-radius:14px;}
 .linkout-box .t{font-size:13.5px;color:var(--gray);margin-bottom:16px;line-height:1.8;}
@@ -120,6 +138,7 @@ const TAB_KIND = {
   'الأتعاب والدفعات': 'finance',
   'الفواتير': 'finance',
   'المصروفات': 'finance',
+  'المرتب': 'salary',
 };
 
 function greetingPhrase() {
@@ -219,6 +238,60 @@ async function renderFinancePanel(container, officeEmail) {
     <div class="sub" style="margin-top:16px;color:var(--gray);font-size:11.5px;">تفاصيل الدفعات لكل قضية على حدة موجودة جوه ملف القضية نفسه.</div>`;
 }
 
+async function renderSalaryPanel(container, staffRow) {
+  container.innerHTML = `
+    <div class="salary-base-box">
+      <label>المرتب الشهري المتفق عليه</label>
+      <input id="salaryBaseInput" type="number" min="0" value="${Number(staffRow.salary) || ''}" placeholder="مثلاً 5000">
+      <button id="btnSaveSalary">حفظ</button>
+    </div>
+    <div class="pay-add-row">
+      <input id="payAmount" class="pay-amount" type="number" min="0" placeholder="قيمة الدفعة">
+      <input id="payNote" class="pay-note" placeholder="ملاحظة (اختياري) — مرتب شهر أغسطس مثلاً">
+      <button id="btnAddPay">+ تسجيل دفعة</button>
+    </div>
+    <div id="payList"></div>
+    <div id="payEmpty" class="empty-row" style="display:none;">لسه معملتش أي دفعة مرتب لـ${window.CaseWidget.escapeHTML(staffRow.name || 'الموظف')}</div>`;
+
+  document.getElementById('btnSaveSalary').addEventListener('click', async () => {
+    const val = document.getElementById('salaryBaseInput').value;
+    await window.CaseWidget.updateStaff(staffRow.id, { salary: Number(val) || 0 });
+    window.CaseWidget.toast('اتحفظ المرتب الأساسي ✓');
+  });
+
+  async function refreshPayments() {
+    const payments = await window.CaseWidget.listSalaryPayments(staffRow.id);
+    document.getElementById('payEmpty').style.display = payments.length ? 'none' : 'block';
+    const list = document.getElementById('payList');
+    list.innerHTML = payments.map(p => `
+      <div class="pay-row" data-id="${p.id}">
+        <span class="amt">${fmtMoney(p.amount)}</span>
+        <span class="note">${window.CaseWidget.escapeHTML(p.note || '')}</span>
+        <span class="date">${fmtDate(p.createdAt)}</span>
+        <button class="del">حذف</button>
+      </div>`).join('');
+    list.querySelectorAll('.pay-row .del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.closest('.pay-row').dataset.id;
+        await window.CaseWidget.deleteSalaryPayment(id);
+        refreshPayments();
+      });
+    });
+  }
+
+  document.getElementById('btnAddPay').addEventListener('click', async () => {
+    const amount = document.getElementById('payAmount').value;
+    if (!amount || Number(amount) <= 0) { window.CaseWidget.toast('اكتب قيمة الدفعة الأول'); return; }
+    const note = document.getElementById('payNote').value;
+    await window.CaseWidget.addSalaryPayment(staffRow.id, { amount, note });
+    document.getElementById('payAmount').value = '';
+    document.getElementById('payNote').value = '';
+    refreshPayments();
+  });
+
+  await refreshPayments();
+}
+
 function renderLinkoutPanel(container, tabLabel) {
   container.innerHTML = `
     <div class="linkout-box">
@@ -260,6 +333,7 @@ async function boot() {
     else if (kind === 'hearings') await renderHearingsPanel(panel, staff.officeEmail);
     else if (kind === 'deadlines') await renderDeadlinesPanel(panel, staff.officeEmail);
     else if (kind === 'finance') await renderFinancePanel(panel, staff.officeEmail);
+    else if (kind === 'salary') await renderSalaryPanel(panel, staff);
     else renderLinkoutPanel(panel, label);
   }
 
