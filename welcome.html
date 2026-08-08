@@ -140,6 +140,7 @@ a{color:inherit;}
 
 <script type="module">
 import './case-widget.js';
+import { initOfficeGate } from './office-gate.js';
 
 function getUser() {
   const saved = localStorage.getItem('legista_user');
@@ -160,16 +161,20 @@ function getDisplayName(user) {
   return guess;
 }
 
+function showContent(user) {
+  document.getElementById('content').style.display = 'block';
+  document.getElementById('greetPhrase').textContent = greetingPhrase();
+  document.getElementById('greetName').textContent = getDisplayName(user);
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 function boot() {
   const user = getUser();
   if (!user) {
     document.getElementById('loginGate').style.display = 'block';
     return;
   }
-  document.getElementById('content').style.display = 'block';
-  document.getElementById('greetPhrase').textContent = greetingPhrase();
-  document.getElementById('greetName').textContent = getDisplayName(user);
-  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  initOfficeGate(user, () => showContent(user));
 }
 boot();
 </script>
