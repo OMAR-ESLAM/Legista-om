@@ -909,8 +909,7 @@ div[id*="g_id_onload"],
   <div class="nav-links">
     <a href="#modules">الأقسام</a>
     <a href="#dafou">الدفوع</a>
-    <a href="#melafat">ملفات القضايا</a>
-    <a href="#dashboard">لوحة التحكم</a>
+    <a href="#maktabak">إدارة مكتبك</a>
     <a href="#esteshara">استشارة</a>
     <a href="rol.html">رول الجلسات</a>
     <a href="#">API</a>
@@ -948,7 +947,7 @@ div[id*="g_id_onload"],
     <a href="#tahlil" class="quicknav-item" data-target="tahlil"><div class="quicknav-icon">💡</div><div class="quicknav-name">تحليل القضية</div></a>
     <a href="#dafou" class="quicknav-item cy" data-target="dafou"><div class="quicknav-icon">🛡️</div><div class="quicknav-name">الدفوع</div></a>
     <a href="#ahkam" class="quicknav-item" data-target="ahkam"><div class="quicknav-icon">⚖️</div><div class="quicknav-name">أحكام محكمة النقض</div></a>
-    <a href="#melafat" class="quicknav-item" data-target="melafat"><div class="quicknav-icon">📁</div><div class="quicknav-name">ملفات القضايا</div></a>
+    <a href="#maktabak" class="quicknav-item" data-target="maktabak"><div class="quicknav-icon">🏢</div><div class="quicknav-name">إدارة مكتبك</div></a>
     <a href="#mawareeth" class="quicknav-item" data-target="mawareeth"><div class="quicknav-icon">📜</div><div class="quicknav-name">المواريث</div></a>
     <a href="#mawaeed" class="quicknav-item" data-target="mawaeed"><div class="quicknav-icon">⏰</div><div class="quicknav-name">المواعيد القانونية</div></a>
     <a href="#esteshara" class="quicknav-item" data-target="esteshara"><div class="quicknav-icon">💬</div><div class="quicknav-name">الاستشارات القانونية</div></a>
@@ -1304,58 +1303,33 @@ div[id*="g_id_onload"],
     <div class="rol-portal-arrow">←</div>
   </a>
 </div>
-<!-- ══ SECTION: ملفات القضايا ══ -->
-<div class="section-wrap reveal" id="melafat">
+<!-- ══ SECTION: إدارة مكتبك ══ -->
+<div class="section-wrap reveal" id="maktabak">
   <p class="section-label">إدارة قانونية موحّدة</p>
-  <h2 class="section-h2">كل قضية في مكان واحد.<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">مش أدوات متفرقة.</span></h2>
+  <h2 class="section-h2">مكتبك كله في مكان واحد.<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">مش أدوات متفرقة.</span></h2>
 
-  <a href="case-file.html" class="rol-portal-card" onclick="return handleToolClick(event, 'case-file.html', false)">
+  <a href="welcome.html" class="rol-portal-card" onclick="return handleToolClick(event, 'welcome.html', false)">
     <div class="rol-radar">
       <div class="rol-radar-ring r1"></div>
       <div class="rol-radar-ring r2"></div>
       <div class="rol-radar-ring r3"></div>
       <div class="rol-radar-sweep"></div>
-      <div class="rol-radar-core">🗂️</div>
+      <div class="rol-radar-core">🏢</div>
     </div>
     <div class="rol-portal-body">
-      <p class="rol-eyebrow">CASE MANAGEMENT · ملفات القضايا</p>
-      <div class="rol-portal-title">ملف قضية متكامل</div>
-      <p class="rol-portal-sub">اعمل ملف لكل قضية بتربط فيه بيانات القضية، كل العقود والإنذارات والصيغ اللي اتولدت ليها، ونتيجة تحليل الذكاء الاصطناعي والدفوع المختارة — كل حاجة مكانها واحد بدل ما تكون متفرقة بين الأدوات.</p>
+      <p class="rol-eyebrow">OFFICE HUB · إدارة مكتبك</p>
+      <div class="rol-portal-title">إدارة مكتبك بالكامل</div>
+      <p class="rol-portal-sub">من مكان واحد: ملفات قضاياك وكل مستنداتها، لوحة تحكم بمواعيدك وجلساتك وآخر تحديث، وفريق مكتبك من محاميين وموظفين وبوابتهم الشخصية — كل حاجة مكانها واحد بدل ما تكون متفرقة بين الأدوات.</p>
       <div class="rol-stats">
-        <div class="rol-stat"><span>∞</span>قضايا بلا حد</div>
-        <div class="rol-stat"><span>🔗</span>ربط تلقائي</div>
-        <div class="rol-stat"><span>📁</span>مستندات وتحليل</div>
+        <div class="rol-stat"><span>🗂️</span>ملفات القضايا</div>
+        <div class="rol-stat"><span>📊</span>لوحة التحكم</div>
+        <div class="rol-stat"><span>👥</span>فريق المكتب</div>
       </div>
     </div>
     <div class="rol-portal-arrow">←</div>
   </a>
 </div>
-<!-- ══ SECTION: لوحة التحكم ══ -->
-<div class="section-wrap reveal" id="dashboard">
-  <p class="section-label">نظرة واحدة على كل حاجة</p>
-  <h2 class="section-h2">مواعيدك، جلساتك، وأتعابك.<br><span style="background:linear-gradient(90deg,var(--cyber),#0a6b53);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">من غير ما تدخل قضية قضية.</span></h2>
 
-  <a href="dashboard.html" class="rol-portal-card" onclick="return handleToolClick(event, 'dashboard.html', false)">
-    <div class="rol-radar">
-      <div class="rol-radar-ring r1"></div>
-      <div class="rol-radar-ring r2"></div>
-      <div class="rol-radar-ring r3"></div>
-      <div class="rol-radar-sweep"></div>
-      <div class="rol-radar-core">📊</div>
-    </div>
-    <div class="rol-portal-body">
-      <p class="rol-eyebrow">CONTROL CENTER · لوحة التحكم</p>
-      <div class="rol-portal-title">لوحة تحكم بكل قضاياك</div>
-      <p class="rol-portal-sub">شاشة واحدة بتجمّعلك المواعيد القانونية اللي قربت أو فاتت، الجلسات القادمة، وآخر تحديث في كل قضاياك — عشان تعرف إيه المحتاج تحرّك فيه دلوقتي من غير ما تدخل كل ملف قضية لوحده.</p>
-      <div class="rol-stats">
-        <div class="rol-stat"><span>⏰</span>تنبيه مواعيد</div>
-        <div class="rol-stat"><span>📅</span>جلسات قادمة</div>
-        <div class="rol-stat"><span>🕘</span>آخر تحديث</div>
-      </div>
-    </div>
-    <div class="rol-portal-arrow">←</div>
-  </a>
-</div>
 <!-- ══ SECTION: الاستشارة مع أ. هدى خميس ══ -->
 <div class="section-wrap reveal" id="esteshara">
   <p class="section-label">استشارة قانونية متخصصة</p>
