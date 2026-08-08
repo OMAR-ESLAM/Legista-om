@@ -59,16 +59,16 @@ const DEADLINE_SOON_DAYS = 3; // لو باقي على الميعاد ٣ أيام
 
 // ═══ مهن مكتب المحاماة — كل مهنة ليها تابات/أقسام خاصة بيها في بوابة الموظف ═══
 const STAFF_ROLES = [
-  { key: 'partner',          label: 'محامي شريك',            tabs: ['كل القضايا', 'التقارير المالية', 'إدارة الموظفين', 'الجلسات القادمة', 'المواعيد القانونية'] },
-  { key: 'lawyer',           label: 'محامي',                  tabs: ['قضاياي', 'الجلسات القادمة', 'المستندات', 'بوابة العميل', 'مهامي اليوم'] },
-  { key: 'trainee',          label: 'محامي تحت التمرين',       tabs: ['مهامي اليوم', 'الجلسات اللي هحضرها', 'تجهيز المستندات', 'مشاويري بالمحاكم'] },
-  { key: 'secretary',        label: 'سكرتير / سكرتيرة المكتب', tabs: ['جدول المواعيد', 'رسائل العملاء', 'تنبيهات المواعيد', 'بيانات العملاء'] },
-  { key: 'accountant',       label: 'محاسب المكتب',           tabs: ['الأتعاب والدفعات', 'المصروفات', 'الفواتير'] },
-  { key: 'office_manager',   label: 'مدير المكتب',            tabs: ['نظرة عامة على القضايا', 'إدارة الموظفين', 'التقارير'] },
-  { key: 'court_clerk',      label: 'مندوب محاكم',            tabs: ['مشاويري اليوم', 'مواعيد التسليم والاستلام', 'الجلسات القريبة'] },
-  { key: 'legal_researcher', label: 'باحث قانوني',            tabs: ['التحليل والدفوع', 'المرفقات والأدلة', 'مهامي اليوم'] },
-  { key: 'client_relations', label: 'مسؤول علاقات العملاء',   tabs: ['بوابة العميل', 'طلبات جديدة', 'رسائل العملاء'] },
-  { key: 'reviewer',         label: 'مراجع مستندات',          tabs: ['مستندات للمراجعة', 'مهامي اليوم'] },
+  { key: 'partner',          label: 'محامي شريك',            emoji: '🤝', tabs: ['كل القضايا', 'التقارير المالية', 'إدارة الموظفين', 'الجلسات القادمة', 'المواعيد القانونية', 'المرتب'] },
+  { key: 'lawyer',           label: 'محامي',                  emoji: '⚖️', tabs: ['قضاياي', 'الجلسات القادمة', 'المستندات', 'بوابة العميل', 'مهامي اليوم', 'المرتب'] },
+  { key: 'trainee',          label: 'محامي تحت التمرين',       emoji: '🎓', tabs: ['مهامي اليوم', 'الجلسات اللي هحضرها', 'تجهيز المستندات', 'مشاويري بالمحاكم', 'المرتب'] },
+  { key: 'secretary',        label: 'سكرتير / سكرتيرة المكتب', emoji: '🗂️', tabs: ['جدول المواعيد', 'رسائل العملاء', 'تنبيهات المواعيد', 'بيانات العملاء', 'المرتب'] },
+  { key: 'accountant',       label: 'محاسب المكتب',           emoji: '💰', tabs: ['الأتعاب والدفعات', 'المصروفات', 'الفواتير', 'المرتب'] },
+  { key: 'office_manager',   label: 'مدير المكتب',            emoji: '🧭', tabs: ['نظرة عامة على القضايا', 'إدارة الموظفين', 'التقارير', 'المرتب'] },
+  { key: 'court_clerk',      label: 'مندوب محاكم',            emoji: '🏛️', tabs: ['مشاويري اليوم', 'مواعيد التسليم والاستلام', 'الجلسات القريبة', 'المرتب'] },
+  { key: 'legal_researcher', label: 'باحث قانوني',            emoji: '🔍', tabs: ['التحليل والدفوع', 'المرفقات والأدلة', 'مهامي اليوم', 'المرتب'] },
+  { key: 'client_relations', label: 'مسؤول علاقات العملاء',   emoji: '💬', tabs: ['بوابة العميل', 'طلبات جديدة', 'رسائل العملاء', 'المرتب'] },
+  { key: 'reviewer',         label: 'مراجع مستندات',          emoji: '📝', tabs: ['مستندات للمراجعة', 'مهامي اليوم', 'المرتب'] },
 ];
 function getRoleDef(roleKey) {
   return STAFF_ROLES.find(r => r.key === roleKey) || null;
@@ -503,6 +503,41 @@ async function deleteStaff(staffId) {
   }
 }
 
+// ═══ مرتبات الموظفين (Staff Salary) ═══
+// staff/{staffId}.salary: الراتب الأساسي المتفق عليه (بيتحدّث بـ updateStaff)
+// salaryPayments/{paymentId}: staffId, amount, note, createdAt — سجل كل دفعة مرتب اتصرفت
+
+async function listSalaryPayments(staffId) {
+  if (!staffId) return [];
+  try {
+    const q = query(collection(db, 'salaryPayments'), where('staffId', '==', staffId));
+    const snap = await getDocs(q);
+    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    rows.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+    return rows;
+  } catch (e) {
+    console.error('CaseWidget.listSalaryPayments error', e);
+    return [];
+  }
+}
+
+async function addSalaryPayment(staffId, { amount, note }) {
+  const payload = { staffId, amount: Number(amount) || 0, note: (note || '').trim(), createdAt: Date.now() };
+  const ref = await addDoc(collection(db, 'salaryPayments'), payload);
+  toast('تم تسجيل الدفعة ✓');
+  return { id: ref.id, ...payload };
+}
+
+async function deleteSalaryPayment(paymentId) {
+  try {
+    await deleteDoc(doc(db, 'salaryPayments', paymentId));
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.deleteSalaryPayment error', e);
+    return false;
+  }
+}
+
 // ═══ مهام يومية شخصية (Personal Tasks) ═══
 // بتستخدم لصاحب المكتب (ownerId = الإيميل) ولكل موظف (ownerId = staffId) بنفس الشكل.
 // personalTasks/{taskId}: ownerId, text, done, createdAt
@@ -650,4 +685,5 @@ window.CaseWidget = {
   requestDocumentFromClient, uploadClientDocument, sendPortalMessage,
   createStaff, listStaff, getStaff, updateStaff, deleteStaff,
   listTasks, addTask, toggleTask, deleteTask,
+  listSalaryPayments, addSalaryPayment, deleteSalaryPayment,
 };
