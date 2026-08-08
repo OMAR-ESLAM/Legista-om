@@ -58,6 +58,9 @@ a{color:inherit;}
 .login-gate{text-align:center;padding:100px 20px;}
 .login-gate .icon{font-size:48px;margin-bottom:14px;}
 .loading-row{text-align:center;padding:40px;color:var(--gray);font-size:13px;}
+.notif-banner{display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:22px;flex-wrap:wrap;}
+.notif-banner .txt{font-size:12.5px;color:var(--gray);}
+.notif-banner button{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;border-radius:8px;padding:8px 16px;font-family:'Cairo',sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -78,6 +81,11 @@ a{color:inherit;}
   <div id="content" style="display:none;">
     <div class="page-title">لوحة <span>التحكم</span></div>
     <div class="page-sub">نظرة سريعة على كل قضاياك — المواعيد اللي محتاجة انتباه، الجلسات القادمة، وآخر تحديث.</div>
+
+    <div class="notif-banner" id="notifBanner">
+      <div class="txt">🔔 فعّل إشعارات الموبايل عشان توصلك تنبيهات المواعيد القانونية ورسايل الموكلين حتى لو الموقع مقفول</div>
+      <button id="btnEnableNotif">تفعيل الإشعارات</button>
+    </div>
 
     <div class="stat-row" id="statRow"></div>
 
@@ -101,6 +109,7 @@ a{color:inherit;}
 
 <script type="module">
 import './case-widget.js';
+import './notifications-client.js';
 
 function getUser() {
   const saved = localStorage.getItem('legista_user');
@@ -169,6 +178,21 @@ async function boot() {
     row.addEventListener('click', () => {
       location.href = `case-file.html?case=${row.dataset.id}`;
     });
+  });
+
+  // يظهر بانر تفعيل الإشعارات بس لو المستخدم لسه ما اتخدش قرار (مش وافق ولا رفض)
+  const state = window.LegistaNotifications.getNotificationPermissionState();
+  if (state === 'default') {
+    document.getElementById('notifBanner').style.display = 'flex';
+  }
+  document.getElementById('btnEnableNotif').addEventListener('click', async () => {
+    const ok = await window.LegistaNotifications.enableNotifications(user.email);
+    if (ok) document.getElementById('notifBanner').style.display = 'none';
+  });
+
+  // إشعار داخل الصفحة نفسها لو المحامي فاتح الداشبورد فعليًا وقت وصول حاجة جديدة
+  window.LegistaNotifications.listenForegroundMessages((payload) => {
+    window.CaseWidget.toast(payload.notification?.title || 'إشعار جديد');
   });
 }
 boot();
