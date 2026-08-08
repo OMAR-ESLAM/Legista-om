@@ -57,6 +57,23 @@ const CASE_TYPES = ['مدني', 'جنائي', 'تجاري', 'أحوال شخصي
 const CASE_STATUSES = ['نشطة', 'معلّقة', 'مغلقة'];
 const DEADLINE_SOON_DAYS = 3; // لو باقي على الميعاد ٣ أيام أو أقل بيتحول لتنبيه "قرب"
 
+// ═══ مهن مكتب المحاماة — كل مهنة ليها تابات/أقسام خاصة بيها في بوابة الموظف ═══
+const STAFF_ROLES = [
+  { key: 'partner',          label: 'محامي شريك',            tabs: ['كل القضايا', 'التقارير المالية', 'إدارة الموظفين', 'الجلسات القادمة', 'المواعيد القانونية'] },
+  { key: 'lawyer',           label: 'محامي',                  tabs: ['قضاياي', 'الجلسات القادمة', 'المستندات', 'بوابة العميل', 'مهامي اليوم'] },
+  { key: 'trainee',          label: 'محامي تحت التمرين',       tabs: ['مهامي اليوم', 'الجلسات اللي هحضرها', 'تجهيز المستندات', 'مشاويري بالمحاكم'] },
+  { key: 'secretary',        label: 'سكرتير / سكرتيرة المكتب', tabs: ['جدول المواعيد', 'رسائل العملاء', 'تنبيهات المواعيد', 'بيانات العملاء'] },
+  { key: 'accountant',       label: 'محاسب المكتب',           tabs: ['الأتعاب والدفعات', 'المصروفات', 'الفواتير'] },
+  { key: 'office_manager',   label: 'مدير المكتب',            tabs: ['نظرة عامة على القضايا', 'إدارة الموظفين', 'التقارير'] },
+  { key: 'court_clerk',      label: 'مندوب محاكم',            tabs: ['مشاويري اليوم', 'مواعيد التسليم والاستلام', 'الجلسات القريبة'] },
+  { key: 'legal_researcher', label: 'باحث قانوني',            tabs: ['التحليل والدفوع', 'المرفقات والأدلة', 'مهامي اليوم'] },
+  { key: 'client_relations', label: 'مسؤول علاقات العملاء',   tabs: ['بوابة العميل', 'طلبات جديدة', 'رسائل العملاء'] },
+  { key: 'reviewer',         label: 'مراجع مستندات',          tabs: ['مستندات للمراجعة', 'مهامي اليوم'] },
+];
+function getRoleDef(roleKey) {
+  return STAFF_ROLES.find(r => r.key === roleKey) || null;
+}
+
 // ═══ أدوات مساعدة عامة ═══
 function escapeHTML(str) {
   if (str === undefined || str === null) return '';
@@ -174,6 +191,19 @@ async function updateCase(caseId, fields) {
   } catch (e) {
     console.error('CaseWidget.updateCase error', e);
     toast('حصل خطأ أثناء الحفظ');
+    return false;
+  }
+}
+
+// تثبيت/إلغاء تثبيت قضية فوق قايمة الداشبورد — من غير ما نلمس updatedAt
+// (عشان تثبيت قضية ما يخليهاش تقفز فوق قسم "آخر تحديث" وهي مالهاش تحديث فعلي)
+async function setCasePinned(caseId, pinned) {
+  try {
+    await updateDoc(doc(db, 'cases', caseId), { pinned: !!pinned });
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.setCasePinned error', e);
+    toast('حصل خطأ أثناء التثبيت');
     return false;
   }
 }
@@ -409,6 +439,115 @@ async function getDashboardSummary(ownerEmail) {
   };
 }
 
+// ═══ الموظفين (Staff) ═══
+// staff/{staffId}: officeEmail (صاحب المكتب), name, role (مفتاح من STAFF_ROLES), phone, createdAt
+
+async function createStaff(officeEmail, { name, role, phone }) {
+  const payload = {
+    officeEmail: officeEmail || '',
+    name: (name || '').trim(),
+    role: role || STAFF_ROLES[0].key,
+    phone: (phone || '').trim(),
+    createdAt: Date.now(),
+  };
+  const ref = await addDoc(collection(db, 'staff'), payload);
+  toast('تم إضافة الموظف ✓');
+  return { id: ref.id, ...payload };
+}
+
+async function listStaff(officeEmail) {
+  if (!officeEmail) return [];
+  try {
+    const q = query(collection(db, 'staff'), where('officeEmail', '==', officeEmail));
+    const snap = await getDocs(q);
+    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    rows.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+    return rows;
+  } catch (e) {
+    console.error('CaseWidget.listStaff error', e);
+    return [];
+  }
+}
+
+async function getStaff(staffId) {
+  try {
+    const snap = await getDoc(doc(db, 'staff', staffId));
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() };
+  } catch (e) {
+    console.error('CaseWidget.getStaff error', e);
+    return null;
+  }
+}
+
+async function updateStaff(staffId, fields) {
+  try {
+    await updateDoc(doc(db, 'staff', staffId), fields);
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.updateStaff error', e);
+    toast('حصل خطأ أثناء الحفظ');
+    return false;
+  }
+}
+
+async function deleteStaff(staffId) {
+  try {
+    await deleteDoc(doc(db, 'staff', staffId));
+    toast('تم حذف الموظف ✓');
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.deleteStaff error', e);
+    toast('حصل خطأ أثناء الحذف');
+    return false;
+  }
+}
+
+// ═══ مهام يومية شخصية (Personal Tasks) ═══
+// بتستخدم لصاحب المكتب (ownerId = الإيميل) ولكل موظف (ownerId = staffId) بنفس الشكل.
+// personalTasks/{taskId}: ownerId, text, done, createdAt
+
+async function listTasks(ownerId) {
+  if (!ownerId) return [];
+  try {
+    const q = query(collection(db, 'personalTasks'), where('ownerId', '==', ownerId));
+    const snap = await getDocs(q);
+    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    rows.sort((a, b) => toMillis(a.createdAt) - toMillis(b.createdAt));
+    return rows;
+  } catch (e) {
+    console.error('CaseWidget.listTasks error', e);
+    return [];
+  }
+}
+
+async function addTask(ownerId, text) {
+  if (!text || !text.trim()) return null;
+  const payload = { ownerId, text: text.trim(), done: false, createdAt: Date.now() };
+  const ref = await addDoc(collection(db, 'personalTasks'), payload);
+  return { id: ref.id, ...payload };
+}
+
+async function toggleTask(taskId, done) {
+  try {
+    await updateDoc(doc(db, 'personalTasks', taskId), { done: !!done });
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.toggleTask error', e);
+    return false;
+  }
+}
+
+async function deleteTask(taskId) {
+  try {
+    await deleteDoc(doc(db, 'personalTasks', taskId));
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.deleteTask error', e);
+    return false;
+  }
+}
+
 // ═══ اختصارات لصفحات الأدوات الأربعة (عقود / إنذارات / جنح / تحليل) ═══
 // دي الدوال اللي زرار "حفظ في ملف قضية" في كل أداة هيناديها.
 
@@ -501,11 +640,14 @@ async function openSaveToCasePicker({ ownerEmail, onSave }) {
 
 window.CaseWidget = {
   CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES, BRANCH_TEMPLATES, DECISION_STAGE_TITLE, DEADLINE_SOON_DAYS,
+  STAFF_ROLES, getRoleDef,
   escapeHTML, toast, toMillis,
-  listCases, getCase, createCase, updateCase, deleteCaseFully,
+  listCases, getCase, createCase, updateCase, setCasePinned, deleteCaseFully,
   listSub, addSubDoc, updateSubDoc, deleteSubDoc,
   saveDocumentToCase, saveAnalysisToCase, saveEvidenceToCase, openSaveToCasePicker,
   getStageTemplate, seedStagesFromTemplate, advanceAfterStage, branchStagesAfterDecision,
   computeDeadlineInfo, getDashboardSummary,
   requestDocumentFromClient, uploadClientDocument, sendPortalMessage,
+  createStaff, listStaff, getStaff, updateStaff, deleteStaff,
+  listTasks, addTask, toggleTask, deleteTask,
 };
