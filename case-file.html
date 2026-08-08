@@ -592,6 +592,7 @@ a{color:inherit;}
 
 <script type="module">
 import './case-widget.js';
+import { initOfficeGate } from './office-gate.js';
 
 let allCases = [];
 let activeStatus = 'الكل';
@@ -610,10 +611,14 @@ async function boot() {
     document.getElementById('listView').style.display = 'none';
     return;
   }
-  await refreshCases();
-  const params = new URLSearchParams(location.search);
-  const caseId = params.get('case');
-  if (caseId) openDetail(caseId);
+  document.getElementById('listView').style.display = 'none';
+  initOfficeGate(user, async () => {
+    document.getElementById('listView').style.display = '';
+    await refreshCases();
+    const params = new URLSearchParams(location.search);
+    const caseId = params.get('case');
+    if (caseId) openDetail(caseId);
+  });
 }
 
 async function refreshCases() {
