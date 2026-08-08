@@ -36,7 +36,7 @@
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc,
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc, setDoc,
   deleteDoc, query, where, writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -56,6 +56,24 @@ const db = getFirestore(app);
 const CASE_TYPES = ['مدني', 'جنائي', 'تجاري', 'أحوال شخصية', 'عمالي', 'إداري', 'أخرى'];
 const CASE_STATUSES = ['نشطة', 'معلّقة', 'مغلقة'];
 const DEADLINE_SOON_DAYS = 3; // لو باقي على الميعاد ٣ أيام أو أقل بيتحول لتنبيه "قرب"
+
+// ═══ تصنيفات سوق العملاء (صفحة "دورلي على محامي" العامة) ═══
+const LEAD_CATEGORIES = [
+  { key: 'rent',      label: 'إيجارات وعقارات',   emoji: '🏠' },
+  { key: 'labor',     label: 'عمالي',              emoji: '💼' },
+  { key: 'criminal',  label: 'جنائي',              emoji: '⚖️' },
+  { key: 'family',    label: 'أحوال شخصية',        emoji: '👪' },
+  { key: 'contracts', label: 'عقود وتحكيم',        emoji: '📄' },
+  { key: 'commercial',label: 'تجاري وشركات',       emoji: '🏢' },
+  { key: 'other',     label: 'حاجة تانية',         emoji: '❓' },
+];
+
+const EGYPT_GOVERNORATES = [
+  'القاهرة', 'الجيزة', 'الإسكندرية', 'القليوبية', 'الشرقية', 'الدقهلية', 'الغربية',
+  'المنوفية', 'البحيرة', 'كفر الشيخ', 'دمياط', 'بورسعيد', 'الإسماعيلية', 'السويس',
+  'شمال سيناء', 'جنوب سيناء', 'الفيوم', 'بني سويف', 'المنيا', 'أسيوط', 'سوهاج',
+  'قنا', 'الأقصر', 'أسوان', 'البحر الأحمر', 'الوادي الجديد', 'مطروح',
+];
 
 // ═══ مهن مكتب المحاماة — كل مهنة ليها تابات/أقسام خاصة بيها في بوابة الموظف ═══
 const STAFF_ROLES = [
@@ -503,7 +521,74 @@ async function deleteStaff(staffId) {
   }
 }
 
-// ═══ مرتبات الموظفين (Staff Salary) ═══
+// ═══ سوق العملاء (Lead Marketplace) ═══
+// leads/{leadId}: name, phone, city, category, description, createdAt, status ('new'|'assigned'), assignedTo (officeEmail أو null)
+// users/{email}.publicProfile: { specialties: [...], city, bio, acceptingLeads }
+
+async function submitLeadRequest({ name, phone, city, category, description }) {
+  const payload = {
+    name: (name || '').trim(),
+    phone: (phone || '').trim(),
+    city: city || '',
+    category: category || 'other',
+    description: (description || '').trim(),
+    status: 'new',
+    assignedTo: null,
+    createdAt: Date.now(),
+  };
+  const ref = await addDoc(collection(db, 'leads'), payload);
+  return { id: ref.id, ...payload };
+}
+
+async function findMatchingLawyers({ category, city }) {
+  try {
+    const q = query(collection(db, 'users'), where('publicProfile.acceptingLeads', '==', true));
+    const snap = await getDocs(q);
+    let lawyers = snap.docs.map(d => ({ email: d.id, ...d.data() }));
+    // فلترة إضافية على العميل (بدل ما نعمل composite index في فايرستور):
+    const bySpecialty = lawyers.filter(l => (l.publicProfile?.specialties || []).includes(category));
+    const byCity = (bySpecialty.length ? bySpecialty : lawyers).filter(l => !city || l.publicProfile?.city === city);
+    return byCity.length ? byCity : (bySpecialty.length ? bySpecialty : lawyers);
+  } catch (e) {
+    console.error('CaseWidget.findMatchingLawyers error', e);
+    return [];
+  }
+}
+
+async function assignLeadToLawyer(leadId, officeEmail) {
+  try {
+    await updateDoc(doc(db, 'leads', leadId), { assignedTo: officeEmail, status: 'assigned' });
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.assignLeadToLawyer error', e);
+    return false;
+  }
+}
+
+async function listLeadsForOffice(officeEmail) {
+  try {
+    const q = query(collection(db, 'leads'), where('assignedTo', '==', officeEmail));
+    const snap = await getDocs(q);
+    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    rows.sort((a, b) => b.createdAt - a.createdAt);
+    return rows;
+  } catch (e) {
+    console.error('CaseWidget.listLeadsForOffice error', e);
+    return [];
+  }
+}
+
+async function getPublicProfile(email) {
+  const snap = await getDoc(doc(db, 'users', email));
+  return snap.exists() ? (snap.data().publicProfile || null) : null;
+}
+
+async function setPublicProfile(email, publicProfile) {
+  await setDoc(doc(db, 'users', email), { publicProfile }, { merge: true });
+  return true;
+}
+
+
 // staff/{staffId}.salary: الراتب الأساسي المتفق عليه (بيتحدّث بـ updateStaff)
 // salaryPayments/{paymentId}: staffId, amount, note, createdAt — سجل كل دفعة مرتب اتصرفت
 
@@ -676,6 +761,7 @@ async function openSaveToCasePicker({ ownerEmail, onSave }) {
 window.CaseWidget = {
   CASE_TYPES, CASE_STATUSES, STAGE_TEMPLATES, BRANCH_TEMPLATES, DECISION_STAGE_TITLE, DEADLINE_SOON_DAYS,
   STAFF_ROLES, getRoleDef,
+  LEAD_CATEGORIES, EGYPT_GOVERNORATES,
   escapeHTML, toast, toMillis,
   listCases, getCase, createCase, updateCase, setCasePinned, deleteCaseFully,
   listSub, addSubDoc, updateSubDoc, deleteSubDoc,
@@ -686,4 +772,6 @@ window.CaseWidget = {
   createStaff, listStaff, getStaff, updateStaff, deleteStaff,
   listTasks, addTask, toggleTask, deleteTask,
   listSalaryPayments, addSalaryPayment, deleteSalaryPayment,
+  submitLeadRequest, findMatchingLawyers, assignLeadToLawyer, listLeadsForOffice,
+  getPublicProfile, setPublicProfile,
 };
