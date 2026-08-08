@@ -163,10 +163,22 @@ a{color:inherit;}
 .notes-box textarea{width:100%;min-height:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13.5px;line-height:1.9;direction:rtl;resize:vertical;outline:none;}
 .notes-box textarea:focus{border-color:var(--cyber);}
 .notes-saved-hint{font-size:11px;color:var(--gray);margin-top:8px;}
-.tab{padding:10px 18px;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;}
+.tab{position:relative;padding:10px 18px;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;display:inline-flex;align-items:center;}
 .tab.active{color:var(--gold);border-color:var(--gold);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
+
+/* ═══ tab notification badge (زي شارة عدد الرسايل الجديدة) ═══ */
+.tab-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:17px;height:17px;padding:0 5px;margin-inline-start:7px;
+  background:linear-gradient(135deg,#ff6b6b,#ff8a8a);color:#fff;
+  font-size:10.5px;font-weight:800;border-radius:20px;
+  box-shadow:0 0 0 2px var(--bg);
+  animation:badgePop .28s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes badgePop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+@media (prefers-reduced-motion: reduce){.tab-badge{animation:none;}}
 
 .tab-panel.paper{background:repeating-linear-gradient(var(--bg) 0px,var(--bg) 26px,rgba(212,175,55,0.045) 27px);border-radius:10px;padding:18px 18px 6px;position:relative;}
 .tab-panel.paper::before{content:'';position:absolute;top:0;bottom:0;right:46px;width:1px;background:rgba(255,90,90,0.18);}
@@ -355,14 +367,14 @@ a{color:inherit;}
       </div>
     </div>
     <div class="tabs">
-      <div class="tab active" data-tab="stages">مراحل القضية</div>
+      <div class="tab active" data-tab="stages">مراحل القضية<span class="tab-badge" id="tabBadge-stages" style="display:none;"></span></div>
       <div class="tab" data-tab="info">بيانات القضية</div>
-      <div class="tab" data-tab="hearings">الجلسات</div>
-      <div class="tab" data-tab="fees">الأتعاب</div>
-      <div class="tab" data-tab="documents">المستندات</div>
-      <div class="tab" data-tab="analyses">التحليل والدفوع</div>
-      <div class="tab" data-tab="evidence">المرفقات والأدلة</div>
-      <div class="tab" data-tab="portal">بوابة العميل</div>
+      <div class="tab" data-tab="hearings">الجلسات<span class="tab-badge" id="tabBadge-hearings" style="display:none;"></span></div>
+      <div class="tab" data-tab="fees">الأتعاب<span class="tab-badge" id="tabBadge-fees" style="display:none;"></span></div>
+      <div class="tab" data-tab="documents">المستندات<span class="tab-badge" id="tabBadge-documents" style="display:none;"></span></div>
+      <div class="tab" data-tab="analyses">التحليل والدفوع<span class="tab-badge" id="tabBadge-analyses" style="display:none;"></span></div>
+      <div class="tab" data-tab="evidence">المرفقات والأدلة<span class="tab-badge" id="tabBadge-evidence" style="display:none;"></span></div>
+      <div class="tab" data-tab="portal">بوابة العميل<span class="tab-badge" id="tabBadge-portal" style="display:none;"></span></div>
       <div class="tab" data-tab="notes">ملاحظات</div>
     </div>
 
@@ -759,6 +771,8 @@ async function openDetail(caseId) {
   await loadHearings(caseId);
   await loadFees(caseId, c);
   await loadPortalTab(caseId);
+  await refreshAllTabBadges(caseId);
+  markTabSeen(caseId, 'stages');
   loadNotes(c);
 }
 
@@ -803,6 +817,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    markTabSeen(currentCaseId, tab.dataset.tab);
   });
 });
 
@@ -1257,6 +1272,70 @@ document.getElementById('btnCopyPortalLink').addEventListener('click', () => {
 function fmtPortalTime(ms) {
   if (!ms) return '';
   return new Date(ms).toLocaleString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+/* ═══ نظام شارة "فيه جديد" فوق التابات (شامل كل التابات) ═══
+   لكل تاب فيه قايمة عناصر (مراحل / جلسات / مستندات / تحليلات / أدلة / بوابة العميل)
+   بنسجّل في المتصفح آخر وقت المحامي فتح فيه التاب ده لنفس القضية بالظبط.
+   أي عنصر جديد اتضاف بعد الوقت ده بيتحسب "جديد" وبيظهر رقمه كشارة حمرا جنب اسم التاب.
+   بمجرد ما يدوس على التاب، بيتسجّل إنه شافه والشارة بتختفي فورًا.
+   تابات "بيانات القضية" و"ملاحظات" مالهاش شارة لإنها مش قوايم عناصر بتتزود. */
+const TAB_BADGE_CONFIG = {
+  stages:    { subs: [{ name: 'stages',    timeField: 'createdAt' }] },
+  hearings:  { subs: [{ name: 'hearings',  timeField: 'createdAt' }] },
+  fees:      { subs: [{ name: 'payments',  timeField: 'createdAt' }] },
+  documents: { subs: [{ name: 'documents', timeField: 'createdAt' }] },
+  analyses:  { subs: [{ name: 'analyses',  timeField: 'createdAt' }] },
+  evidence:  { subs: [{ name: 'evidence',  timeField: 'createdAt' }] },
+  portal:    { subs: [
+    { name: 'messages',       timeField: 'createdAt', filter: (m) => m.sender === 'client' },
+    { name: 'portalRequests', timeField: 'uploadedAt', filter: (r) => r.status === 'uploaded' },
+  ] },
+};
+
+function tabSeenKey(caseId, tabKey) {
+  return `legista_tab_seen_${caseId}_${tabKey}`;
+}
+function getTabLastSeen(caseId, tabKey) {
+  return Number(localStorage.getItem(tabSeenKey(caseId, tabKey))) || 0;
+}
+function markTabSeen(caseId, tabKey) {
+  if (!TAB_BADGE_CONFIG[tabKey]) return;
+  localStorage.setItem(tabSeenKey(caseId, tabKey), String(Date.now()));
+  const badge = document.getElementById('tabBadge-' + tabKey);
+  if (badge) badge.style.display = 'none';
+}
+
+async function computeTabNewCount(caseId, tabKey) {
+  const cfg = TAB_BADGE_CONFIG[tabKey];
+  if (!cfg) return 0;
+  const lastSeen = getTabLastSeen(caseId, tabKey);
+  let count = 0;
+  for (const sub of cfg.subs) {
+    const items = await window.CaseWidget.listSub(caseId, sub.name);
+    count += items.filter(it => {
+      if (sub.filter && !sub.filter(it)) return false;
+      return window.CaseWidget.toMillis(it[sub.timeField]) > lastSeen;
+    }).length;
+  }
+  return count;
+}
+
+function renderTabBadge(tabKey, count) {
+  const badge = document.getElementById('tabBadge-' + tabKey);
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 9 ? '9+' : String(count);
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+async function refreshAllTabBadges(caseId) {
+  await Promise.all(Object.keys(TAB_BADGE_CONFIG).map(async (key) => {
+    renderTabBadge(key, await computeTabNewCount(caseId, key));
+  }));
 }
 
 async function loadPortalTab(caseId) {
