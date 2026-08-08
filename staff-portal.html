@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابتي | LEGISTA</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
+a{color:inherit;}
+
+.top-nav{height:56px;display:flex;align-items:center;justify-content:center;padding:0 26px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:5px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+
+.wrap{max-width:820px;margin:0 auto;padding:36px 20px 80px;}
+
+.hero{background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(0,229,255,0.03));border:1px solid var(--border);border-radius:18px;padding:26px 24px;margin-bottom:28px;}
+.hero .greet{font-size:20px;font-weight:900;margin-bottom:6px;}
+.hero .greet span{color:var(--gold);}
+.hero .role-tag{display:inline-block;font-size:11px;padding:4px 13px;border-radius:20px;background:rgba(0,229,255,0.09);color:var(--cyber);border:1px solid rgba(0,229,255,0.2);font-weight:700;}
+.hero .sub{font-size:12.5px;color:var(--gray);margin-top:12px;line-height:1.8;}
+
+.error-box{text-align:center;padding:100px 20px;}
+.error-box .icon{font-size:44px;margin-bottom:14px;}
+
+/* ═══ role tabs ═══ */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap;}
+.tab{padding:10px 16px;font-size:12.5px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--gold);border-color:var(--gold);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ═══ tasks widget ═══ */
+.task-add-row{display:flex;gap:8px;margin-bottom:16px;}
+.task-add-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.task-add-row input:focus{border-color:var(--cyber);}
+.task-add-row button{background:var(--cyber);color:#03181a;border:none;padding:0 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+.task-row{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.task-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--success);flex-shrink:0;cursor:pointer;}
+.task-row .txt{flex:1;font-size:13.5px;}
+.task-row.done .txt{color:var(--gray);text-decoration:line-through;}
+.task-row .del{color:#ff6b6b;background:none;border:none;font-size:12px;cursor:pointer;font-family:'Cairo',sans-serif;}
+
+/* ═══ hearings/deadlines lists ═══ */
+.row-card{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;gap:12px;flex-wrap:wrap;}
+.row-card.overdue{border-inline-start:3px solid #ff6b6b;}
+.row-card.soon{border-inline-start:3px solid #ffa726;}
+.row-title{font-size:13.5px;font-weight:800;margin-bottom:3px;}
+.row-sub{font-size:11.5px;color:var(--gray);}
+.row-badge{font-size:10.5px;padding:4px 11px;border-radius:9px;font-weight:800;white-space:nowrap;}
+.row-badge.overdue{background:rgba(255,107,107,0.16);color:#ff6b6b;}
+.row-badge.soon{background:rgba(255,167,38,0.14);color:#ffa726;}
+.row-badge.info{background:rgba(0,229,255,0.08);color:var(--cyber);}
+
+/* ═══ finance summary ═══ */
+.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media (max-width:560px){.fin-grid{grid-template-columns:1fr;}}
+.fin-stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.fin-stat .lbl{font-size:11px;color:var(--gray);margin-bottom:6px;}
+.fin-stat .val{font-size:17px;font-weight:900;color:var(--gold);}
+
+/* ═══ generic link-out panel ═══ */
+.linkout-box{text-align:center;padding:36px 20px;background:var(--bg2);border:1px dashed var(--border);border-radius:14px;}
+.linkout-box .t{font-size:13.5px;color:var(--gray);margin-bottom:16px;line-height:1.8;}
+.btn-linkout{display:inline-block;background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;text-decoration:none;padding:11px 24px;border-radius:10px;font-weight:800;font-size:13px;}
+
+.empty-row{text-align:center;padding:30px 20px;color:var(--gray);font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:14px;}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html" class="nav-logo">LEGISTA</a>
+</div>
+
+<div class="wrap">
+  <div id="errorBox" class="error-box" style="display:none;">
+    <div class="icon">🔒</div>
+    <div class="hero greet">اللينك ده مش صحيح أو الموظف اتحذف</div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="hero">
+      <div class="greet"><span id="greetPhrase"></span>، <span id="staffName"></span> 👋</div>
+      <span class="role-tag" id="roleTag"></span>
+      <div class="sub">دي بوابتك الشخصية — هتلاقي فيها مهامك ومواعيدك بس على حسب دورك في المكتب.</div>
+    </div>
+
+    <div class="tabs" id="tabsBar"></div>
+    <div id="panelsWrap"></div>
+  </div>
+</div>
+
+<script type="module">
+import './case-widget.js';
+
+const params = new URLSearchParams(location.search);
+const staffId = params.get('staff');
+
+const TAB_KIND = {
+  'مهامي اليوم': 'tasks',
+  'الجلسات القادمة': 'hearings',
+  'الجلسات اللي هحضرها': 'hearings',
+  'الجلسات القريبة': 'hearings',
+  'مشاويري اليوم': 'hearings',
+  'مشاويري بالمحاكم': 'hearings',
+  'مواعيد التسليم والاستلام': 'hearings',
+  'المواعيد القانونية': 'deadlines',
+  'التقارير المالية': 'finance',
+  'الأتعاب والدفعات': 'finance',
+  'الفواتير': 'finance',
+  'المصروفات': 'finance',
+};
+
+function greetingPhrase() {
+  const h = new Date().getHours();
+  if (h < 12) return 'صباح الخير';
+  if (h < 18) return 'مساء الخير';
+  return 'مساء الخير';
+}
+
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('ar-EG');
+}
+function fmtMoney(n) {
+  return (Number(n) || 0).toLocaleString('ar-EG') + ' ج.م';
+}
+
+async function renderTasksPanel(container) {
+  container.innerHTML = `
+    <div class="task-add-row">
+      <input id="newTaskInput" placeholder="اكتب مهمة جديدة واضغط إضافة...">
+      <button id="btnAddTask">+ إضافة</button>
+    </div>
+    <div id="tasksList"></div>
+    <div id="tasksEmpty" class="empty-row" style="display:none;">مفيش مهام مسجّلة لسه — ضيف أول مهمة النهاردة</div>`;
+
+  async function refresh() {
+    const tasks = await window.CaseWidget.listTasks(staffId);
+    document.getElementById('tasksEmpty').style.display = tasks.length ? 'none' : 'block';
+    const list = document.getElementById('tasksList');
+    list.innerHTML = tasks.map(t => `
+      <div class="task-row ${t.done ? 'done' : ''}" data-id="${t.id}">
+        <input type="checkbox" ${t.done ? 'checked' : ''}>
+        <div class="txt">${window.CaseWidget.escapeHTML(t.text)}</div>
+        <button class="del">حذف</button>
+      </div>`).join('');
+    list.querySelectorAll('.task-row').forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('input[type="checkbox"]').addEventListener('change', async (e) => {
+        await window.CaseWidget.toggleTask(id, e.target.checked);
+        refresh();
+      });
+      row.querySelector('.del').addEventListener('click', async () => {
+        await window.CaseWidget.deleteTask(id);
+        refresh();
+      });
+    });
+  }
+  document.getElementById('btnAddTask').addEventListener('click', async () => {
+    const input = document.getElementById('newTaskInput');
+    if (!input.value.trim()) return;
+    await window.CaseWidget.addTask(staffId, input.value);
+    input.value = '';
+    refresh();
+  });
+  document.getElementById('newTaskInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnAddTask').click();
+  });
+  await refresh();
+}
+
+async function renderHearingsPanel(container, officeEmail) {
+  container.innerHTML = `<div id="hearingsWrap"></div>`;
+  const summary = await window.CaseWidget.getDashboardSummary(officeEmail);
+  const wrap = document.getElementById('hearingsWrap');
+  wrap.innerHTML = summary.upcomingHearings.length ? summary.upcomingHearings.map(h => `
+    <div class="row-card">
+      <div><div class="row-title">${window.CaseWidget.escapeHTML(h.caseTitle)}</div><div class="row-sub">جلسة يوم ${fmtDate(h.date)}</div></div>
+      <span class="row-badge info">📅 ${fmtDate(h.date)}</span>
+    </div>`).join('') : `<div class="empty-row">مفيش جلسات قادمة متسجّلة في المكتب دلوقتي 🎉</div>`;
+}
+
+async function renderDeadlinesPanel(container, officeEmail) {
+  container.innerHTML = `<div id="dlWrap"></div>`;
+  const summary = await window.CaseWidget.getDashboardSummary(officeEmail);
+  const wrap = document.getElementById('dlWrap');
+  wrap.innerHTML = summary.deadlines.length ? summary.deadlines.map(d => `
+    <div class="row-card ${d.status}">
+      <div><div class="row-title">${window.CaseWidget.escapeHTML(d.caseTitle)}</div><div class="row-sub">${window.CaseWidget.escapeHTML(d.stageTitle || '')}${d.dueDate ? ' — الميعاد: ' + fmtDate(d.dueDate) : ''}</div></div>
+      <span class="row-badge ${d.status}">${d.status === 'overdue' ? 'فات الميعاد ⏰' : 'الميعاد قرب ⏰'}</span>
+    </div>`).join('') : `<div class="empty-row">مفيش مواعيد قانونية قربت أو فاتت دلوقتي 🎉</div>`;
+}
+
+async function renderFinancePanel(container, officeEmail) {
+  container.innerHTML = `<div id="finWrap"></div>`;
+  const cases = await window.CaseWidget.listCases(officeEmail);
+  const agreed = cases.reduce((s, c) => s + (Number(c.feeAgreed) || 0), 0);
+  const paid = cases.reduce((s, c) => s + (Number(c.paymentsTotal) || 0), 0);
+  document.getElementById('finWrap').innerHTML = `
+    <div class="fin-grid">
+      <div class="fin-stat"><div class="lbl">إجمالي الأتعاب المتفق عليها</div><div class="val">${fmtMoney(agreed)}</div></div>
+      <div class="fin-stat"><div class="lbl">إجمالي المحصّل</div><div class="val">${fmtMoney(paid)}</div></div>
+      <div class="fin-stat"><div class="lbl">المتبقي</div><div class="val">${fmtMoney(agreed - paid)}</div></div>
+    </div>
+    <div class="sub" style="margin-top:16px;color:var(--gray);font-size:11.5px;">تفاصيل الدفعات لكل قضية على حدة موجودة جوه ملف القضية نفسه.</div>`;
+}
+
+function renderLinkoutPanel(container, tabLabel) {
+  container.innerHTML = `
+    <div class="linkout-box">
+      <div class="t">تفاصيل "${window.CaseWidget.escapeHTML(tabLabel)}" بتتفتح من جوه ملفات القضايا مباشرة.</div>
+      <a class="btn-linkout" href="case-file.html">فتح ملفات القضايا ←</a>
+    </div>`;
+}
+
+async function boot() {
+  if (!staffId) {
+    document.getElementById('errorBox').style.display = 'block';
+    return;
+  }
+  const staff = await window.CaseWidget.getStaff(staffId);
+  if (!staff) {
+    document.getElementById('errorBox').style.display = 'block';
+    return;
+  }
+  document.getElementById('content').style.display = 'block';
+  document.getElementById('greetPhrase').textContent = greetingPhrase();
+  document.getElementById('staffName').textContent = staff.name || 'موظف';
+  const role = window.CaseWidget.getRoleDef(staff.role);
+  document.getElementById('roleTag').textContent = role ? role.label : staff.role;
+
+  const tabs = role ? role.tabs : ['مهامي اليوم'];
+  const tabsBar = document.getElementById('tabsBar');
+  const panelsWrap = document.getElementById('panelsWrap');
+  tabsBar.innerHTML = tabs.map((t, i) => `<div class="tab ${i === 0 ? 'active' : ''}" data-i="${i}">${window.CaseWidget.escapeHTML(t)}</div>`).join('');
+  panelsWrap.innerHTML = tabs.map((t, i) => `<div class="tab-panel ${i === 0 ? 'active' : ''}" id="panel-${i}"></div>`).join('');
+
+  const panelLoaded = new Set();
+  async function loadPanel(i) {
+    if (panelLoaded.has(i)) return;
+    panelLoaded.add(i);
+    const label = tabs[i];
+    const kind = TAB_KIND[label] || 'link';
+    const panel = document.getElementById('panel-' + i);
+    if (kind === 'tasks') await renderTasksPanel(panel);
+    else if (kind === 'hearings') await renderHearingsPanel(panel, staff.officeEmail);
+    else if (kind === 'deadlines') await renderDeadlinesPanel(panel, staff.officeEmail);
+    else if (kind === 'finance') await renderFinancePanel(panel, staff.officeEmail);
+    else renderLinkoutPanel(panel, label);
+  }
+
+  tabsBar.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const i = tab.dataset.i;
+      tabsBar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      panelsWrap.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + i).classList.add('active');
+      loadPanel(Number(i));
+    });
+  });
+
+  await loadPanel(0);
+}
+boot();
+</script>
+</body>
+</html>
