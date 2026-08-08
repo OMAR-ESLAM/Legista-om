@@ -67,13 +67,21 @@ a{color:inherit;}
 .hero .greet{font-size:20px;font-weight:900;margin-bottom:4px;}
 .hero .greet span{color:var(--gold);}
 .hero .date-line{font-size:12px;color:var(--gray);}
-.hub-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+.hub-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
 @media (max-width:560px){.hub-row{grid-template-columns:1fr;}}
-.hub-btn{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-decoration:none;color:var(--white);transition:border-color .2s, transform .2s;}
-.hub-btn:hover{border-color:var(--gold);transform:translateY(-1px);}
-.hub-btn .ic{font-size:20px;}
-.hub-btn .t{font-size:13px;font-weight:800;}
-.hub-btn .s{font-size:10.5px;color:var(--gray);margin-top:2px;}
+.hub-btn{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;text-decoration:none;color:var(--white);transition:transform .25s ease, border-color .25s ease;}
+.hub-btn:hover{transform:translateY(-3px);}
+.hub-btn.gold:hover{border-color:var(--gold);}
+.hub-btn.cyan:hover{border-color:var(--cyber);}
+.hub-ic-badge{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.hub-btn.gold .hub-ic-badge{background:rgba(212,175,55,0.12);animation:pulseGold 2.4s ease-in-out infinite;}
+.hub-btn.cyan .hub-ic-badge{background:rgba(0,229,255,0.1);animation:pulseCyan 2.4s ease-in-out infinite;}
+.hub-btn.gold:hover .hub-ic-badge{animation-duration:1.1s;}
+.hub-btn.cyan:hover .hub-ic-badge{animation-duration:1.1s;}
+@keyframes pulseGold{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.45);}70%{box-shadow:0 0 0 13px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
+@keyframes pulseCyan{0%{box-shadow:0 0 0 0 rgba(0,229,255,0.4);}70%{box-shadow:0 0 0 13px rgba(0,229,255,0);}100%{box-shadow:0 0 0 0 rgba(0,229,255,0);}}
+.hub-btn .t{font-size:14.5px;font-weight:800;}
+.hub-btn .s{font-size:11px;color:var(--gray);margin-top:3px;}
 
 /* ═══ pinned cases ═══ */
 .pin-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;color:var(--gray);flex-shrink:0;}
@@ -112,12 +120,12 @@ a{color:inherit;}
       <div class="greet"><span id="greetPhrase"></span>، <span id="greetName"></span> 👋</div>
       <div class="date-line" id="todayDate"></div>
       <div class="hub-row">
-        <a href="case-file.html" class="hub-btn">
-          <span class="ic">📁</span>
+        <a href="case-file.html" class="hub-btn gold">
+          <div class="hub-ic-badge">📁</div>
           <div><div class="t">إدارة قضاياك</div><div class="s">كل ملفات القضايا والمستندات</div></div>
         </a>
-        <a href="staff.html" class="hub-btn">
-          <span class="ic">👥</span>
+        <a href="staff.html" class="hub-btn cyan">
+          <div class="hub-ic-badge">👥</div>
           <div><div class="t">إدارة محاميينك وموظفيك</div><div class="s">ضيف فريق المكتب وابعتلهم بوابتهم الشخصية</div></div>
         </a>
       </div>
@@ -166,6 +174,7 @@ a{color:inherit;}
 <script type="module">
 import './case-widget.js';
 import './notifications-client.js';
+import { initOfficeGate } from './office-gate.js';
 
 function getUser() {
   const saved = localStorage.getItem('legista_user');
@@ -217,12 +226,16 @@ async function renderTasks(ownerId) {
   });
 }
 
-async function boot() {
+function boot() {
   const user = getUser();
   if (!user) {
     document.getElementById('loginGate').style.display = 'block';
     return;
   }
+  initOfficeGate(user, () => showContent(user));
+}
+
+async function showContent(user) {
   document.getElementById('content').style.display = 'block';
 
   document.getElementById('greetPhrase').textContent = greetingPhrase();
@@ -302,7 +315,7 @@ async function boot() {
       const willPin = !btn.classList.contains('pinned');
       await window.CaseWidget.setCasePinned(btn.dataset.id, willPin);
       window.CaseWidget.toast(willPin ? 'اتثبّتت القضية فوق ✓' : 'اتشالت من المثبّتة');
-      boot();
+      showContent(user);
     });
   });
 
