@@ -114,6 +114,7 @@ a{color:inherit;}
 
 <script type="module">
 import './case-widget.js';
+import { initOfficeGate } from './office-gate.js';
 
 function getUser() {
   const saved = localStorage.getItem('legista_user');
@@ -212,9 +213,11 @@ async function boot() {
     document.getElementById('loginGate').style.display = 'block';
     return;
   }
-  document.getElementById('content').style.display = 'block';
-  populateRoleSelect();
-  await refreshStaffList();
+  initOfficeGate(currentUser, async () => {
+    document.getElementById('content').style.display = 'block';
+    populateRoleSelect();
+    await refreshStaffList();
+  });
 }
 boot();
 </script>
