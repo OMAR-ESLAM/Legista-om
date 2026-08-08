@@ -63,7 +63,7 @@ function injectStyles() {
 export async function initOfficeGate(user, onUnlocked) {
   const email = user.email;
 
-  if (localStorage.getItem(unlockKey(email)) === '1') {
+  if (sessionStorage.getItem(unlockKey(email)) === '1') {
     onUnlocked();
     return;
   }
@@ -137,7 +137,7 @@ export async function initOfficeGate(user, onUnlocked) {
   }
 
   async function afterUnlock() {
-    localStorage.setItem(unlockKey(email), '1');
+    sessionStorage.setItem(unlockKey(email), '1');
     if (isMobile() && !localStorage.getItem(credKey(email)) && await biometricAvailable()) {
       renderBiometricOffer();
     } else {
@@ -184,7 +184,7 @@ export async function initOfficeGate(user, onUnlocked) {
           timeout: 60000
         }
       });
-      localStorage.setItem(unlockKey(email), '1');
+      sessionStorage.setItem(unlockKey(email), '1');
       finish();
     } catch (e) {
       if (!silentFail) render('biometric', 'مقدرنا نتحقق من البصمة، جرّب تاني أو استخدم الباصورد');
