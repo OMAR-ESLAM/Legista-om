@@ -1,0 +1,12 @@
+{
+  "name": "legista-notifications",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "notify:deadlines": "node scripts/notify-deadlines.js",
+    "notify:messages": "node scripts/notify-messages.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.3.1"
+  }
+}
