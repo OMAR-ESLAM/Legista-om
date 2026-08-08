@@ -37,10 +37,21 @@ a{color:inherit;}
 .hub-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:780px;margin:0 auto;}
 @media (max-width:640px){.hub-row{grid-template-columns:1fr;}}
 
-.hub-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:40px 26px;border-radius:24px;text-decoration:none;color:inherit;background:linear-gradient(145deg,#12121a 0%,#0a0f14 100%);border:1px solid rgba(0,229,255,0.15);overflow:hidden;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s,border-color .35s;}
+@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes spinBorder { to { --angle: 360deg; } }
+
+.hub-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:44px 26px 34px;border-radius:26px;text-decoration:none;color:inherit;background:linear-gradient(145deg,#14141e 0%,#0a0f14 100%);overflow:hidden;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s;}
+.hub-card::before{content:'';position:absolute;inset:0;border-radius:26px;padding:1.5px;background:conic-gradient(from var(--angle),rgba(0,229,255,0.9),rgba(0,229,255,0) 35%,rgba(0,229,255,0) 65%,rgba(0,229,255,0.9));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spinBorder 3.5s linear infinite;pointer-events:none;z-index:1;}
+.hub-card.gold::before{background:conic-gradient(from var(--angle),rgba(212,175,55,0.9),rgba(212,175,55,0) 35%,rgba(212,175,55,0) 65%,rgba(212,175,55,0.9));}
+.hub-card:hover::before{animation-duration:1.4s;}
+.hub-card::after{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,0.16),transparent 70%);pointer-events:none;z-index:0;transition:opacity .35s;}
+.hub-card.gold::after{background:radial-gradient(circle,rgba(212,175,55,0.18),transparent 70%);}
 .hub-card:hover{transform:translateY(-6px);}
-.hub-card.cyan:hover{border-color:rgba(0,229,255,0.4);box-shadow:0 24px 64px rgba(0,229,255,0.14),0 0 0 1px rgba(0,229,255,0.25);}
-.hub-card.gold:hover{border-color:rgba(212,175,55,0.45);box-shadow:0 24px 64px rgba(212,175,55,0.16),0 0 0 1px rgba(212,175,55,0.28);}
+.hub-card.cyan:hover{box-shadow:0 24px 64px rgba(0,229,255,0.16);}
+.hub-card.gold:hover{box-shadow:0 24px 64px rgba(212,175,55,0.18);}
+.hub-card>*{position:relative;z-index:2;}
+.hub-shine{position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,0.07),transparent);transform:skewX(-15deg);transition:left .65s ease;z-index:1;pointer-events:none;}
+.hub-card:hover .hub-shine{left:130%;}
 
 .hub-radar{position:relative;width:96px;height:96px;flex-shrink:0;}
 .hub-radar-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,0.3);}
@@ -58,9 +69,9 @@ a{color:inherit;}
 @keyframes hubPulseCyan{0%{box-shadow:0 0 0 0 rgba(0,229,255,0.35);}70%{box-shadow:0 0 0 20px rgba(0,229,255,0);}100%{box-shadow:0 0 0 0 rgba(0,229,255,0);}}
 @keyframes hubPulseGold{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.35);}70%{box-shadow:0 0 0 20px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
 
-.hub-eyebrow{font-size:10.5px;letter-spacing:3px;color:var(--cyber);font-weight:700;}
+.hub-eyebrow{font-size:10.5px;letter-spacing:3.5px;color:var(--cyber);font-weight:700;}
 .hub-card.gold .hub-eyebrow{color:var(--gold);}
-.hub-title{font-size:18px;font-weight:900;color:var(--white);}
+.hub-title{font-size:19.5px;font-weight:900;color:var(--white);}
 .hub-sub{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.7;}
 .hub-arrow{margin-top:4px;width:38px;height:38px;border-radius:50%;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--cyber);transition:transform .3s,box-shadow .3s;}
 .hub-card.gold .hub-arrow{background:rgba(212,175,55,0.08);border-color:rgba(212,175,55,0.28);color:var(--gold);}
@@ -93,6 +104,7 @@ a{color:inherit;}
 
     <div class="hub-row">
       <a href="case-file.html" class="hub-card gold">
+        <div class="hub-shine"></div>
         <div class="hub-radar">
           <div class="hub-radar-ring r1"></div>
           <div class="hub-radar-ring r2"></div>
@@ -106,6 +118,7 @@ a{color:inherit;}
         <div class="hub-arrow">←</div>
       </a>
       <a href="staff.html" class="hub-card cyan">
+        <div class="hub-shine"></div>
         <div class="hub-radar">
           <div class="hub-radar-ring r1"></div>
           <div class="hub-radar-ring r2"></div>
