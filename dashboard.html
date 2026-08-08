@@ -61,6 +61,35 @@ a{color:inherit;}
 .notif-banner{display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:22px;flex-wrap:wrap;}
 .notif-banner .txt{font-size:12.5px;color:var(--gray);}
 .notif-banner button{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;border-radius:8px;padding:8px 16px;font-family:'Cairo',sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;}
+
+/* ═══ hero + hub ═══ */
+.hero{background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(0,229,255,0.03));border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:22px;}
+.hero .greet{font-size:20px;font-weight:900;margin-bottom:4px;}
+.hero .greet span{color:var(--gold);}
+.hero .date-line{font-size:12px;color:var(--gray);}
+.hub-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+@media (max-width:560px){.hub-row{grid-template-columns:1fr;}}
+.hub-btn{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-decoration:none;color:var(--white);transition:border-color .2s, transform .2s;}
+.hub-btn:hover{border-color:var(--gold);transform:translateY(-1px);}
+.hub-btn .ic{font-size:20px;}
+.hub-btn .t{font-size:13px;font-weight:800;}
+.hub-btn .s{font-size:10.5px;color:var(--gray);margin-top:2px;}
+
+/* ═══ pinned cases ═══ */
+.pin-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;color:var(--gray);flex-shrink:0;}
+.pin-btn.pinned{color:var(--gold);}
+.row-card{position:relative;}
+
+/* ═══ daily tasks widget ═══ */
+.task-add-row{display:flex;gap:8px;margin-bottom:14px;}
+.task-add-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.task-add-row input:focus{border-color:var(--cyber);}
+.task-add-row button{background:var(--cyber);color:#03181a;border:none;padding:0 18px;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;white-space:nowrap;}
+.task-row{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:8px;}
+.task-row input[type="checkbox"]{width:17px;height:17px;accent-color:var(--success);flex-shrink:0;cursor:pointer;}
+.task-row .txt{flex:1;font-size:13px;}
+.task-row.done .txt{color:var(--gray);text-decoration:line-through;}
+.task-row .del{color:#ff6b6b;background:none;border:none;font-size:11.5px;cursor:pointer;font-family:'Cairo',sans-serif;}
 </style>
 </head>
 <body>
@@ -79,8 +108,20 @@ a{color:inherit;}
   </div>
 
   <div id="content" style="display:none;">
-    <div class="page-title">لوحة <span>التحكم</span></div>
-    <div class="page-sub">نظرة سريعة على كل قضاياك — المواعيد اللي محتاجة انتباه، الجلسات القادمة، وآخر تحديث.</div>
+    <div class="hero">
+      <div class="greet"><span id="greetPhrase"></span>، <span id="greetName"></span> 👋</div>
+      <div class="date-line" id="todayDate"></div>
+      <div class="hub-row">
+        <a href="case-file.html" class="hub-btn">
+          <span class="ic">📁</span>
+          <div><div class="t">إدارة قضاياك</div><div class="s">كل ملفات القضايا والمستندات</div></div>
+        </a>
+        <a href="staff.html" class="hub-btn">
+          <span class="ic">👥</span>
+          <div><div class="t">إدارة محاميينك وموظفيك</div><div class="s">ضيف فريق المكتب وابعتلهم بوابتهم الشخصية</div></div>
+        </a>
+      </div>
+    </div>
 
     <div class="notif-banner" id="notifBanner">
       <div class="txt">🔔 فعّل إشعارات الموبايل عشان توصلك تنبيهات المواعيد القانونية ورسايل الموكلين حتى لو الموقع مقفول</div>
@@ -88,6 +129,21 @@ a{color:inherit;}
     </div>
 
     <div class="stat-row" id="statRow"></div>
+
+    <div class="section">
+      <div class="section-title">✅ مهامي اليوم</div>
+      <div class="task-add-row">
+        <input id="newTaskInput" placeholder="اكتب مهمة سريعة واضغط إضافة...">
+        <button id="btnAddTask">+ إضافة</button>
+      </div>
+      <div id="tasksList"></div>
+      <div id="tasksEmpty" class="empty-row" style="display:none;">مفيش مهام النهاردة — نظّم شغلك بإضافة أول مهمة</div>
+    </div>
+
+    <div class="section" id="pinnedSection" style="display:none;">
+      <div class="section-title">📌 قضايا مثبّتة <span class="cnt" id="pinnedCount"></span></div>
+      <div id="pinnedList"></div>
+    </div>
 
     <div class="section">
       <div class="section-title">⏰ مواعيد قانونية محتاجة انتباه <span class="cnt" id="deadlinesCount"></span></div>
@@ -124,6 +180,43 @@ function fmtDate(v) {
   return d.toLocaleDateString('ar-EG');
 }
 
+function greetingPhrase() {
+  const h = new Date().getHours();
+  if (h < 12) return 'صباح الخير';
+  if (h < 18) return 'مساء الخير';
+  return 'مساء الخير';
+}
+
+// المحامي يقدر يظبط اسمه اللي بيتنادى بيه في الترحيب (بيتحفظ مرة واحدة محليًا)
+function getDisplayName(user) {
+  if (user.name) return user.name;
+  const guess = (user.email || '').split('@')[0];
+  return guess;
+}
+
+async function renderTasks(ownerId) {
+  const tasks = await window.CaseWidget.listTasks(ownerId);
+  document.getElementById('tasksEmpty').style.display = tasks.length ? 'none' : 'block';
+  const list = document.getElementById('tasksList');
+  list.innerHTML = tasks.map(t => `
+    <div class="task-row ${t.done ? 'done' : ''}" data-id="${t.id}">
+      <input type="checkbox" ${t.done ? 'checked' : ''}>
+      <div class="txt">${window.CaseWidget.escapeHTML(t.text)}</div>
+      <button class="del">حذف</button>
+    </div>`).join('');
+  list.querySelectorAll('.task-row').forEach(row => {
+    const id = row.dataset.id;
+    row.querySelector('input[type="checkbox"]').addEventListener('change', async (e) => {
+      await window.CaseWidget.toggleTask(id, e.target.checked);
+      renderTasks(ownerId);
+    });
+    row.querySelector('.del').addEventListener('click', async () => {
+      await window.CaseWidget.deleteTask(id);
+      renderTasks(ownerId);
+    });
+  });
+}
+
 async function boot() {
   const user = getUser();
   if (!user) {
@@ -131,6 +224,22 @@ async function boot() {
     return;
   }
   document.getElementById('content').style.display = 'block';
+
+  document.getElementById('greetPhrase').textContent = greetingPhrase();
+  document.getElementById('greetName').textContent = getDisplayName(user);
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  document.getElementById('btnAddTask').addEventListener('click', async () => {
+    const input = document.getElementById('newTaskInput');
+    if (!input.value.trim()) return;
+    await window.CaseWidget.addTask(user.email, input.value);
+    input.value = '';
+    renderTasks(user.email);
+  });
+  document.getElementById('newTaskInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnAddTask').click();
+  });
+  renderTasks(user.email);
 
   const summary = await window.CaseWidget.getDashboardSummary(user.email);
 
@@ -141,6 +250,19 @@ async function boot() {
       <div class="num">${summary.deadlines.filter(d => d.status === 'overdue').length}</div><div class="lbl">مواعيد فاتت</div></div>
     <div class="stat-card"><div class="num">${summary.deadlines.filter(d => d.status === 'soon').length}</div><div class="lbl">مواعيد قربت</div></div>
   `;
+
+  const allCases = await window.CaseWidget.listCases(user.email);
+  const pinned = allCases.filter(c => c.pinned);
+  document.getElementById('pinnedSection').style.display = pinned.length ? 'block' : 'none';
+  document.getElementById('pinnedCount').textContent = pinned.length ? `(${pinned.length})` : '';
+  document.getElementById('pinnedList').innerHTML = pinned.map(c => `
+    <div class="row-card" data-id="${c.id}">
+      <div class="row-main">
+        <div class="row-title">${window.CaseWidget.escapeHTML(c.title)}</div>
+        <div class="row-sub">${window.CaseWidget.escapeHTML(c.currentStageTitle || c.caseType || '')}</div>
+      </div>
+      <button class="pin-btn pinned" data-id="${c.id}" title="إلغاء التثبيت">📌</button>
+    </div>`).join('');
 
   document.getElementById('deadlinesCount').textContent = summary.deadlines.length ? `(${summary.deadlines.length})` : '';
   const dlList = document.getElementById('deadlinesList');
@@ -171,8 +293,18 @@ async function boot() {
         <div class="row-title">${window.CaseWidget.escapeHTML(c.title)}</div>
         <div class="row-sub">${window.CaseWidget.escapeHTML(c.currentStageTitle || c.caseType || '')}</div>
       </div>
-      <span class="row-badge info">${fmtDate(c.updatedAt)}</span>
+      <button class="pin-btn ${c.pinned ? 'pinned' : ''}" data-id="${c.id}" title="${c.pinned ? 'إلغاء التثبيت' : 'تثبيت القضية'}">📌</button>
     </div>`).join('') : `<div class="empty-row">مفيش قضايا لسه</div>`;
+
+  document.querySelectorAll('.pin-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const willPin = !btn.classList.contains('pinned');
+      await window.CaseWidget.setCasePinned(btn.dataset.id, willPin);
+      window.CaseWidget.toast(willPin ? 'اتثبّتت القضية فوق ✓' : 'اتشالت من المثبّتة');
+      boot();
+    });
+  });
 
   document.querySelectorAll('.row-card').forEach(row => {
     row.addEventListener('click', () => {
