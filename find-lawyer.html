@@ -49,12 +49,12 @@
 </head>
 <body class="bg-app text-fg">
 
-<main class="relative min-h-screen w-full overflow-hidden">
-  <!-- Hero background -->
-  <div class="absolute inset-0 -z-10">
+<main class="relative min-h-screen w-full overflow-hidden bg-app">
+  <!-- Hero background (limited to first screen height so content below sits on solid background) -->
+  <div class="absolute inset-x-0 top-0 h-screen -z-10">
     <img src="find-lawyer-hero.png" alt="" class="w-full h-full object-cover object-center">
-    <div class="absolute inset-0 bg-gradient-to-b from-[var(--background)]/85 via-[var(--background)]/70 to-[var(--background)]"></div>
-    <div class="absolute inset-x-0 top-0 h-2/3" style="background:radial-gradient(ellipse 60% 50% at 50% 20%, oklch(0.78 0.1 82 / 22%), transparent 70%);"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(to bottom, color-mix(in oklch, var(--background) 92%, transparent) 0%, color-mix(in oklch, var(--background) 82%, transparent) 45%, var(--background) 100%);"></div>
+    <div class="absolute inset-x-0 top-0 h-2/3" style="background:radial-gradient(ellipse 60% 50% at 50% 20%, oklch(0.78 0.1 82 / 18%), transparent 70%);"></div>
   </div>
 
   <!-- Logo -->
