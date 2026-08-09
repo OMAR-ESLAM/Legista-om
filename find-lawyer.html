@@ -47,15 +47,23 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Wave background */
-  .wave-band { position: absolute; inset-inline: 0; top: 22%; height: 46%; overflow: hidden; pointer-events: none; }
+  .wave-band { position: absolute; inset-inline: 0; top: 10%; height: 42%; overflow: hidden; pointer-events: none; }
+  .wave-bob { position: absolute; inset: -20% 0; animation: waveBob 7s ease-in-out infinite; }
   .wave-track { position: absolute; top: 0; right: 0; height: 100%; width: 200%; display: flex; animation: waveScroll 22s linear infinite; }
   .wave-track svg { height: 100%; width: 50%; flex-shrink: 0; }
   @keyframes waveScroll {
     from { transform: translateX(0); }
     to { transform: translateX(50%); }
   }
+  @keyframes waveBob {
+    0%   { transform: translateY(0) scaleY(1); }
+    25%  { transform: translateY(-10px) scaleY(1.06); }
+    50%  { transform: translateY(4px) scaleY(0.96); }
+    75%  { transform: translateY(-6px) scaleY(1.03); }
+    100% { transform: translateY(0) scaleY(1); }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .wave-track { animation: none; }
+    .wave-track, .wave-bob { animation: none; }
   }
 </style>
 </head>
@@ -70,6 +78,7 @@
 
     <!-- Animated tech wave band, behind the search panel -->
     <div class="wave-band">
+      <div class="wave-bob">
       <div class="wave-track">
         <svg viewBox="0 0 720 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -114,6 +123,7 @@
             <circle cx="495" cy="128" r="1.6" opacity="0.5"/>
           </g>
         </svg>
+      </div>
       </div>
     </div>
   </div>
