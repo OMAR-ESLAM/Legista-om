@@ -3,264 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>دورلك على محامي | LEGISTA Connect</title>
-<meta name="description" content="احكي مشكلتك وهنرشحلك أفضل محامين متخصصين وقريبين منك.">
-<meta name="theme-color" content="#0B0F17">
+<title>دور على محاميك | LEGISTA</title>
+<meta name="description" content="تصفّح محامين متخصصين قريبين منك وابعتله طلبك على طول.">
+<meta name="theme-color" content="#FAF8F4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #0B0F17; --ink2: #121826; --card: #161D2C;
-  --gold: #C9A227; --gold-soft: #E8CC7A; --cream: #F3EFE4;
-  --emerald: #1F9D73; --white: #FBF9F4; --gray: #8B93A3; --gray-soft: #5B6272;
-  --border: rgba(201,162,39,0.16); --border-soft: rgba(255,255,255,0.06);
+  --bg: #FAF8F4; --panel: #FFFFFF; --ink: #12181F;
+  --navy: #1E3A5F; --navy-deep: #142942; --navy-soft: #EAF0F6;
+  --gold: #C9A227; --gold-soft: #F4E7BE;
+  --gray: #6B7280; --gray-soft: #98A1AC; --border: #E7E2D6;
+  --success: #1F9D73;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html,body{min-height:100%;}
-body{font-family:'Cairo',sans-serif;background:var(--ink);color:var(--white);}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);}
 a{color:inherit;}
 
-/* ═══ nav ═══ */
-.top-nav{height:68px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:0 26px;border-bottom:1px solid var(--border-soft);}
-.nav-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:5px;color:var(--white);}
+/* ═══ top bar ═══ */
+.top-nav{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel);z-index:200;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:4px;color:var(--navy-deep);text-decoration:none;}
 .nav-logo span{color:var(--gold);}
-.nav-tag{font-size:9.5px;letter-spacing:2.5px;color:var(--gray-soft);margin-top:2px;}
+.nav-sub{font-size:11.5px;color:var(--gray);font-weight:600;}
 
-/* ═══ hero ═══ */
-.hero{position:relative;text-align:center;padding:70px 24px 30px;max-width:680px;margin:0 auto;overflow:hidden;}
-.hero-glow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:480px;height:320px;background:radial-gradient(ellipse,rgba(201,162,39,0.16),transparent 70%);pointer-events:none;}
-.eyebrow{position:relative;display:inline-block;font-size:10.5px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:18px;padding:6px 16px;border:1px solid var(--border);border-radius:20px;}
-.hero h1{position:relative;font-size:30px;font-weight:900;line-height:1.55;margin-bottom:16px;}
-.hero h1 span{color:var(--gold);}
-.hero p{position:relative;font-size:14.5px;color:var(--gray);line-height:1.9;max-width:480px;margin:0 auto;}
+/* ═══ search header ═══ */
+.search-head{background:linear-gradient(160deg,var(--navy-soft) 0%,var(--bg) 100%);border-bottom:1px solid var(--border);padding:36px 20px 28px;}
+.search-inner{max-width:1080px;margin:0 auto;}
+.search-inner h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:16px;color:var(--navy-deep);}
+.search-inner h1 span{color:var(--gold);}
+.search-bar{display:flex;gap:10px;flex-wrap:wrap;}
+.search-bar input, .search-bar select{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--ink);font-family:'Cairo',sans-serif;font-size:13.5px;outline:none;direction:rtl;}
+.search-bar input{flex:2;min-width:180px;}
+.search-bar select{flex:1;min-width:140px;}
+.search-bar input:focus, .search-bar select:focus{border-color:var(--navy);}
 
-.stat-row{display:flex;justify-content:center;gap:0;margin-top:34px;border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:18px 0;}
-.stat{flex:1;text-align:center;position:relative;}
-.stat:not(:last-child)::after{content:'';position:absolute;top:8px;bottom:8px;left:0;width:1px;background:var(--border-soft);}
-.stat .n{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--gold-soft);}
-.stat .l{font-size:10.5px;color:var(--gray-soft);margin-top:4px;}
+/* ═══ category chips ═══ */
+.chip-row{max-width:1080px;margin:0 auto;padding:18px 20px 0;display:flex;gap:8px;flex-wrap:wrap;}
+.chip{background:var(--panel);border:1px solid var(--border);color:var(--gray);padding:9px 17px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .2s;}
+.chip:hover{border-color:var(--navy);color:var(--navy);}
+.chip.active{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep);}
 
-/* ═══ wizard ═══ */
-.wizard{max-width:600px;margin:0 auto;padding:44px 20px 90px;}
+/* ═══ grid ═══ */
+.grid-wrap{max-width:1080px;margin:0 auto;padding:22px 20px 90px;}
+.results-count{font-size:12px;color:var(--gray);margin-bottom:16px;}
+.lawyer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media (max-width:900px){.lawyer-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:600px){.lawyer-grid{grid-template-columns:1fr;}}
 
-.step-track{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:42px;}
-.tk-node{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;flex-shrink:0;}
-.tk-circle{width:34px;height:34px;border-radius:50%;background:var(--card);border:1.5px solid var(--border-soft);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--gray-soft);transition:all .3s;}
-.tk-node.done .tk-circle{background:var(--gold);border-color:var(--gold);color:#1a1300;}
-.tk-node.active .tk-circle{border-color:var(--gold);color:var(--gold-soft);box-shadow:0 0 0 4px rgba(201,162,39,0.12);}
-.tk-label{font-size:10px;color:var(--gray-soft);white-space:nowrap;}
-.tk-node.active .tk-label{color:var(--gold-soft);}
-.tk-line{width:56px;height:1px;background:var(--border-soft);margin:0 6px;position:relative;top:-13px;}
-.tk-line.done{background:var(--gold);}
-@media (max-width:480px){.tk-line{width:24px;}.tk-label{display:none;}}
+.lawyer-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(20,41,66,0.04);transition:transform .2s, box-shadow .2s;}
+.lawyer-card:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(20,41,66,0.1);}
+.lc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.lc-avatar{width:50px;height:50px;border-radius:50%;background:var(--navy-soft);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:var(--navy);}
+.lc-name{font-size:14.5px;font-weight:800;color:var(--navy-deep);}
+.lc-city{font-size:11px;color:var(--gray);margin-top:3px;}
+.lc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.lc-tag{font-size:10.5px;padding:3px 10px;border-radius:20px;background:var(--gold-soft);color:#7a5c0e;border:1px solid rgba(201,162,39,0.3);}
+.lc-bio{font-size:12px;color:var(--gray);line-height:1.7;flex:1;margin-bottom:14px;}
+.lc-btn{background:var(--navy-deep);color:#fff;border:none;padding:11px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;transition:background .2s;}
+.lc-btn:hover{background:var(--navy);}
 
-.step{display:none;}
-.step.active{display:block;animation:fadeUp .4s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.empty-state{text-align:center;padding:60px 20px;background:var(--panel);border:1px dashed var(--border);border-radius:16px;color:var(--gray);font-size:13px;line-height:1.9;}
+.empty-state .em{font-size:34px;margin-bottom:12px;}
 
-.step-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;text-align:center;}
-.step-sub{font-size:12.5px;color:var(--gray);text-align:center;margin-bottom:30px;line-height:1.8;}
-
-/* ═══ category cards ═══ */
-.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media (max-width:480px){.cat-grid{grid-template-columns:1fr;}}
-.cat-card{position:relative;display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border-soft);border-radius:14px;padding:18px 18px;cursor:pointer;transition:border-color .25s, transform .25s, box-shadow .25s;text-align:right;}
-.cat-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,0.28);}
-.cat-card .em-badge{width:42px;height:42px;border-radius:11px;background:rgba(201,162,39,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.cat-card .lbl{font-size:14px;font-weight:700;}
-.cat-card.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset;}
-.cat-card.selected .em-badge{background:var(--gold);}
-
-/* ═══ form fields ═══ */
-.field{margin-bottom:18px;}
-.field label{display:block;font-size:12.5px;color:var(--gray);margin-bottom:8px;}
-.field select, .field textarea, .field input{width:100%;background:var(--card);border:1px solid var(--border-soft);border-radius:11px;padding:14px 16px;color:var(--white);font-family:'Cairo',sans-serif;font-size:14px;direction:rtl;outline:none;transition:border-color .2s;}
-.field select:focus, .field textarea:focus, .field input:focus{border-color:var(--gold);}
-.field textarea{resize:vertical;min-height:90px;}
-.field input[type="tel"]{direction:ltr;text-align:right;}
-
-.step-actions{display:flex;gap:10px;margin-top:10px;}
-.btn-next{flex:1;background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#1a1300;border:none;padding:16px;border-radius:12px;font-weight:800;font-size:14.5px;cursor:pointer;font-family:'Cairo',sans-serif;transition:filter .2s;}
-.btn-next:hover{filter:brightness(1.08);}
-.btn-back{background:transparent;border:1px solid var(--border-soft);color:var(--gray);padding:16px 22px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:13.5px;cursor:pointer;}
-.field-err{font-size:11.5px;color:#e0705f;margin-top:-8px;margin-bottom:14px;min-height:14px;}
-
-/* ═══ loading ═══ */
-.loading-box{text-align:center;padding:70px 20px;}
-.loading-spinner{width:44px;height:44px;border-radius:50%;border:2.5px solid var(--border-soft);border-top-color:var(--gold);margin:0 auto 22px;animation:spin 0.9s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loading-box p{font-size:13px;color:var(--gray);}
-
-/* ═══ results ═══ */
-.results-head{text-align:center;margin-bottom:28px;}
-.results-head .badge-ok{width:52px;height:52px;border-radius:50%;background:rgba(31,157,115,0.14);border:1px solid rgba(31,157,115,0.35);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px;color:var(--emerald);}
-.results-head h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;margin-bottom:6px;}
-.results-head p{font-size:12.5px;color:var(--gray);}
-
-.lawyer-card{background:var(--card);border:1px solid var(--border-soft);border-radius:16px;padding:20px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s, transform .2s;}
-.lawyer-card:hover{border-color:rgba(201,162,39,0.3);transform:translateY(-1px);}
-.lawyer-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,rgba(201,162,39,0.22),rgba(201,162,39,0.05));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
-.lawyer-main{flex:1;min-width:0;}
-.lawyer-name{font-size:14.5px;font-weight:800;}
-.lawyer-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.lawyer-tag{font-size:10.5px;padding:3px 10px;border-radius:20px;background:rgba(201,162,39,0.1);color:var(--gold-soft);border:1px solid var(--border);}
-.lawyer-city{font-size:11.5px;color:var(--gray-soft);margin-top:6px;}
-.lawyer-bio{font-size:12px;color:var(--gray);margin-top:8px;line-height:1.8;}
-.lawyer-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
-.btn-pick{background:transparent;border:1px solid var(--border);color:var(--gold-soft);padding:10px 18px;border-radius:9px;font-family:'Cairo',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s;}
-.btn-pick:hover{background:rgba(201,162,39,0.08);}
-.btn-pick.picked{background:var(--emerald);border-color:var(--emerald);color:#04231b;}
-
-.empty-results{text-align:center;padding:36px 24px;background:var(--card);border:1px dashed var(--border-soft);border-radius:16px;color:var(--gray);font-size:13px;line-height:1.9;}
-
-.confirm-box{text-align:center;padding:60px 20px;}
-.confirm-box .badge-ok{width:60px;height:60px;border-radius:50%;background:rgba(31,157,115,0.14);border:1px solid rgba(31,157,115,0.35);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 20px;color:var(--emerald);}
-.confirm-box h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;margin-bottom:10px;}
-.confirm-box p{font-size:13px;color:var(--gray);line-height:1.9;max-width:360px;margin:0 auto;}
-
-.trust-foot{text-align:center;padding:26px 20px 50px;font-size:11px;color:var(--gray-soft);}
+/* ═══ contact modal ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(18,24,31,0.55);display:none;align-items:center;justify-content:center;z-index:999;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-card{max-width:400px;width:100%;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:26px;position:relative;box-shadow:0 24px 60px rgba(20,41,66,0.25);}
+.modal-close{position:absolute;top:16px;left:16px;background:none;border:none;color:var(--gray);font-size:18px;cursor:pointer;}
+.modal-head{margin-bottom:18px;}
+.modal-head .lawyer-name{font-size:15px;font-weight:800;color:var(--navy-deep);}
+.modal-head .sub{font-size:11.5px;color:var(--gray);margin-top:4px;}
+.m-field{margin-bottom:12px;}
+.m-field label{display:block;font-size:11.5px;color:var(--gray);margin-bottom:6px;}
+.m-field input, .m-field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--ink);font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:rtl;}
+.m-field input:focus, .m-field textarea:focus{border-color:var(--navy);}
+.m-field textarea{resize:vertical;min-height:70px;}
+.m-field input[type="tel"]{direction:ltr;text-align:right;}
+.m-err{font-size:11px;color:#c0392b;margin-bottom:8px;min-height:14px;}
+.m-submit{width:100%;background:var(--navy-deep);color:#fff;border:none;padding:13px;border-radius:10px;font-weight:800;font-size:13.5px;cursor:pointer;font-family:'Cairo',sans-serif;}
+.m-submit.sent{background:var(--success);}
 </style>
 </head>
 <body>
 
 <div class="top-nav">
-  <a href="index.html" class="nav-logo">LEGISTA <span>Connect</span></a>
-  <div class="nav-tag">شبكة محامين موثوقة</div>
+  <a href="index.html" class="nav-logo">LEGISTA<span>.</span></a>
+  <span class="nav-sub">دور على محاميك</span>
 </div>
 
-<div class="hero">
-  <div class="hero-glow"></div>
-  <div class="eyebrow">LEGAL MATCHING</div>
-  <h1>محتاج <span>محامي</span> يفهم مشكلتك؟</h1>
-  <p>احكي مشكلتك بالتفصيل، وهنرشحلك محامين متخصصين وقريبين منك تقدر تتواصل معاهم على طول — من غير أي مقابل.</p>
-  <div class="stat-row">
-    <div class="stat"><div class="n">100%</div><div class="l">سرية البيانات</div></div>
-    <div class="stat"><div class="n">دقايق</div><div class="l">وقت الترشيح</div></div>
-    <div class="stat"><div class="n">مجاني</div><div class="l">بالكامل</div></div>
+<div class="search-head">
+  <div class="search-inner">
+    <h1>دور على <span>محاميك</span> المناسب دلوقتي</h1>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="دور بالاسم أو التخصص...">
+      <select id="citySelect"><option value="">كل المحافظات</option></select>
+    </div>
   </div>
 </div>
 
-<div class="wizard">
-  <div class="step-track" id="stepTrack"></div>
+<div class="chip-row" id="chipRow"></div>
 
-  <!-- Step 1: category -->
-  <div class="step active" data-step="1">
-    <div class="step-title">مشكلتك نوعها إيه؟</div>
-    <div class="step-sub">اختار الأقرب لحالتك</div>
-    <div class="cat-grid" id="catGrid"></div>
-    <div class="field-err" id="err1"></div>
-  </div>
-
-  <!-- Step 2: details -->
-  <div class="step" data-step="2">
-    <div class="step-title">تفاصيل أكتر</div>
-    <div class="step-sub">ده بيساعد المحامي يفهم حالتك بسرعة</div>
-    <div class="field">
-      <label>محافظتك</label>
-      <select id="citySelect"><option value="">اختار المحافظة</option></select>
-    </div>
-    <div class="field">
-      <label>احكي مشكلتك باختصار (اختياري)</label>
-      <textarea id="descInput" placeholder="مثلاً: صاحب الشقة عايز يخرجني قبل نهاية عقد الإيجار..."></textarea>
-    </div>
-    <div class="field-err" id="err2"></div>
-    <div class="step-actions">
-      <button class="btn-back" data-back="1">رجوع</button>
-      <button class="btn-next" data-next="3">التالي ←</button>
-    </div>
-  </div>
-
-  <!-- Step 3: contact -->
-  <div class="step" data-step="3">
-    <div class="step-title">بيانات التواصل</div>
-    <div class="step-sub">عشان المحامي يقدر يتواصل معاك</div>
-    <div class="field">
-      <label>اسمك</label>
-      <input type="text" id="nameInput" placeholder="اسمك بالكامل">
-    </div>
-    <div class="field">
-      <label>رقم موبايلك</label>
-      <input type="tel" id="phoneInput" placeholder="01000000000">
-    </div>
-    <div class="field-err" id="err3"></div>
-    <div class="step-actions">
-      <button class="btn-back" data-back="2">رجوع</button>
-      <button class="btn-next" id="btnSubmit">دورلي على محامي 🔍</button>
-    </div>
-  </div>
-
-  <!-- Step 4: loading -->
-  <div class="step" data-step="4">
-    <div class="loading-box">
-      <div class="loading-spinner"></div>
-      <p>بنشوف أفضل محامين متخصصين في مشكلتك...</p>
-    </div>
-  </div>
-
-  <!-- Step 5: results -->
-  <div class="step" data-step="5">
-    <div class="results-head">
-      <div class="badge-ok">✓</div>
-      <h2>تم استلام طلبك</h2>
-      <p>اختار محامي وابعتله طلبك على طول</p>
-    </div>
-    <div id="resultsList"></div>
-  </div>
-
-  <!-- Step 6: confirmed -->
-  <div class="step" data-step="6">
-    <div class="confirm-box">
-      <div class="badge-ok">🎉</div>
-      <h2>تم إرسال طلبك</h2>
-      <p>المحامي هيتواصل معاك على رقمك قريب. تقدر تقفل الصفحة دلوقتي.</p>
-    </div>
-  </div>
-
+<div class="grid-wrap">
+  <div class="results-count" id="resultsCount"></div>
+  <div class="lawyer-grid" id="lawyerGrid"></div>
 </div>
 
-<div class="trust-foot">🔒 بياناتك بتتشارك بس مع المحامي اللي هتختاره — مش متاحة لأي حد تاني</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-head">
+      <div class="lawyer-name" id="modalLawyerName"></div>
+      <div class="sub">اكتب طلبك وهيتواصل معاك على رقمك</div>
+    </div>
+    <div class="m-field"><label>اسمك</label><input type="text" id="mName" placeholder="اسمك بالكامل"></div>
+    <div class="m-field"><label>رقم موبايلك</label><input type="tel" id="mPhone" placeholder="01000000000"></div>
+    <div class="m-field"><label>مشكلتك باختصار</label><textarea id="mDesc" placeholder="احكي مشكلتك بالتفصيل..."></textarea></div>
+    <div class="m-err" id="mErr"></div>
+    <button class="m-submit" id="mSubmit">ابعت الطلب</button>
+  </div>
+</div>
 
 <script type="module">
 import './case-widget.js';
 
-let currentStep = 1;
-const TOTAL_STEPS = 3;
-const STEP_LABELS = ['نوع المشكلة', 'التفاصيل', 'التواصل'];
-let selectedCategory = null;
-let leadRecord = null;
-let matchedLawyers = [];
+let allLawyers = [];
+let activeCategory = 'all';
 
-function renderProgress() {
-  const track = document.getElementById('stepTrack');
-  let html = '';
-  for (let i = 1; i <= TOTAL_STEPS; i++) {
-    const state = i < currentStep ? 'done' : i === currentStep ? 'active' : '';
-    html += `<div class="tk-node ${state}"><div class="tk-circle">${i < currentStep ? '✓' : i}</div><div class="tk-label">${STEP_LABELS[i-1]}</div></div>`;
-    if (i < TOTAL_STEPS) html += `<div class="tk-line ${i < currentStep ? 'done' : ''}"></div>`;
-  }
-  track.innerHTML = html;
-}
-
-function goToStep(n) {
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.querySelector(`.step[data-step="${n}"]`).classList.add('active');
-  if (n <= TOTAL_STEPS) { currentStep = n; renderProgress(); }
-}
-
-function renderCategories() {
-  const grid = document.getElementById('catGrid');
-  grid.innerHTML = window.CaseWidget.LEAD_CATEGORIES.map(c => `
-    <div class="cat-card" data-key="${c.key}">
-      <span class="em-badge">${c.emoji}</span>
-      <span class="lbl">${window.CaseWidget.escapeHTML(c.label)}</span>
-    </div>`).join('');
-  grid.querySelectorAll('.cat-card').forEach(card => {
-    card.addEventListener('click', () => {
-      grid.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedCategory = card.dataset.key;
-      document.getElementById('err1').textContent = '';
-      setTimeout(() => goToStep(2), 250);
+function renderChips() {
+  const row = document.getElementById('chipRow');
+  const cats = [{ key: 'all', label: 'الكل', emoji: '🔎' }, ...window.CaseWidget.LEAD_CATEGORIES];
+  row.innerHTML = cats.map(c => `<div class="chip ${c.key === activeCategory ? 'active' : ''}" data-key="${c.key}">${c.emoji} ${window.CaseWidget.escapeHTML(c.label)}</div>`).join('');
+  row.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeCategory = chip.dataset.key;
+      renderChips();
+      applyFilters();
     });
   });
 }
@@ -272,71 +150,104 @@ function renderCities() {
     opt.value = g; opt.textContent = g;
     sel.appendChild(opt);
   });
+  sel.addEventListener('change', applyFilters);
 }
 
-document.querySelectorAll('.btn-back').forEach(btn => {
-  btn.addEventListener('click', () => goToStep(Number(btn.dataset.back)));
-});
+function categoryLabel(key) {
+  const c = window.CaseWidget.LEAD_CATEGORIES.find(x => x.key === key);
+  return c ? c.label : key;
+}
 
-document.querySelector('[data-next="3"]').addEventListener('click', () => {
+function applyFilters() {
+  const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
   const city = document.getElementById('citySelect').value;
-  if (!city) { document.getElementById('err2').textContent = 'اختار محافظتك الأول'; return; }
-  goToStep(3);
-});
 
-document.getElementById('btnSubmit').addEventListener('click', async () => {
-  const name = document.getElementById('nameInput').value.trim();
-  const phone = document.getElementById('phoneInput').value.trim();
-  if (!name) { document.getElementById('err3').textContent = 'اكتب اسمك'; return; }
-  if (!phone || phone.length < 10) { document.getElementById('err3').textContent = 'اكتب رقم موبايل صحيح'; return; }
+  let filtered = allLawyers.filter(l => {
+    if (activeCategory !== 'all' && !(l.publicProfile?.specialties || []).includes(activeCategory)) return false;
+    if (city && l.publicProfile?.city !== city) return false;
+    if (searchTerm) {
+      const hay = [(l.name || ''), ...(l.publicProfile?.specialties || []).map(categoryLabel), (l.publicProfile?.bio || '')].join(' ').toLowerCase();
+      if (!hay.includes(searchTerm)) return false;
+    }
+    return true;
+  });
 
-  goToStep(4);
+  renderGrid(filtered);
+}
 
-  const category = selectedCategory;
-  const city = document.getElementById('citySelect').value;
-  const description = document.getElementById('descInput').value;
+function renderGrid(lawyers) {
+  const grid = document.getElementById('lawyerGrid');
+  document.getElementById('resultsCount').textContent = lawyers.length ? `${lawyers.length} محامي متاح` : '';
 
-  leadRecord = await window.CaseWidget.submitLeadRequest({ name, phone, city, category, description });
-  matchedLawyers = await window.CaseWidget.findMatchingLawyers({ category, city });
-
-  renderResults();
-  goToStep(5);
-});
-
-function renderResults() {
-  const list = document.getElementById('resultsList');
-  if (!matchedLawyers.length) {
-    list.innerHTML = `<div class="empty-results">لسه مفيش محامين متسجّلين في تخصصك أو منطقتك بالظبط، بس طلبك محفوظ عندنا — أول ما ينضم محامي مناسب هيتواصل معاك على رقمك.</div>`;
+  if (!lawyers.length) {
+    grid.innerHTML = '';
+    grid.insertAdjacentHTML('afterend', `<div class="empty-state" id="emptyState"><div class="em">🧑‍⚖️</div>لسه مفيش محامين متسجّلين في التصنيف أو المحافظة دي — جرّب تصنيف تاني أو رجّع "الكل".</div>`);
     return;
   }
-  list.innerHTML = matchedLawyers.map((l, i) => `
+  document.getElementById('emptyState')?.remove();
+
+  grid.innerHTML = lawyers.map((l, i) => `
     <div class="lawyer-card" data-idx="${i}">
-      <div class="lawyer-avatar">⚖️</div>
-      <div class="lawyer-main">
-        <div class="lawyer-name">${window.CaseWidget.escapeHTML(l.name || 'محامي')}</div>
-        ${l.publicProfile?.city ? `<div class="lawyer-city">📍 ${window.CaseWidget.escapeHTML(l.publicProfile.city)}</div>` : ''}
-        ${l.publicProfile?.specialties?.length ? `<div class="lawyer-tags">${l.publicProfile.specialties.map(s => `<span class="lawyer-tag">${window.CaseWidget.escapeHTML(s)}</span>`).join('')}</div>` : ''}
-        ${l.publicProfile?.bio ? `<div class="lawyer-bio">${window.CaseWidget.escapeHTML(l.publicProfile.bio)}</div>` : ''}
+      <div class="lc-top">
+        <div class="lc-avatar">⚖️</div>
+        <div>
+          <div class="lc-name">${window.CaseWidget.escapeHTML(l.name || 'محامي')}</div>
+          ${l.publicProfile?.city ? `<div class="lc-city">📍 ${window.CaseWidget.escapeHTML(l.publicProfile.city)}</div>` : ''}
+        </div>
       </div>
-      <div class="lawyer-actions">
-        <button class="btn-pick" data-email="${l.email}">اختاره</button>
-      </div>
+      ${l.publicProfile?.specialties?.length ? `<div class="lc-tags">${l.publicProfile.specialties.map(s => `<span class="lc-tag">${window.CaseWidget.escapeHTML(categoryLabel(s))}</span>`).join('')}</div>` : ''}
+      <div class="lc-bio">${window.CaseWidget.escapeHTML(l.publicProfile?.bio || 'محامي مسجّل على LEGISTA.')}</div>
+      <button class="lc-btn" data-email="${l.email}" data-name="${window.CaseWidget.escapeHTML(l.name || 'محامي')}">تواصل معه</button>
     </div>`).join('');
 
-  list.querySelectorAll('.btn-pick').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      list.querySelectorAll('.btn-pick').forEach(b => { b.disabled = true; });
-      await window.CaseWidget.assignLeadToLawyer(leadRecord.id, btn.dataset.email);
-      btn.classList.add('picked');
-      btn.textContent = 'تم ✓';
-      setTimeout(() => goToStep(6), 700);
-    });
+  grid.querySelectorAll('.lc-btn').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.dataset.email, btn.dataset.name));
   });
 }
 
-renderProgress();
-renderCategories();
-renderCities();
+let modalLawyerEmail = null;
+function openModal(email, name) {
+  modalLawyerEmail = email;
+  document.getElementById('modalLawyerName').textContent = name;
+  document.getElementById('mName').value = '';
+  document.getElementById('mPhone').value = '';
+  document.getElementById('mDesc').value = '';
+  document.getElementById('mErr').textContent = '';
+  const submitBtn = document.getElementById('mSubmit');
+  submitBtn.textContent = 'ابعت الطلب';
+  submitBtn.classList.remove('sent');
+  submitBtn.disabled = false;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+document.getElementById('modalClose').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('open'));
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') e.currentTarget.classList.remove('open'); });
+
+document.getElementById('mSubmit').addEventListener('click', async () => {
+  const name = document.getElementById('mName').value.trim();
+  const phone = document.getElementById('mPhone').value.trim();
+  const description = document.getElementById('mDesc').value.trim();
+  if (!name) { document.getElementById('mErr').textContent = 'اكتب اسمك'; return; }
+  if (!phone || phone.length < 10) { document.getElementById('mErr').textContent = 'اكتب رقم موبايل صحيح'; return; }
+  if (!description) { document.getElementById('mErr').textContent = 'اكتب مشكلتك باختصار'; return; }
+
+  const btn = document.getElementById('mSubmit');
+  btn.disabled = true;
+  const lead = await window.CaseWidget.submitLeadRequest({ name, phone, description, category: activeCategory === 'all' ? 'other' : activeCategory, city: document.getElementById('citySelect').value });
+  await window.CaseWidget.assignLeadToLawyer(lead.id, modalLawyerEmail);
+  btn.textContent = 'تم الإرسال ✓';
+  btn.classList.add('sent');
+  setTimeout(() => document.getElementById('modalOverlay').classList.remove('open'), 1200);
+});
+
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+async function boot() {
+  allLawyers = await window.CaseWidget.listAllPublicLawyers();
+  renderChips();
+  renderCities();
+  applyFilters();
+}
+boot();
 </script>
 </body>
 </html>
