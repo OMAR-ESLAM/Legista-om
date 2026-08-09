@@ -45,6 +45,18 @@
   .modal-overlay { backdrop-filter: blur(4px); }
   .spin { animation: spin 0.9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Wave background */
+  .wave-band { position: absolute; inset-inline: 0; top: 22%; height: 46%; overflow: hidden; pointer-events: none; }
+  .wave-track { position: absolute; top: 0; right: 0; height: 100%; width: 200%; display: flex; animation: waveScroll 22s linear infinite; }
+  .wave-track svg { height: 100%; width: 50%; flex-shrink: 0; }
+  @keyframes waveScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wave-track { animation: none; }
+  }
 </style>
 </head>
 <body class="bg-app text-fg">
@@ -55,6 +67,55 @@
     <img src="find-lawyer-hero.png" alt="" class="w-full h-full object-cover object-center">
     <div class="absolute inset-0" style="background:linear-gradient(to bottom, rgba(10,9,7,0.9) 0%, rgba(10,9,7,0.75) 45%, rgba(10,9,7,1) 100%);"></div>
     <div class="absolute inset-x-0 top-0 h-2/3" style="background:radial-gradient(ellipse 60% 50% at 50% 20%, rgba(201,162,75,0.18), transparent 70%);"></div>
+
+    <!-- Animated tech wave band, behind the search panel -->
+    <div class="wave-band">
+      <div class="wave-track">
+        <svg viewBox="0 0 720 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="waveFade1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#5fd9e8" stop-opacity="0"/>
+              <stop offset="50%" stop-color="#5fd9e8" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#5fd9e8" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="waveFade2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#9fe8f0" stop-opacity="0"/>
+              <stop offset="50%" stop-color="#9fe8f0" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#9fe8f0" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="waveFade3" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#38bdd4" stop-opacity="0"/>
+              <stop offset="50%" stop-color="#38bdd4" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#38bdd4" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,151.2 C45.0,151.2 45.0,120.0 90.0,120.0 C135.0,120.0 135.0,148.8 180.0,148.8 C225.0,148.8 225.0,180.0 270.0,180.0 C315.0,180.0 315.0,151.2 360.0,151.2 C405.0,151.2 405.0,120.0 450.0,120.0 C495.0,120.0 495.0,148.8 540.0,148.8 C585.0,148.8 585.0,180.0 630.0,180.0 C675.0,180.0 675.0,151.2 720.0,151.2" fill="none" stroke="url(#waveFade3)" stroke-width="1.5"/>
+          <path d="M0,150.0 C22.5,150.0 22.5,172.0 45.0,172.0 C67.5,172.0 67.5,150.0 90.0,150.0 C112.5,150.0 112.5,128.0 135.0,128.0 C157.5,128.0 157.5,150.0 180.0,150.0 C202.5,150.0 202.5,172.0 225.0,172.0 C247.5,172.0 247.5,150.0 270.0,150.0 C292.5,150.0 292.5,128.0 315.0,128.0 C337.5,128.0 337.5,150.0 360.0,150.0 C382.5,150.0 382.5,172.0 405.0,172.0 C427.5,172.0 427.5,150.0 450.0,150.0 C472.5,150.0 472.5,128.0 495.0,128.0 C517.5,128.0 517.5,150.0 540.0,150.0 C562.5,150.0 562.5,172.0 585.0,172.0 C607.5,172.0 607.5,150.0 630.0,150.0 C652.5,150.0 652.5,128.0 675.0,128.0 C697.5,128.0 697.5,150.0 720.0,150.0" fill="none" stroke="url(#waveFade1)" stroke-width="1.8"/>
+          <path d="M0,164.0 C22.5,164.0 22.5,149.6 45.0,149.6 C67.5,149.6 67.5,136.0 90.0,136.0 C112.5,136.0 112.5,150.4 135.0,150.4 C157.5,150.4 157.5,164.0 180.0,164.0 C202.5,164.0 202.5,149.6 225.0,149.6 C247.5,149.6 247.5,136.0 270.0,136.0 C292.5,136.0 292.5,150.4 315.0,150.4 C337.5,150.4 337.5,164.0 360.0,164.0 C382.5,164.0 382.5,149.6 405.0,149.6 C427.5,149.6 427.5,136.0 450.0,136.0 C472.5,136.0 472.5,150.4 495.0,150.4 C517.5,150.4 517.5,164.0 540.0,164.0 C562.5,164.0 562.5,149.6 585.0,149.6 C607.5,149.6 607.5,136.0 630.0,136.0 C652.5,136.0 652.5,150.4 675.0,150.4 C697.5,150.4 697.5,164.0 720.0,164.0" fill="none" stroke="url(#waveFade2)" stroke-width="1.2"/>
+          <g fill="#bdf2f7">
+            <circle cx="90" cy="120" r="2.4" opacity="0.75"/>
+            <circle cx="270" cy="180" r="2" opacity="0.55"/>
+            <circle cx="450" cy="120" r="2.4" opacity="0.75"/>
+            <circle cx="630" cy="180" r="2" opacity="0.55"/>
+            <circle cx="135" cy="128" r="1.6" opacity="0.5"/>
+            <circle cx="495" cy="128" r="1.6" opacity="0.5"/>
+          </g>
+        </svg>
+        <svg viewBox="0 0 720 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,151.2 C45.0,151.2 45.0,120.0 90.0,120.0 C135.0,120.0 135.0,148.8 180.0,148.8 C225.0,148.8 225.0,180.0 270.0,180.0 C315.0,180.0 315.0,151.2 360.0,151.2 C405.0,151.2 405.0,120.0 450.0,120.0 C495.0,120.0 495.0,148.8 540.0,148.8 C585.0,148.8 585.0,180.0 630.0,180.0 C675.0,180.0 675.0,151.2 720.0,151.2" fill="none" stroke="url(#waveFade3)" stroke-width="1.5"/>
+          <path d="M0,150.0 C22.5,150.0 22.5,172.0 45.0,172.0 C67.5,172.0 67.5,150.0 90.0,150.0 C112.5,150.0 112.5,128.0 135.0,128.0 C157.5,128.0 157.5,150.0 180.0,150.0 C202.5,150.0 202.5,172.0 225.0,172.0 C247.5,172.0 247.5,150.0 270.0,150.0 C292.5,150.0 292.5,128.0 315.0,128.0 C337.5,128.0 337.5,150.0 360.0,150.0 C382.5,150.0 382.5,172.0 405.0,172.0 C427.5,172.0 427.5,150.0 450.0,150.0 C472.5,150.0 472.5,128.0 495.0,128.0 C517.5,128.0 517.5,150.0 540.0,150.0 C562.5,150.0 562.5,172.0 585.0,172.0 C607.5,172.0 607.5,150.0 630.0,150.0 C652.5,150.0 652.5,128.0 675.0,128.0 C697.5,128.0 697.5,150.0 720.0,150.0" fill="none" stroke="url(#waveFade1)" stroke-width="1.8"/>
+          <path d="M0,164.0 C22.5,164.0 22.5,149.6 45.0,149.6 C67.5,149.6 67.5,136.0 90.0,136.0 C112.5,136.0 112.5,150.4 135.0,150.4 C157.5,150.4 157.5,164.0 180.0,164.0 C202.5,164.0 202.5,149.6 225.0,149.6 C247.5,149.6 247.5,136.0 270.0,136.0 C292.5,136.0 292.5,150.4 315.0,150.4 C337.5,150.4 337.5,164.0 360.0,164.0 C382.5,164.0 382.5,149.6 405.0,149.6 C427.5,149.6 427.5,136.0 450.0,136.0 C472.5,136.0 472.5,150.4 495.0,150.4 C517.5,150.4 517.5,164.0 540.0,164.0 C562.5,164.0 562.5,149.6 585.0,149.6 C607.5,149.6 607.5,136.0 630.0,136.0 C652.5,136.0 652.5,150.4 675.0,150.4 C697.5,150.4 697.5,164.0 720.0,164.0" fill="none" stroke="url(#waveFade2)" stroke-width="1.2"/>
+          <g fill="#bdf2f7">
+            <circle cx="90" cy="120" r="2.4" opacity="0.75"/>
+            <circle cx="270" cy="180" r="2" opacity="0.55"/>
+            <circle cx="450" cy="120" r="2.4" opacity="0.75"/>
+            <circle cx="630" cy="180" r="2" opacity="0.55"/>
+            <circle cx="135" cy="128" r="1.6" opacity="0.5"/>
+            <circle cx="495" cy="128" r="1.6" opacity="0.5"/>
+          </g>
+        </svg>
+      </div>
+    </div>
   </div>
 
   <!-- Logo -->
