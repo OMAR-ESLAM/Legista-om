@@ -540,6 +540,17 @@ async function submitLeadRequest({ name, phone, city, category, description }) {
   return { id: ref.id, ...payload };
 }
 
+async function listAllPublicLawyers() {
+  try {
+    const q = query(collection(db, 'users'), where('publicProfile.acceptingLeads', '==', true));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ email: d.id, ...d.data() }));
+  } catch (e) {
+    console.error('CaseWidget.listAllPublicLawyers error', e);
+    return [];
+  }
+}
+
 async function findMatchingLawyers({ category, city }) {
   try {
     const q = query(collection(db, 'users'), where('publicProfile.acceptingLeads', '==', true));
@@ -772,6 +783,6 @@ window.CaseWidget = {
   createStaff, listStaff, getStaff, updateStaff, deleteStaff,
   listTasks, addTask, toggleTask, deleteTask,
   listSalaryPayments, addSalaryPayment, deleteSalaryPayment,
-  submitLeadRequest, findMatchingLawyers, assignLeadToLawyer, listLeadsForOffice,
+  submitLeadRequest, findMatchingLawyers, assignLeadToLawyer, listLeadsForOffice, listAllPublicLawyers,
   getPublicProfile, setPublicProfile,
 };
