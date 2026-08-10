@@ -363,7 +363,7 @@ function renderGrid(lawyers) {
       <div class="flex flex-1 flex-col gap-2 px-3 pb-3 pt-1 text-center">
         <div class="flex items-center justify-center gap-1.5">
           <i data-lucide="star" class="text-gold-c" style="width:13px;height:13px;"></i>
-          <h3 class="text-sm font-bold text-fg">${window.CaseWidget.escapeHTML(l.name || 'محامي')}</h3>
+          <h3 class="text-sm font-bold text-fg">${window.CaseWidget.escapeHTML(l.publicProfile?.displayName || l.name || 'محامي')}</h3>
         </div>
         <p class="text-xs leading-relaxed text-muted-c">${window.CaseWidget.escapeHTML(specialtyLine)}</p>
         ${l.publicProfile?.city ? `<div class="flex items-center justify-center gap-1 text-xs text-muted-c">
