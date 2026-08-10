@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ظهورك في السوق | LEGISTA</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
+a{color:inherit;}
+
+.top-nav{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
+.nav-back{font-size:11px;color:var(--cyber);text-decoration:none;letter-spacing:1px;border:1px solid rgba(0,229,255,0.2);padding:6px 14px;border-radius:8px;}
+.nav-back:hover{background:rgba(0,229,255,0.07);}
+.nav-section{font-size:11px;letter-spacing:3px;color:var(--gray);font-weight:600;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:5px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px;}
+.page-title{font-size:22px;font-weight:900;margin-bottom:6px;}
+.page-title span{color:var(--gold);}
+.page-sub{font-size:13px;color:var(--gray);margin-bottom:28px;line-height:1.8;}
+
+.login-gate{text-align:center;padding:100px 20px;}
+.login-gate .icon{font-size:48px;margin-bottom:14px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:24px;}
+.card .lbl{font-size:11px;color:var(--gold);letter-spacing:1px;font-weight:800;margin-bottom:16px;}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;}
+.toggle-row .t{font-size:13.5px;font-weight:800;}
+.toggle-row .s{font-size:11.5px;color:var(--gray);margin-top:4px;}
+.switch{position:relative;width:46px;height:26px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.switch .track{position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:background .2s;}
+.switch .thumb{position:absolute;top:3px;right:3px;width:20px;height:20px;background:var(--gray);border-radius:50%;transition:.2s;}
+.switch input:checked + .track{background:rgba(212,175,55,0.35);}
+.switch input:checked + .track .thumb{transform:translateX(-20px);background:var(--gold);}
+
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:11.5px;color:var(--gray);margin-bottom:8px;}
+.field select, .field textarea, .field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.field select:focus, .field textarea:focus, .field input:focus{border-color:var(--cyber);}
+.field textarea{resize:vertical;min-height:80px;}
+
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media (max-width:520px){.spec-grid{grid-template-columns:1fr;}}
+.spec-chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 12px;cursor:pointer;font-size:12.5px;}
+.spec-chip input{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;}
+.spec-chip.checked{border-color:rgba(212,175,55,0.4);background:rgba(212,175,55,0.06);}
+
+.btn-save{background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#0A0A0D;border:none;padding:13px 26px;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:800;font-size:13.5px;cursor:pointer;}
+.save-msg{font-size:12px;color:var(--success);margin-right:12px;}
+
+.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;}
+.lead-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.lead-name{font-size:13.5px;font-weight:800;}
+.lead-badge{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(0,229,255,0.08);color:var(--cyber);border:1px solid rgba(0,229,255,0.2);font-weight:700;}
+.lead-meta{font-size:11px;color:var(--gray);margin-bottom:8px;}
+.lead-desc{font-size:12.5px;color:var(--white);line-height:1.8;margin-bottom:10px;}
+.lead-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.lead-actions a{font-size:11.5px;padding:7px 14px;border-radius:8px;text-decoration:none;font-weight:700;}
+.wa-btn{background:rgba(0,255,178,0.1);color:var(--success);border:1px solid rgba(0,255,178,0.3);}
+.call-btn{background:rgba(0,229,255,0.08);color:var(--cyber);border:1px solid rgba(0,229,255,0.2);}
+
+.empty-row{text-align:center;padding:30px 20px;color:var(--gray);font-size:13px;background:var(--surface);border:1px dashed var(--border);border-radius:14px;}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="case-file.html" class="nav-back">← ملفات القضايا</a>
+  <span class="nav-section">◈ ظهورك في السوق</span>
+  <a href="index.html" class="nav-logo">LEGISTA</a>
+</div>
+
+<div class="wrap">
+
+  <div id="loginGate" class="login-gate" style="display:none;">
+    <div class="icon">🔒</div>
+    <div class="page-title">سجّل الدخول الأول</div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="page-title">ظهورك في <span>سوق العملاء</span></div>
+    <div class="page-sub">فعّل ظهورك عشان تبدأ تستقبل طلبات عملاء جداد من صفحة "دور على محاميك"، وحدد تخصصاتك ومحافظتك عشان يوصلوا للعميل المناسب.</div>
+
+    <div class="card">
+      <div class="toggle-row">
+        <div>
+          <div class="t">مستقبل عملاء جداد؟</div>
+          <div class="s">لما يكون مفعّل، اسمك يظهر للعملاء اللي بيدوروا على محامي في تخصصك ومحافظتك.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="acceptingToggle">
+          <div class="track"><div class="thumb"></div></div>
+        </label>
+      </div>
+
+      <div class="field">
+        <label>رقم موبايلك اللي هيظهر للعملاء</label>
+        <input type="tel" id="phoneInput" placeholder="01000000000" dir="ltr" style="text-align:right;">
+      </div>
+
+      <div class="field">
+        <label>صورتك الشخصية (تظهر في كارتك بالسوق)</label>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div id="photoPreview" style="width:64px;height:64px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;">⚖️</div>
+          <input type="file" id="photoInput" accept="image/*" style="font-size:12px;color:var(--gray);">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>تخصصاتك (اختار واحد أو أكتر)</label>
+        <div class="spec-grid" id="specGrid"></div>
+      </div>
+
+      <div class="field">
+        <label>محافظتك</label>
+        <select id="citySelect"><option value="">اختار المحافظة</option></select>
+      </div>
+
+      <div class="field">
+        <label>نبذة مختصرة عنك (اختياري)</label>
+        <textarea id="bioInput" placeholder="مثلاً: محامي بخبرة 10 سنين في قضايا الإيجارات والعقارات..."></textarea>
+      </div>
+
+      <button class="btn-save" id="btnSave">حفظ</button>
+      <span class="save-msg" id="saveMsg" style="display:none;">تم الحفظ ✓</span>
+    </div>
+
+    <div class="card">
+      <div class="lbl">◈ إحصائيات ظهورك</div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:32px;font-weight:900;color:var(--gold);" id="impressionsCount">—</div>
+        <div style="font-size:12.5px;color:var(--gray);line-height:1.8;">مرة ظهر بروفايلك في نتائج بحث العملاء على صفحة "دور على محاميك".</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import './case-widget.js';
+import { initOfficeGate } from './office-gate.js';
+
+function getUser() {
+  const saved = localStorage.getItem('legista_user');
+  if (!saved) return null;
+  try { return JSON.parse(saved); } catch (e) { return null; }
+}
+
+let currentUser = null;
+let selectedSpecialties = new Set();
+
+function renderSpecialties() {
+  const grid = document.getElementById('specGrid');
+  grid.innerHTML = window.CaseWidget.LEAD_CATEGORIES.map(c => `
+    <label class="spec-chip" data-key="${c.key}">
+      <input type="checkbox" value="${c.key}">
+      <span>${c.emoji} ${window.CaseWidget.escapeHTML(c.label)}</span>
+    </label>`).join('');
+  grid.querySelectorAll('.spec-chip').forEach(chip => {
+    const input = chip.querySelector('input');
+    input.addEventListener('change', () => {
+      chip.classList.toggle('checked', input.checked);
+      if (input.checked) selectedSpecialties.add(chip.dataset.key);
+      else selectedSpecialties.delete(chip.dataset.key);
+    });
+  });
+}
+
+function renderCities() {
+  const sel = document.getElementById('citySelect');
+  window.CaseWidget.EGYPT_GOVERNORATES.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g; opt.textContent = g;
+    sel.appendChild(opt);
+  });
+}
+
+function categoryLabel(key) {
+  const c = window.CaseWidget.LEAD_CATEGORIES.find(x => x.key === key);
+  return c ? c.label : key;
+}
+
+let photoBase64 = null;
+
+function resizeImageToBase64(file, maxSize) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } }
+        else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('photoInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  photoBase64 = await resizeImageToBase64(file, 300);
+  document.getElementById('photoPreview').innerHTML = `<img src="${photoBase64}" style="width:100%;height:100%;object-fit:cover;">`;
+});
+
+async function loadProfile() {
+  const profile = await window.CaseWidget.getPublicProfile(currentUser.email);
+  document.getElementById('impressionsCount').textContent = profile?.impressions || 0;
+  if (!profile) return;
+  document.getElementById('acceptingToggle').checked = !!profile.acceptingLeads;
+  document.getElementById('citySelect').value = profile.city || '';
+  document.getElementById('phoneInput').value = profile.phone || '';
+  document.getElementById('bioInput').value = profile.bio || '';
+  if (profile.photoBase64) {
+    photoBase64 = profile.photoBase64;
+    document.getElementById('photoPreview').innerHTML = `<img src="${photoBase64}" style="width:100%;height:100%;object-fit:cover;">`;
+  }
+  selectedSpecialties = new Set(profile.specialties || []);
+  document.querySelectorAll('.spec-chip').forEach(chip => {
+    const checked = selectedSpecialties.has(chip.dataset.key);
+    chip.querySelector('input').checked = checked;
+    chip.classList.toggle('checked', checked);
+  });
+}
+
+document.getElementById('btnSave').addEventListener('click', async () => {
+  const acceptingLeads = document.getElementById('acceptingToggle').checked;
+  const city = document.getElementById('citySelect').value;
+  const phone = document.getElementById('phoneInput').value.trim();
+  const bio = document.getElementById('bioInput').value.trim();
+  if (acceptingLeads && phone.length < 10) {
+    window.CaseWidget.toast('لازم تكتب رقم موبايل صحيح عشان تقدر تستقبل عملاء');
+    return;
+  }
+  await window.CaseWidget.setPublicProfile(currentUser.email, {
+    acceptingLeads, city, phone, bio, specialties: Array.from(selectedSpecialties),
+    photoBase64: photoBase64 || null,
+  });
+  const msg = document.getElementById('saveMsg');
+  msg.style.display = 'inline';
+  setTimeout(() => { msg.style.display = 'none'; }, 2500);
+});
+
+async function boot() {
+  currentUser = getUser();
+  if (!currentUser) {
+    document.getElementById('loginGate').style.display = 'block';
+    return;
+  }
+  initOfficeGate(currentUser, async () => {
+    document.getElementById('content').style.display = 'block';
+    renderSpecialties();
+    renderCities();
+    await loadProfile();
+  });
+}
+boot();
+</script>
+</body>
+</html>
