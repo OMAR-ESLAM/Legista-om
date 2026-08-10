@@ -107,6 +107,11 @@ a{color:inherit;}
       </div>
 
       <div class="field">
+        <label>اسمك اللي يظهر للعملاء</label>
+        <input type="text" id="displayNameInput" placeholder="مثلاً: أحمد كمال">
+      </div>
+
+      <div class="field">
         <label>رقم موبايلك اللي هيظهر للعملاء</label>
         <input type="tel" id="phoneInput" placeholder="01000000000" dir="ltr" style="text-align:right;">
       </div>
@@ -120,7 +125,10 @@ a{color:inherit;}
       </div>
 
       <div class="field">
-        <label>تخصصاتك (اختار واحد أو أكتر)</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <label style="margin:0;">تخصصاتك (اختار واحد أو أكتر)</label>
+          <button type="button" id="btnSelectAllSpecs" style="background:none;border:1px solid var(--border);color:var(--gold);font-size:11px;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif;">اختار الكل</button>
+        </div>
         <div class="spec-grid" id="specGrid"></div>
       </div>
 
@@ -179,6 +187,18 @@ function renderSpecialties() {
   });
 }
 
+document.getElementById('btnSelectAllSpecs').addEventListener('click', () => {
+  const allKeys = window.CaseWidget.LEAD_CATEGORIES.map(c => c.key);
+  const allSelected = allKeys.every(k => selectedSpecialties.has(k));
+  document.querySelectorAll('.spec-chip').forEach(chip => {
+    const input = chip.querySelector('input');
+    input.checked = !allSelected;
+    chip.classList.toggle('checked', !allSelected);
+  });
+  selectedSpecialties = allSelected ? new Set() : new Set(allKeys);
+  document.getElementById('btnSelectAllSpecs').textContent = allSelected ? 'اختار الكل' : 'الغِ الكل';
+});
+
 function renderCities() {
   const sel = document.getElementById('citySelect');
   window.CaseWidget.EGYPT_GOVERNORATES.forEach(g => {
@@ -231,6 +251,7 @@ async function loadProfile() {
   document.getElementById('acceptingToggle').checked = !!profile.acceptingLeads;
   document.getElementById('citySelect').value = profile.city || '';
   document.getElementById('phoneInput').value = profile.phone || '';
+  document.getElementById('displayNameInput').value = profile.displayName || '';
   document.getElementById('bioInput').value = profile.bio || '';
   if (profile.photoBase64) {
     photoBase64 = profile.photoBase64;
@@ -248,13 +269,18 @@ document.getElementById('btnSave').addEventListener('click', async () => {
   const acceptingLeads = document.getElementById('acceptingToggle').checked;
   const city = document.getElementById('citySelect').value;
   const phone = document.getElementById('phoneInput').value.trim();
+  const displayName = document.getElementById('displayNameInput').value.trim();
   const bio = document.getElementById('bioInput').value.trim();
+  if (acceptingLeads && !displayName) {
+    window.CaseWidget.toast('لازم تكتب اسمك اللي يظهر للعملاء');
+    return;
+  }
   if (acceptingLeads && phone.length < 10) {
     window.CaseWidget.toast('لازم تكتب رقم موبايل صحيح عشان تقدر تستقبل عملاء');
     return;
   }
   await window.CaseWidget.setPublicProfile(currentUser.email, {
-    acceptingLeads, city, phone, bio, specialties: Array.from(selectedSpecialties),
+    acceptingLeads, city, phone, displayName, bio, specialties: Array.from(selectedSpecialties),
     photoBase64: photoBase64 || null,
   });
   const msg = document.getElementById('saveMsg');
