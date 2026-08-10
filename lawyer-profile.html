@@ -31,6 +31,9 @@
   .text-primary-fg-c { color: var(--primary-foreground); }
   .border-app { border-color: var(--border); }
   [data-lucide] { width: 1em; height: 1em; }
+  .cover-pattern { background-image: repeating-linear-gradient(135deg, oklch(0.78 0.1 82 / 6%) 0px, oklch(0.78 0.1 82 / 6%) 1px, transparent 1px, transparent 14px); }
+  .avatar-ring { box-shadow: 0 0 0 4px var(--background), 0 0 0 6px oklch(0.78 0.1 82 / 40%), 0 8px 30px oklch(0.78 0.1 82 / 25%); }
+  .quote-mark { font-family: Georgia, serif; }
 </style>
 </head>
 <body class="bg-app text-[var(--foreground)] min-h-screen">
@@ -46,32 +49,48 @@
 
 <main id="profileWrap" class="max-w-lg mx-auto px-4 py-10 hidden">
   <!-- cover -->
-  <div class="relative h-28 rounded-2xl bg-gradient-to-l from-[var(--card)] to-[var(--secondary)] border border-app"></div>
-
-  <!-- avatar + name -->
-  <div class="flex flex-col items-center -mt-12">
-    <div id="avatarWrap" class="w-24 h-24 rounded-full border-4 flex items-center justify-center text-3xl bg-secondary-c overflow-hidden" style="border-color:var(--background);">
-      <i data-lucide="scale" class="text-gold-c" style="width:32px;height:32px;"></i>
-    </div>
-    <h1 id="lawyerName" class="mt-3 text-lg font-extrabold"></h1>
-    <div id="lawyerCity" class="flex items-center gap-1 text-xs text-muted-c mt-1"></div>
-    <div id="specialtyTags" class="flex flex-wrap justify-center gap-1.5 mt-3"></div>
+  <div class="relative h-40 rounded-2xl border border-app overflow-hidden cover-pattern" style="background:radial-gradient(ellipse 80% 100% at 50% 0%, oklch(0.78 0.1 82 / 16%), var(--card) 70%);">
+    <span class="absolute top-3 left-3 flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-app/60 border border-app text-gold-c">
+      <i data-lucide="shield-check" style="width:11px;height:11px;"></i> عضو شبكة Legano
+    </span>
   </div>
 
-  <!-- bio -->
-  <div id="bioBox" class="mt-6 rounded-2xl border border-app bg-card-c p-4 text-sm leading-loose text-muted-c"></div>
+  <!-- avatar + name -->
+  <div class="flex flex-col items-center -mt-16">
+    <div class="relative">
+      <div id="avatarWrap" class="avatar-ring w-32 h-32 rounded-full flex items-center justify-center text-3xl bg-secondary-c overflow-hidden">
+        <i data-lucide="scale" class="text-gold-c" style="width:40px;height:40px;"></i>
+      </div>
+    </div>
+    <h1 id="lawyerName" class="mt-4 text-xl font-extrabold"></h1>
+    <div class="w-10 h-[3px] rounded-full bg-gold-c mt-2"></div>
+    <div id="lawyerCity" class="flex items-center gap-1 text-xs text-muted-c mt-3"></div>
+    <div id="specialtyTags" class="flex flex-wrap justify-center gap-1.5 mt-4"></div>
+  </div>
 
-  <!-- impressions note -->
-  <p class="mt-3 text-center text-[11px] text-muted-c/70">من ضمن الشبكة المسجّلة على Legano</p>
+  <!-- stats row (real data only) -->
+  <div id="statsRow" class="mt-6 flex items-center justify-center gap-3"></div>
+
+  <!-- bio -->
+  <div id="bioBox" class="relative mt-6 rounded-2xl border border-app bg-card-c p-5 pt-7 text-sm leading-loose text-muted-c">
+    <span class="quote-mark absolute -top-1 right-4 text-4xl text-gold-c/30">”</span>
+  </div>
 
   <!-- contact buttons -->
   <div class="mt-6 grid grid-cols-2 gap-3">
-    <a id="waBtn" target="_blank" class="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold" style="background:#25D366;color:#04230f;">
+    <a id="waBtn" target="_blank" class="flex items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold shadow-lg" style="background:linear-gradient(135deg,#25D366,#1aa650);color:#04230f;">
       <i data-lucide="message-circle"></i> واتساب
     </a>
-    <a id="callBtn" class="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold bg-gold-c text-primary-fg-c">
+    <a id="callBtn" class="flex items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold bg-gold-c text-primary-fg-c shadow-lg">
       <i data-lucide="phone"></i> اتصال
     </a>
+  </div>
+
+  <!-- trust row -->
+  <div class="mt-6 flex items-center justify-center gap-5 text-[10.5px] text-muted-c">
+    <span class="flex items-center gap-1"><i data-lucide="lock" style="width:11px;height:11px;"></i> بياناتك آمنة</span>
+    <span class="flex items-center gap-1"><i data-lucide="zap" style="width:11px;height:11px;"></i> رد سريع</span>
+    <span class="flex items-center gap-1"><i data-lucide="badge-check" style="width:11px;height:11px;"></i> عضو مسجّل</span>
   </div>
 </main>
 
@@ -102,7 +121,7 @@ async function boot() {
 
   window.CaseWidget.incrementProfileImpression(email);
 
-  document.getElementById('lawyerName').textContent = lawyer.name || 'محامي';
+  document.getElementById('lawyerName').textContent = profile.displayName || lawyer.name || 'محامي';
   if (profile.city) {
     document.getElementById('lawyerCity').innerHTML = `<i data-lucide="map-pin" style="width:12px;height:12px;"></i><span>${window.CaseWidget.escapeHTML(profile.city)}</span>`;
   }
