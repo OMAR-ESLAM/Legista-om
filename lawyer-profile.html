@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بروفايل المحامي | Legano</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --background: oklch(0.17 0.008 60);
+    --foreground: oklch(0.97 0.005 80);
+    --card: oklch(0.21 0.01 60);
+    --border: oklch(1 0 0 / 12%);
+    --muted-foreground: oklch(0.72 0.01 70);
+    --secondary: oklch(0.27 0.01 60);
+    --primary-foreground: oklch(0.2 0.02 70);
+    --gold: oklch(0.78 0.1 82);
+    --gold-soft: oklch(0.85 0.08 85);
+  }
+  body { font-family: 'Cairo', sans-serif; background: var(--background); color: var(--foreground); }
+  .bg-app { background: var(--background); }
+  .bg-card-c { background: var(--card); }
+  .bg-secondary-c { background: var(--secondary); }
+  .bg-gold-c { background: var(--gold); }
+  .text-muted-c { color: var(--muted-foreground); }
+  .text-gold-c { color: var(--gold); }
+  .text-primary-fg-c { color: var(--primary-foreground); }
+  .border-app { border-color: var(--border); }
+  [data-lucide] { width: 1em; height: 1em; }
+</style>
+</head>
+<body class="bg-app text-[var(--foreground)] min-h-screen">
+
+<header class="flex items-center justify-between px-6 py-4 border-b border-app">
+  <a href="find-lawyer.html" class="flex items-center gap-1.5 text-xs text-muted-c hover:text-[var(--foreground)]">
+    <i data-lucide="arrow-right"></i> رجوع لكل المحامين
+  </a>
+  <div class="flex items-center gap-1.5 text-base font-extrabold tracking-widest">
+    <i data-lucide="sparkles" class="text-gold-c"></i><span>Legano</span>
+  </div>
+</header>
+
+<main id="profileWrap" class="max-w-lg mx-auto px-4 py-10 hidden">
+  <!-- cover -->
+  <div class="relative h-28 rounded-2xl bg-gradient-to-l from-[var(--card)] to-[var(--secondary)] border border-app"></div>
+
+  <!-- avatar + name -->
+  <div class="flex flex-col items-center -mt-12">
+    <div id="avatarWrap" class="w-24 h-24 rounded-full border-4 flex items-center justify-center text-3xl bg-secondary-c overflow-hidden" style="border-color:var(--background);">
+      <i data-lucide="scale" class="text-gold-c" style="width:32px;height:32px;"></i>
+    </div>
+    <h1 id="lawyerName" class="mt-3 text-lg font-extrabold"></h1>
+    <div id="lawyerCity" class="flex items-center gap-1 text-xs text-muted-c mt-1"></div>
+    <div id="specialtyTags" class="flex flex-wrap justify-center gap-1.5 mt-3"></div>
+  </div>
+
+  <!-- bio -->
+  <div id="bioBox" class="mt-6 rounded-2xl border border-app bg-card-c p-4 text-sm leading-loose text-muted-c"></div>
+
+  <!-- impressions note -->
+  <p class="mt-3 text-center text-[11px] text-muted-c/70">من ضمن الشبكة المسجّلة على Legano</p>
+
+  <!-- contact buttons -->
+  <div class="mt-6 grid grid-cols-2 gap-3">
+    <a id="waBtn" target="_blank" class="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold" style="background:#25D366;color:#04230f;">
+      <i data-lucide="message-circle"></i> واتساب
+    </a>
+    <a id="callBtn" class="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold bg-gold-c text-primary-fg-c">
+      <i data-lucide="phone"></i> اتصال
+    </a>
+  </div>
+</main>
+
+<div id="errorBox" class="hidden max-w-md mx-auto px-4 py-24 text-center text-muted-c">
+  <div class="text-4xl mb-3">🧑‍⚖️</div>
+  <p>البروفايل ده غير موجود أو المحامي مش مستقبل عملاء دلوقتي.</p>
+  <a href="find-lawyer.html" class="text-gold-c text-sm mt-4 inline-block">← رجوع لكل المحامين</a>
+</div>
+
+<script type="module">
+import './case-widget.js';
+
+function categoryLabel(key) {
+  const c = window.CaseWidget.LEAD_CATEGORIES.find(x => x.key === key);
+  return c ? c.label : key;
+}
+
+async function boot() {
+  const params = new URLSearchParams(location.search);
+  const email = params.get('email');
+  if (!email) { showError(); return; }
+
+  const profile = await window.CaseWidget.getPublicProfile(email);
+  const lawyers = await window.CaseWidget.listAllPublicLawyers();
+  const lawyer = lawyers.find(l => l.email === email);
+
+  if (!profile || !lawyer || !profile.acceptingLeads) { showError(); return; }
+
+  window.CaseWidget.incrementProfileImpression(email);
+
+  document.getElementById('lawyerName').textContent = lawyer.name || 'محامي';
+  if (profile.city) {
+    document.getElementById('lawyerCity').innerHTML = `<i data-lucide="map-pin" style="width:12px;height:12px;"></i><span>${window.CaseWidget.escapeHTML(profile.city)}</span>`;
+  }
+  if (profile.photoBase64) {
+    document.getElementById('avatarWrap').innerHTML = `<img src="${profile.photoBase64}" class="w-full h-full object-cover">`;
+  }
+  const specialties = profile.specialties || [];
+  document.getElementById('specialtyTags').innerHTML = specialties.map(s =>
+    `<span class="text-[11px] px-3 py-1 rounded-full bg-card-c border border-app text-gold-c">${window.CaseWidget.escapeHTML(categoryLabel(s))}</span>`
+  ).join('');
+  document.getElementById('bioBox').textContent = profile.bio || 'محامي مسجّل على شبكة Legano.';
+
+  const phone = (profile.phone || '').trim();
+  if (phone) {
+    document.getElementById('waBtn').href = `https://wa.me/20${phone.replace(/^0/, '')}`;
+    document.getElementById('callBtn').href = `tel:${phone}`;
+  } else {
+    document.getElementById('waBtn').classList.add('hidden');
+    document.getElementById('callBtn').classList.add('hidden');
+  }
+
+  document.getElementById('profileWrap').classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function showError() {
+  document.getElementById('errorBox').classList.remove('hidden');
+  lucide.createIcons();
+}
+
+boot();
+</script>
+</body>
+</html>
