@@ -37,7 +37,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc, setDoc,
-  deleteDoc, query, where, writeBatch
+  deleteDoc, query, where, writeBatch, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -599,6 +599,16 @@ async function setPublicProfile(email, publicProfile) {
   return true;
 }
 
+async function incrementProfileImpression(email) {
+  try {
+    await updateDoc(doc(db, 'users', email), { 'publicProfile.impressions': increment(1) });
+    return true;
+  } catch (e) {
+    console.error('CaseWidget.incrementProfileImpression error', e);
+    return false;
+  }
+}
+
 
 // staff/{staffId}.salary: الراتب الأساسي المتفق عليه (بيتحدّث بـ updateStaff)
 // salaryPayments/{paymentId}: staffId, amount, note, createdAt — سجل كل دفعة مرتب اتصرفت
@@ -784,5 +794,5 @@ window.CaseWidget = {
   listTasks, addTask, toggleTask, deleteTask,
   listSalaryPayments, addSalaryPayment, deleteSalaryPayment,
   submitLeadRequest, findMatchingLawyers, assignLeadToLawyer, listLeadsForOffice, listAllPublicLawyers,
-  getPublicProfile, setPublicProfile,
+  getPublicProfile, setPublicProfile, incrementProfileImpression,
 };
