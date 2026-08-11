@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مكتبة التشريعات القانونية — LEGANO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="legista-theme.css">
+<style>
+  body { cursor: auto; }
+  .tsh-wrap { max-width: 1280px; margin: 0 auto; padding: 140px 24px 100px; }
+  .tsh-crumb { font-size: 12px; color: var(--gray); margin-bottom: 18px; display:flex; align-items:center; gap:8px; }
+  .tsh-crumb a { color: var(--gray); text-decoration:none; }
+  .tsh-crumb a:hover { color: var(--gold); }
+  .tsh-header { margin-bottom: 40px; }
+  .tsh-eyebrow { font-size: 10px; letter-spacing: 5px; color: var(--cyber); font-weight: 700; margin-bottom: 14px; opacity: .85; }
+  .tsh-title { font-family:'Syne',sans-serif; font-size: clamp(28px,4vw,44px); font-weight: 800; line-height: 1.25; margin-bottom: 14px; }
+  .tsh-title span { background:linear-gradient(90deg,var(--cyber),#0a6b53); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .tsh-sub { color: var(--gray); font-size: 14px; max-width: 680px; line-height: 1.9; }
+
+  .tsh-toolbar { display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between; margin: 34px 0 30px; }
+  .tsh-search { flex:1; min-width: 240px; position: relative; }
+  .tsh-search input { width:100%; background: var(--surface); border:1px solid var(--border); border-radius: 12px; padding: 13px 44px 13px 16px; color: var(--white); font-family:'Cairo',sans-serif; font-size: 13px; outline:none; transition: border-color .2s; }
+  .tsh-search input:focus { border-color: rgba(212,175,55,0.5); }
+  .tsh-search::before { content:'🔍'; position:absolute; right:16px; top:50%; transform:translateY(-50%); font-size:13px; opacity:.5; }
+
+  .tsh-tabs { display:flex; flex-wrap:wrap; gap:8px; }
+  .tsh-tab { background: var(--surface); border:1px solid var(--border); color: var(--gray); padding: 9px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; white-space:nowrap; }
+  .tsh-tab:hover { border-color: rgba(212,175,55,0.35); color: var(--white); }
+  .tsh-tab.active { background: linear-gradient(135deg, var(--gold), #96700e); color: #0A0A0D; border-color: transparent; }
+
+  .law-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 980px) { .law-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px) { .law-grid { grid-template-columns: 1fr; } .tsh-wrap{padding:120px 16px 80px;} }
+
+  .law-card { position:relative; border-radius: 20px; padding: 26px; overflow:hidden; border: 1px solid rgba(255,255,255,0.07); display:flex; flex-direction:column; min-height: 268px; transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s; }
+  .law-card:hover { transform: translateY(-6px); }
+  .law-card.jinaiya { background: linear-gradient(145deg, #0e0e18 0%, #0a131f 60%, #090d17 100%); }
+  .law-card.jinaiya:hover { box-shadow: 0 20px 50px rgba(0,229,255,0.12), 0 0 0 1px rgba(0,229,255,0.2); border-color: rgba(0,229,255,0.3); }
+  .law-card.madaniya { background: linear-gradient(145deg, #130f07 0%, #1a1408 60%, #100e05 100%); }
+  .law-card.madaniya:hover { box-shadow: 0 20px 50px rgba(212,175,55,0.14), 0 0 0 1px rgba(212,175,55,0.3); border-color: rgba(212,175,55,0.4); }
+
+  .law-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom: 18px; }
+  .law-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  .jinaiya .law-icon { background: rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.2); }
+  .madaniya .law-icon { background: rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.25); }
+  .law-badge { font-size:9px; font-weight:800; letter-spacing:1.5px; padding:5px 11px; border-radius:16px; }
+  .jinaiya .law-badge { background: rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.2); color: var(--cyber); }
+  .madaniya .law-badge { background: rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.25); color: var(--gold); }
+
+  .law-title { font-size: 17px; font-weight: 900; color: var(--white); margin-bottom: 4px; line-height:1.4; }
+  .law-title-en { font-size: 10px; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .jinaiya .law-title-en { color: rgba(0,229,255,0.55); }
+  .madaniya .law-title-en { color: rgba(212,175,55,0.55); }
+  .law-desc { font-size: 12.5px; color: rgba(255,255,255,0.4); line-height: 1.85; flex: 1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+  .law-footer { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+  .law-count { font-family:'Syne',sans-serif; font-size:11px; color: rgba(255,255,255,0.35); }
+  .law-count b { font-size: 20px; display:block; line-height:1; }
+  .jinaiya .law-count b { color: var(--cyber); }
+  .madaniya .law-count b { color: var(--gold); }
+  .law-actions { display:flex; gap: 8px; }
+  .law-btn { border:none; cursor:pointer; border-radius: 10px; font-family:'Cairo',sans-serif; font-weight:800; font-size:11px; padding: 9px 14px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition: opacity .2s, transform .15s; }
+  .law-btn:active { transform: scale(.96); }
+  .jinaiya .law-btn-primary { background: rgba(0,229,255,0.12); color: var(--cyber); border:1px solid rgba(0,229,255,0.3); }
+  .madaniya .law-btn-primary { background: linear-gradient(135deg, var(--gold), #96700e); color:#0A0A0D; }
+  .law-btn-dl { background: rgba(255,255,255,0.06); color: var(--white); width:34px; height:34px; padding:0; justify-content:center; }
+  .law-btn-dl:hover { background: rgba(255,255,255,0.12); }
+  .law-btn-dl.loading { opacity:.5; pointer-events:none; }
+
+  .tsh-empty { text-align:center; padding: 70px 20px; color: var(--gray); font-size:14px; grid-column: 1/-1; }
+
+  .tsh-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border:1px solid var(--border); color: var(--white); padding: 13px 24px; border-radius: 12px; font-size: 13px; opacity:0; pointer-events:none; transition: opacity .3s, transform .3s; z-index: 999; }
+  .tsh-toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">LEGANO</a>
+  <div class="nav-links">
+    <a href="index.html#modules">الأقسام</a>
+    <a href="index.html#dafou">الدفوع</a>
+    <a href="tashrieat.html" style="color:var(--gold)">التشريعات</a>
+    <a href="index.html#esteshara">استشارة</a>
+  </div>
+</nav>
+
+<div class="tsh-wrap">
+  <div class="tsh-crumb"><a href="index.html">الرئيسية</a> ← <span style="color:var(--gold)">التشريعات القانونية</span></div>
+
+  <div class="tsh-header">
+    <p class="tsh-eyebrow">LEGAL CODES LIBRARY · التشريعات والأكواد</p>
+    <h1 class="tsh-title">كل القوانين والأكواد المصرية،<br><span>نص كامل ومحدّث في مكان واحد.</span></h1>
+    <p class="tsh-sub">دوّري داخل أي قانون بالكلمة أو رقم المادة، انسخي النص كامل، أو حمّلي القانون بالكامل كملف نصي — كل ده من غير أي قفل أو حد للتجربة المجانية.</p>
+  </div>
+
+  <div class="tsh-toolbar">
+    <div class="tsh-search"><input type="text" id="lawSearch" placeholder="دوّري باسم القانون..."></div>
+    <div class="tsh-tabs" id="catTabs"></div>
+  </div>
+
+  <div class="law-grid" id="lawGrid"></div>
+</div>
+
+<footer>
+  <div class="footer-logo">LEGANO</div>
+  <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
+</footer>
+
+<div class="tsh-toast" id="toast"></div>
+
+<script src="laws-data/manifest.js"></script>
+<script>
+const ACCENT_MAP = {
+  'مدني':'madaniya', 'مدني خاص':'madaniya', 'تجاري':'madaniya', 'أحوال شخصية':'madaniya',
+  'عمل وإداري':'madaniya', 'خاص':'madaniya',
+  'جنائي':'jinaiya', 'إجراءات':'jinaiya', 'جنائي خاص':'jinaiya'
+};
+const CATS = ['الكل', ...Array.from(new Set(window.LAWS_MANIFEST.map(l=>l.cat)))];
+
+const tabsEl = document.getElementById('catTabs');
+let activeCat = 'الكل';
+let searchQ = '';
+
+CATS.forEach(cat => {
+  const b = document.createElement('button');
+  b.className = 'tsh-tab' + (cat === activeCat ? ' active' : '');
+  b.textContent = cat;
+  b.onclick = () => { activeCat = cat; render(); document.querySelectorAll('.tsh-tab').forEach(t=>t.classList.remove('active')); b.classList.add('active'); };
+  tabsEl.appendChild(b);
+});
+
+document.getElementById('lawSearch').addEventListener('input', e => {
+  searchQ = e.target.value.trim();
+  render();
+});
+
+function render() {
+  const grid = document.getElementById('lawGrid');
+  grid.innerHTML = '';
+  const list = window.LAWS_MANIFEST.filter(l => {
+    const matchCat = activeCat === 'الكل' || l.cat === activeCat;
+    const matchSearch = !searchQ || l.title.includes(searchQ) || (l.desc||'').includes(searchQ);
+    return matchCat && matchSearch;
+  });
+  if (!list.length) {
+    grid.innerHTML = '<div class="tsh-empty">مفيش قوانين مطابقة للبحث ده</div>';
+    return;
+  }
+  list.forEach(law => {
+    const accent = ACCENT_MAP[law.cat] || 'madaniya';
+    const card = document.createElement('div');
+    card.className = 'law-card ' + accent;
+    card.innerHTML = `
+      <div class="law-top">
+        <div class="law-icon">${law.icon}</div>
+        <div class="law-badge">${law.cat.toUpperCase()} · ${law.cat}</div>
+      </div>
+      <div class="law-title">${law.title}</div>
+      <div class="law-title-en">${law.title_en}</div>
+      <div class="law-desc">${law.desc}</div>
+      <div class="law-footer">
+        <div class="law-count"><b>${law.article_count}</b>مادة</div>
+        <div class="law-actions">
+          <button class="law-btn law-btn-dl" title="تحميل نص القانون كاملاً" onclick="downloadLaw('${law.id}', this)">⬇</button>
+          <a class="law-btn law-btn-primary" href="tashrieat-detail.html?law=${law.id}">تصفح ←</a>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+render();
+
+const loadedScripts = {};
+function loadLawData(id) {
+  return new Promise((resolve, reject) => {
+    if (window.__LAW_CACHE && window.__LAW_CACHE[id]) return resolve(window.__LAW_CACHE[id]);
+    window.__LAW_CACHE = window.__LAW_CACHE || {};
+    const s = document.createElement('script');
+    s.src = 'laws-data/' + id + '.js';
+    s.onload = () => {
+      window.__LAW_CACHE[id] = window.LAW_DATA;
+      resolve(window.LAW_DATA);
+    };
+    s.onerror = reject;
+    document.body.appendChild(s);
+  });
+}
+
+function downloadLaw(id, btn) {
+  btn.classList.add('loading');
+  loadLawData(id).then(data => {
+    let txt = `${data.title} (${data.title_en})\n${'='.repeat(50)}\n${data.desc}\n\nعدد المواد: ${data.article_count}\n${'='.repeat(50)}\n\n`;
+    let lastChapter = null;
+    data.articles.forEach(a => {
+      if (a.chapter && a.chapter !== lastChapter) {
+        txt += `\n\n— ${a.chapter} —\n\n`;
+        lastChapter = a.chapter;
+      }
+      txt += `مادة ${a.number}:\n${a.text}\n\n`;
+    });
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = data.title.replace(/[\/\\:*?"<>|]/g,'') + '.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    btn.classList.remove('loading');
+    showToast('تم تحميل ' + data.title);
+  }).catch(() => {
+    btn.classList.remove('loading');
+    showToast('حصل خطأ في التحميل، حاولي تاني');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>

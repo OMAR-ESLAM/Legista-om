@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تصفح التشريعات — LEGANO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="legista-theme.css">
+<style>
+  body { cursor: auto; }
+  .det-wrap { max-width: 980px; margin: 0 auto; padding: 130px 24px 100px; }
+  .det-crumb { font-size: 12px; color: var(--gray); margin-bottom: 22px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .det-crumb a { color: var(--gray); text-decoration:none; }
+  .det-crumb a:hover { color: var(--gold); }
+
+  .det-header { display:flex; align-items:flex-start; gap:20px; margin-bottom: 30px; padding-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .det-icon { width:64px; height:64px; border-radius:16px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+  .det-title { font-family:'Syne',sans-serif; font-size: clamp(22px,3vw,30px); font-weight:800; margin-bottom:6px; }
+  .det-title-en { font-size:11px; letter-spacing:2px; color: var(--gold); opacity:.7; margin-bottom:10px; }
+  .det-desc { font-size:13px; color: var(--gray); line-height:1.85; max-width:640px; }
+
+  .det-toolbar { display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom: 24px; position: sticky; top: 70px; z-index: 20; background: rgba(10,10,13,0.85); backdrop-filter: blur(12px); padding: 14px 0; }
+  .det-search { flex:1; min-width:220px; position:relative; }
+  .det-search input { width:100%; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 44px 13px 16px; color:var(--white); font-family:'Cairo',sans-serif; font-size:13px; outline:none; }
+  .det-search input:focus { border-color: rgba(212,175,55,0.5); }
+  .det-search::before { content:'🔍'; position:absolute; right:16px; top:50%; transform:translateY(-50%); font-size:13px; opacity:.5; }
+  .det-count-pill { font-size:11px; color: var(--gray); background: var(--surface); border:1px solid var(--border); padding:9px 16px; border-radius:20px; white-space:nowrap; }
+  .det-count-pill b { color: var(--gold); }
+
+  .chap-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 26px; }
+  .chap-pill { background: var(--surface); border:1px solid var(--border); color: var(--gray); padding:7px 14px; border-radius:16px; font-size:11px; cursor:pointer; transition: all .2s; }
+  .chap-pill:hover { color: var(--white); }
+  .chap-pill.active { background: rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.4); color: var(--gold); }
+
+  .art-list { display:flex; flex-direction:column; gap: 14px; }
+  .chap-heading { font-size:13px; font-weight:800; color: var(--gold); letter-spacing:1px; margin: 26px 0 4px; padding-right:4px; }
+  .chap-heading:first-child { margin-top:0; }
+
+  .art-card { position:relative; background: linear-gradient(145deg, #130f07 0%, #1a1408 55%, #100e05 100%); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding: 22px 24px; transition: border-color .2s; }
+  .art-card:hover { border-color: rgba(212,175,55,0.3); }
+  .art-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:10px; }
+  .art-num { font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color: var(--gold); background: rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.25); padding: 5px 14px; border-radius: 20px; white-space:nowrap; }
+  .art-copy { background: rgba(255,255,255,0.06); border:none; color: var(--white); font-family:'Cairo',sans-serif; font-size:11px; font-weight:800; padding: 8px 14px; border-radius:9px; cursor:pointer; display:flex; align-items:center; gap:6px; transition: background .2s, transform .15s; flex-shrink:0; }
+  .art-copy:hover { background: rgba(255,255,255,0.12); }
+  .art-copy:active { transform: scale(.95); }
+  .art-copy.copied { background: rgba(0,229,255,0.15); color: var(--cyber); }
+  .art-text { font-size: 14px; line-height: 2.05; color: rgba(255,255,255,0.82); }
+  .art-text mark { background: rgba(212,175,55,0.35); color: var(--white); border-radius:3px; padding: 0 2px; }
+
+  .det-empty { text-align:center; padding:80px 20px; color: var(--gray); font-size:14px; }
+  .det-loading { text-align:center; padding:120px 20px; color: var(--gray); font-size:14px; }
+
+  .det-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border:1px solid var(--border); color: var(--white); padding: 13px 24px; border-radius: 12px; font-size: 13px; opacity:0; pointer-events:none; transition: opacity .3s, transform .3s; z-index: 999; }
+  .det-toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">LEGANO</a>
+  <div class="nav-links">
+    <a href="index.html#modules">الأقسام</a>
+    <a href="index.html#dafou">الدفوع</a>
+    <a href="tashrieat.html" style="color:var(--gold)">التشريعات</a>
+    <a href="index.html#esteshara">استشارة</a>
+  </div>
+</nav>
+
+<div class="det-wrap" id="detWrap">
+  <div class="det-loading">جاري تحميل نص القانون...</div>
+</div>
+
+<footer>
+  <div class="footer-logo">LEGANO</div>
+  <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
+</footer>
+
+<div class="det-toast" id="toast"></div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const lawId = params.get('law');
+const wrap = document.getElementById('detWrap');
+
+if (!lawId) {
+  wrap.innerHTML = '<div class="det-empty">مفيش قانون محدد. <a href="tashrieat.html" style="color:var(--gold)">ارجع لمكتبة التشريعات</a></div>';
+} else {
+  const s = document.createElement('script');
+  s.src = 'laws-data/' + lawId + '.js';
+  s.onload = () => renderLaw(window.LAW_DATA);
+  s.onerror = () => {
+    wrap.innerHTML = '<div class="det-empty">القانون ده مش متاح دلوقتي. <a href="tashrieat.html" style="color:var(--gold)">ارجع لمكتبة التشريعات</a></div>';
+  };
+  document.body.appendChild(s);
+}
+
+let activeChapter = 'الكل';
+let currentQuery = '';
+
+function renderLaw(data) {
+  const chapters = Array.from(new Set(data.articles.map(a => a.chapter).filter(Boolean)));
+
+  wrap.innerHTML = `
+    <div class="det-crumb"><a href="index.html">الرئيسية</a> ← <a href="tashrieat.html">التشريعات القانونية</a> ← <span style="color:var(--gold)">${data.title}</span></div>
+    <div class="det-header">
+      <div class="det-icon">${data.icon}</div>
+      <div>
+        <div class="det-title">${data.title}</div>
+        <div class="det-title-en">${data.title_en}</div>
+        <div class="det-desc">${data.desc}</div>
+      </div>
+    </div>
+    <div class="det-toolbar">
+      <div class="det-search"><input type="text" id="artSearch" placeholder="دوّري بالكلمة أو رقم المادة..."></div>
+      <div class="det-count-pill" id="countPill"><b>${data.article_count}</b> مادة</div>
+    </div>
+    ${chapters.length > 1 ? `<div class="chap-nav" id="chapNav"></div>` : ''}
+    <div class="art-list" id="artList"></div>
+  `;
+
+  if (chapters.length > 1) {
+    const nav = document.getElementById('chapNav');
+    const allBtn = mkChapPill('الكل');
+    nav.appendChild(allBtn);
+    chapters.forEach(c => nav.appendChild(mkChapPill(c)));
+  }
+
+  document.getElementById('artSearch').addEventListener('input', e => {
+    currentQuery = e.target.value.trim();
+    renderArticles(data);
+  });
+
+  function mkChapPill(label) {
+    const b = document.createElement('button');
+    b.className = 'chap-pill' + (label === activeChapter ? ' active' : '');
+    b.textContent = label.length > 34 ? label.slice(0,34) + '…' : label;
+    b.title = label;
+    b.onclick = () => {
+      activeChapter = label;
+      document.querySelectorAll('.chap-pill').forEach(p => p.classList.remove('active'));
+      b.classList.add('active');
+      renderArticles(data);
+    };
+    return b;
+  }
+
+  renderArticles(data);
+}
+
+function highlight(text, q) {
+  if (!q) return escapeHtml(text);
+  const esc = escapeHtml(text);
+  const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return esc.replace(new RegExp('(' + safeQ + ')', 'gi'), '<mark>$1</mark>');
+}
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderArticles(data) {
+  const list = document.getElementById('artList');
+  const countPill = document.getElementById('countPill');
+  list.innerHTML = '';
+
+  let filtered = data.articles.filter(a => {
+    const matchChapter = activeChapter === 'الكل' || a.chapter === activeChapter;
+    if (!matchChapter) return false;
+    if (!currentQuery) return true;
+    const q = currentQuery.trim();
+    if (/^\d+$/.test(q)) return a.number.replace(/[^\d]/g,'') === q;
+    return a.text.includes(q) || a.number.includes(q);
+  });
+
+  countPill.innerHTML = `<b>${filtered.length}</b> مادة`;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="det-empty">مفيش مواد مطابقة للبحث ده</div>';
+    return;
+  }
+
+  let lastChapter = null;
+  filtered.forEach((a, i) => {
+    if (activeChapter === 'الكل' && a.chapter && a.chapter !== lastChapter) {
+      const h = document.createElement('div');
+      h.className = 'chap-heading';
+      h.textContent = a.chapter;
+      list.appendChild(h);
+      lastChapter = a.chapter;
+    }
+    const card = document.createElement('div');
+    card.className = 'art-card';
+    card.innerHTML = `
+      <div class="art-top">
+        <div class="art-num">مادة ${a.number}</div>
+        <button class="art-copy">📋 نسخ</button>
+      </div>
+      <div class="art-text">${highlight(a.text, currentQuery)}</div>
+    `;
+    card.querySelector('.art-copy').addEventListener('click', function() {
+      copyArticle(this, 'مادة ' + a.number + ': ' + a.text);
+    });
+    list.appendChild(card);
+  });
+}
+
+function copyArticle(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '✓ اتنسخت';
+    showToast('تم نسخ نص المادة');
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋 نسخ'; }, 1800);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
