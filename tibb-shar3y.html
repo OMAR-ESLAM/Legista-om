@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>مرجع الطب الشرعي | LEGISTA</title>
+<meta name="description" content="مرجع سريع لتصنيف الإصابات في الطب الشرعي المصري: الأداة المستخدمة وخصائص الجرح والدلالات القانونية.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0A0A0D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D; --bg2: #121217; --gold: #D4AF37; --gold-soft: #F4E5A6;
+  --cyber: #00E5FF; --white: #FFFFFF; --gray: #8A8A8F;
+  --success: #00FFB2; --surface: #1A1A22; --border: rgba(212,175,55,0.15);
+  --danger: #ff6b6b;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--white);}
+a{color:inherit;}
+
+.top-nav{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:200;}
+.nav-back{font-size:11px;color:var(--cyber);text-decoration:none;letter-spacing:1px;border:1px solid rgba(0,229,255,0.2);padding:6px 14px;border-radius:8px;}
+.nav-back:hover{background:rgba(0,229,255,0.07);}
+.nav-section{font-size:11px;letter-spacing:3px;color:var(--gray);font-weight:600;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:5px;background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+
+.wrap{max-width:980px;margin:0 auto;padding:32px 20px 90px;}
+
+.page-head{margin-bottom:22px;}
+.page-title{font-size:21px;font-weight:900;}
+.page-title span{color:var(--gold);}
+.page-sub{font-size:12.5px;color:var(--gray);margin-top:6px;line-height:1.8;max-width:640px;}
+
+.disclaimer{background:linear-gradient(120deg,rgba(255,107,107,0.08),rgba(255,107,107,0.02));border:1px solid rgba(255,107,107,0.22);border-radius:12px;padding:12px 16px;font-size:11.5px;color:var(--gray);line-height:1.8;margin-bottom:24px;}
+.disclaimer b{color:var(--danger);}
+
+.search-box{position:relative;margin-bottom:16px;max-width:400px;}
+.search-box input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13px;direction:rtl;outline:none;}
+.search-box input:focus{border-color:var(--cyber);}
+
+.filters{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;}
+.filter-chip{font-size:11.5px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--gray);cursor:pointer;background:transparent;font-family:'Cairo',sans-serif;}
+.filter-chip.active{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.08);}
+
+.wound-grid{display:grid;gap:14px;}
+
+.wound-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s;}
+.wound-card:hover{border-color:rgba(212,175,55,0.35);}
+.wound-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;cursor:pointer;}
+.wound-head-right{display:flex;align-items:center;gap:12px;}
+.wound-icon{font-size:22px;width:42px;height:42px;border-radius:11px;background:rgba(212,175,55,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wound-title{font-size:15px;font-weight:800;}
+.wound-tool-hint{font-size:11.5px;color:var(--gray);margin-top:2px;}
+.wound-cat-badge{font-size:9.5px;padding:3px 10px;border-radius:9px;background:rgba(0,229,255,0.1);color:var(--cyber);white-space:nowrap;font-weight:700;}
+.wound-toggle{font-size:13px;color:var(--gray);transition:transform .25s;flex-shrink:0;}
+.wound-card.open .wound-toggle{transform:rotate(180deg);}
+
+.wound-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.wound-card.open .wound-body{max-height:900px;}
+.wound-body-inner{padding:0 18px 20px;border-top:1px dashed var(--border);margin-top:2px;padding-top:16px;}
+
+.wb-row{margin-bottom:14px;}
+.wb-row:last-child{margin-bottom:0;}
+.wb-label{font-size:10.5px;color:var(--gold);letter-spacing:.5px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.wb-text{font-size:13px;line-height:1.9;color:var(--white);}
+.wb-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.wb-list li{font-size:12.5px;line-height:1.8;color:var(--white);padding-inline-start:16px;position:relative;}
+.wb-list li::before{content:'◈';position:absolute;right:0;color:var(--gold);font-size:9px;top:5px;}
+
+.tool-pill{display:inline-block;font-size:11px;padding:4px 11px;border-radius:20px;background:rgba(212,175,55,0.1);color:var(--gold-soft);border:1px solid rgba(212,175,55,0.2);margin-inline-end:5px;margin-top:4px;}
+
+.wb-note{font-size:11.5px;color:var(--cyber);background:rgba(0,229,255,0.06);border-radius:9px;padding:9px 12px;line-height:1.8;}
+
+.empty-search{text-align:center;padding:60px 20px;color:var(--gray);display:none;}
+.empty-search .icon{font-size:36px;margin-bottom:10px;}
+
+@media (max-width:560px){
+  .wound-title{font-size:14px;}
+  .wound-icon{width:36px;height:36px;font-size:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="case-file.html" class="nav-back">← ملفات القضايا</a>
+  <span class="nav-section">◈ مرجع الطب الشرعي</span>
+  <a href="welcome.html" class="nav-logo">LEGISTA</a>
+</div>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <div class="page-title">مرجع <span>الطب الشرعي</span></div>
+    <div class="page-sub">تصنيف سريع للإصابات حسب الأداة المستخدمة وخصائص كل جرح، مرتّب بالشكل اللي بتستخدمه في قراءة التقارير الطبية الشرعية ومقارنتها بأقوال الشهود ومحضر المعاينة.</div>
+  </div>
+
+  <div class="disclaimer">
+    <b>ملحوظة:</b> المحتوى ده مرجع قانوني سريع للاستئناس بس، ومبني على المصادر الطبية الشرعية المتعارف عليها ونصوص قانون العقوبات المصري. تحديد نوع الإصابة والأداة المستخدمة وتقدير نسبة العجز بشكل قاطع من اختصاص الطبيب الشرعي المنتدب في القضية وحده.
+  </div>
+
+  <div class="search-box">
+    <input id="searchInput" placeholder="دور على نوع جرح أو أداة... مثال: سكين">
+  </div>
+
+  <div class="filters" id="filtersRow">
+    <div class="filter-chip active" data-cat="الكل">الكل</div>
+    <div class="filter-chip" data-cat="حادة">أدوات حادة</div>
+    <div class="filter-chip" data-cat="كليلة">أدوات كليلة</div>
+    <div class="filter-chip" data-cat="نارية">إصابات نارية</div>
+    <div class="filter-chip" data-cat="أخرى">أخرى (حروق / خنق)</div>
+  </div>
+
+  <div class="wound-grid" id="woundGrid"></div>
+
+  <div class="empty-search" id="emptySearch">
+    <div class="icon">🔍</div>
+    <div>مفيش نتايج مطابقة للبحث</div>
+  </div>
+
+</div>
+
+<script>
+const DATA = [
+  {
+    id: 'incised',
+    title: 'الجرح القطعي',
+    cat: 'حادة',
+    icon: '🔪',
+    tools: ['سكين', 'موس/شفرة', 'زجاج مكسور', 'أي أداة ذات حافة حادة'],
+    hint: 'سكين، موس، زجاج مكسور...',
+    features: [
+      'حوافه منتظمة وزواياه حادة (تنتهي بشكل رفيع)',
+      'قاع الجرح نظيف وخالي من الجسور النسيجية',
+      'طول الجرح أكبر من عمقه',
+      'نزيف غزير وشديد لقطع الأوعية الدموية بشكل نظيف',
+      'الشعر الموجود في مسار الجرح مقطوع قطعاً حاداً وليس مهتوكاً',
+      'الملابس في مكان الإصابة تكون مقطوعة قطعاً حاداً منتظماً',
+    ],
+    legal: [
+      'أكثر ما تكون هذه الجروح في مناطق الرقبة والأطراف',
+      'قد تكون عرضية أو جنائية أو انتحارية (غالباً في مقدم العنق أو الرسغ) أو دفاعية (في الذراعين نتيجة مقاومة المجني عليه)',
+      'وجود جروح متعددة أو "جروح تردد" (سطحية بجوار الجرح الرئيسي) قد يرجّح الطابع الانتحاري',
+      'أهم مضاعفاته: النزف الدموي، أو السدة الهوائية، أو الاختناق عند قطع الحنجرة/القصبة الهوائية',
+    ],
+  },
+  {
+    id: 'stab',
+    title: 'الجرح الطعني',
+    cat: 'حادة',
+    icon: '🗡️',
+    tools: ['سكين مدببة', 'مطواة', 'خنجر', 'أي أداة مدببة ذات حافة'],
+    hint: 'سكين مدببة، مطواة، خنجر...',
+    features: [
+      'عمق الجرح أكبر بكثير من طوله وعرضه على سطح الجلد (عكس الجرح القطعي)',
+      'فتحة الدخول على الجلد قد تكون أصغر من العرض الحقيقي للأداة، وقد تكبر بسبب حركة السحب أو الدوران وقت النزع',
+      'شكل الفتحة يدل أحياناً على نوع نصل الأداة (ذات حد واحد أو حدّين)',
+      'قد يوجد جرح خروج في الحالات النافذة تماماً عبر الجسم',
+    ],
+    legal: [
+      'خطورة الإصابة تتحدد أساساً بعمق الطعنة والعضو أو العضو الحيوي المصاب، مش بشكل الجرح الظاهري',
+      'الأداة الفعلية يصعب تحديد أبعادها بدقة من قياسات الجرح وحدها',
+      'أغلب هذه الإصابات في السياق الجنائي تكون مقصودة نظراً لصعوبة حدوثها عرضياً',
+    ],
+  },
+  {
+    id: 'contused',
+    title: 'الجرح الرضي',
+    cat: 'كليلة',
+    icon: '🪵',
+    tools: ['عصا', 'حجر', 'قبضة اليد', 'أي أداة كليلة (غير حادة)'],
+    hint: 'عصا، حجر، قبضة يد...',
+    features: [
+      'حوافه غير منتظمة ومهتوكة (على عكس استقامة حواف الجرح القطعي)',
+      'وجود شريط سحجي أو كدمي حول شفة الجرح (علامة مميزة تفرّقه عن القطعي)',
+      'الشعر في عمق الجرح يبقى سليماً غير مقطوع، وتحت الفحص الدقيق تكون نهاياته "مشرذمة" لا مقطوعة بشكل حاد',
+      'نزيف أقل شدة مقارنة بالجرح القطعي',
+      'قاع الجرح غير نظيف، وتوجد فيه "جسور نسيجية" (خيوط من الأنسجة تربط بين حوافه) لأن الرض يمزق الأنسجة بدل قطعها',
+      'أكثر عرضة للعدوى الجرثومية من الجروح القطعية',
+    ],
+    legal: [
+      'التفرقة بين الرضي والقطعي مهمة قانونياً لتحديد نوع الأداة المستخدمة، خصوصاً لما يكون الجرح الرضي شكله قريب من القطعي',
+      'العلامات الفارقة الأساسية: الشريط الكدمي حول الجرح، وسلامة الشعر في العمق — دي علامات لا توجد إلا في الجروح الرضية',
+    ],
+  },
+  {
+    id: 'contused-incised',
+    title: 'الجرح الرضي القطعي',
+    cat: 'كليلة',
+    icon: '🪓',
+    tools: ['فأس', 'ساطور', 'بلطة', 'أداة ثقيلة ذات حافة حادة'],
+    hint: 'فأس، ساطور، بلطة...',
+    features: [
+      'جرح مركّب ناتج عن الإصابة بأداة ثقيلة الوزن ولها في نفس الوقت حافة حادة',
+      'يجمع بين خصائص الرض (كدمة حول الجرح، قوة الأداة وثقلها) وخصائص القطع (حافة منتظمة نسبياً في جزء من الجرح)',
+      'قد يصل لعمق كبير يشمل كسر العظام تحت مكان الإصابة نتيجة ثقل الأداة',
+    ],
+    legal: [
+      'من أخطر أنواع الإصابات لجمعه بين قوة الرض وحدة القطع، وغالباً ما يصاحبه ضرر بالغ أو عاهة مستديمة',
+      'موقع الإصابة (الرأس خصوصاً) عامل حاسم في تقدير الخطورة والقصد الجنائي',
+    ],
+  },
+  {
+    id: 'puncture',
+    title: 'الجرح الوخزي',
+    cat: 'حادة',
+    icon: '📌',
+    tools: ['مسمار', 'إبرة', 'شوكة', 'سيخ حديد', 'مفك'],
+    hint: 'مسمار، إبرة، سيخ...',
+    features: [
+      'فتحة صغيرة جداً على سطح الجلد لا تعكس حجم أو خطورة الإصابة الحقيقية',
+      'قد يكون عميقاً بدرجة تصل لإصابة أعضاء داخلية حيوية رغم صغر الفتحة الظاهرة',
+      'نزيف خارجي محدود، لكن خطورته الحقيقية في احتمال النزيف الداخلي غير الظاهر للعين',
+    ],
+    legal: [
+      'مهم جداً في التقرير الطبي عدم الاكتفاء بوصف "جرح صغير" دون تقدير العمق والأعضاء التي قد تكون تأثرت',
+      'شائع في حالات الاعتداء بأدوات مرتجلة أو في الحوادث الصناعية',
+    ],
+  },
+  {
+    id: 'lacerated',
+    title: 'الجرح الممزق (المهتك)',
+    cat: 'كليلة',
+    icon: '⚙️',
+    tools: ['سيور آلات متحركة', 'حوادث مركبات', 'عض حيوان', 'احتكاك بسطح خشن'],
+    hint: 'ماكينات، حوادث سيارات، عض...',
+    features: [
+      'حوافه غير منتظمة بشكل شديد مع تهتك واضح في الأنسجة',
+      'ينتج عادة عن قوة شد أو جذب أو احتكاك، وليس عن ضربة مباشرة فقط',
+      'شائع في إصابات العمل عند الاقتراب من الأجزاء المتحركة في المصانع',
+      'قد يصاحبه بتر جزئي أو كلي لطرف (كالأصابع أو الذراع)',
+    ],
+    legal: [
+      'غالباً ما تكون إصابات عمل (مسؤولية صاحب العمل عن توفير وسائل السلامة)، أو حوادث مرورية',
+      'تقدير العاهة المستديمة هنا مرتبط مباشرة بمدى فقدان وظيفة العضو المصاب',
+    ],
+  },
+  {
+    id: 'gunshot',
+    title: 'الإصابة النارية',
+    cat: 'نارية',
+    icon: '🔫',
+    tools: ['سلاح ناري (مسدس / بندقية / فرد خرطوش)'],
+    hint: 'مسدس، بندقية، خرطوش...',
+    features: [
+      'فتحة الدخول عادة أصغر ومستديرة، ومحاطة بـ"هالة سحجية" (كدمة دائرية حول الفتحة)',
+      'عند إطلاق النار من مسافة قريبة تظهر آثار إضافية حول الفتحة: وشم بارودي، وسواد ناتج عن الدخان والسخام، وأحياناً حروق من لهب الطلقة',
+      'شكل توزّع هذه الآثار (مخروطي الاتساع) يساعد الطبيب الشرعي في تقدير المسافة التقريبية بين فوهة السلاح والمجني عليه',
+      'فتحة الخروج (إن وُجدت) عادة أكبر حجماً وأكثر عدم انتظام من فتحة الدخول',
+    ],
+    legal: [
+      'تحديد مسافة الإطلاق ومسار الطلقة من أهم عناصر التقرير الطبي الشرعي لمطابقة رواية الشهود ومسرح الجريمة',
+      'عدد الإصابات ومواقعها على الجسم مؤشر مهم لتقدير القصد الجنائي (توافر نية القتل من عدمها)',
+    ],
+  },
+  {
+    id: 'burns',
+    title: 'الحروق',
+    cat: 'أخرى',
+    icon: '🔥',
+    tools: ['نار مباشرة', 'سوائل ساخنة', 'تيار كهربائي', 'مواد كيميائية حارقة'],
+    hint: 'نار، ماء ساخن، كهرباء، مواد كيميائية...',
+    features: [
+      'تُصنَّف طبياً حسب الدرجة: أولى (احمرار سطحي)، ثانية (بثور/فقاعات)، ثالثة (تدمير كامل لطبقات الجلد وقد يصل للأنسجة تحته)',
+      'خطورة الحرق الحقيقية تقاس بعنصرين معاً: درجة عمقه، ونسبة مساحته من مساحة سطح الجسم الكلية',
+      'الحروق الكهربائية لها علامات دخول وخروج مميزة تختلف عن حروق النار العادية',
+      'الحروق الكيميائية قد تستمر في التأثير على الأنسجة لفترة بعد التماس إذا لم تُغسل فوراً',
+    ],
+    legal: [
+      'التقرير الطبي الشرعي في وقائع الحروق لازم يوضح النسبة المئوية للمساحة المصابة من الجسم، لأنها أساس تقدير الجسامة والعقوبة',
+      'مهم التفرقة بين الحرق العرضي (حادث منزلي/صناعي) والحرق الناتج عن اعتداء عمدي من خلال موقع وتوزيع الحروق على الجسم',
+    ],
+  },
+  {
+    id: 'asphyxia',
+    title: 'الخنق والاختناق',
+    cat: 'أخرى',
+    icon: '🎗️',
+    tools: ['اليد (خنق يدوي)', 'حبل أو رباط (خنق بربط)', 'الشنق'],
+    hint: 'خنق يدوي، رباط، شنق...',
+    features: [
+      'الخنق اليدوي: تظهر آثار بصمات أصابع وأظافر (سحجات وكدمات) على جانبي الرقبة بشكل غير منتظم',
+      'الخنق بالرباط: يترك أثر ربط أفقي منتظم يحيط بالرقبة بالكامل تقريباً وفي مستوى واحد',
+      'الشنق: يترك أثر ربط مائل يصعد باتجاه نقطة التعليق، وغالباً لا يكون كاملاً حول الرقبة (يفوت الجزء المواجه لنقطة التعليق)',
+      'علامات الاختناق العامة: احتقان واحمرار بالوجه، نزيف نقطي (Petechiae) في ملتحمة العين والوجه',
+    ],
+    legal: [
+      'التفرقة بين الخنق (فعل من الغير) والشنق (قد يكون انتحاراً) من أهم وأدق مهام الطبيب الشرعي في هذه الحالات',
+      'شكل واتجاه أثر الرباط على الرقبة هو العنصر الحاسم في هذه التفرقة',
+    ],
+  },
+];
+
+const grid = document.getElementById('woundGrid');
+const emptyEl = document.getElementById('emptySearch');
+let activeCat = 'الكل';
+let searchTerm = '';
+
+function render() {
+  const term = searchTerm.trim().toLowerCase();
+  const items = DATA.filter(w => {
+    const matchesCat = activeCat === 'الكل' || w.cat === activeCat;
+    if (!matchesCat) return false;
+    if (!term) return true;
+    const hay = (w.title + ' ' + w.tools.join(' ') + ' ' + w.hint).toLowerCase();
+    return hay.includes(term);
+  });
+
+  emptyEl.style.display = items.length ? 'none' : 'block';
+  grid.innerHTML = items.map(w => `
+    <div class="wound-card" data-id="${w.id}">
+      <div class="wound-head">
+        <div class="wound-head-right">
+          <div class="wound-icon">${w.icon}</div>
+          <div>
+            <div class="wound-title">${w.title}</div>
+            <div class="wound-tool-hint">${w.hint}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="wound-cat-badge">${w.cat === 'حادة' ? 'أداة حادة' : w.cat === 'كليلة' ? 'أداة كليلة' : w.cat === 'نارية' ? 'سلاح ناري' : 'أخرى'}</span>
+          <span class="wound-toggle">▾</span>
+        </div>
+      </div>
+      <div class="wound-body">
+        <div class="wound-body-inner">
+          <div class="wb-row">
+            <div class="wb-label">🛠️ الأداة الشائعة</div>
+            <div class="wb-text">${w.tools.map(t => `<span class="tool-pill">${t}</span>`).join('')}</div>
+          </div>
+          <div class="wb-row">
+            <div class="wb-label">🔎 خصائص الإصابة</div>
+            <ul class="wb-list">${w.features.map(f => `<li>${f}</li>`).join('')}</ul>
+          </div>
+          <div class="wb-row">
+            <div class="wb-label">⚖️ دلالات قانونية وتحقيقية</div>
+            <ul class="wb-list">${w.legal.map(f => `<li>${f}</li>`).join('')}</ul>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  grid.querySelectorAll('.wound-head').forEach(head => {
+    head.addEventListener('click', () => {
+      head.closest('.wound-card').classList.toggle('open');
+    });
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  render();
+});
+
+document.getElementById('filtersRow').addEventListener('click', (e) => {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeCat = chip.dataset.cat;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
