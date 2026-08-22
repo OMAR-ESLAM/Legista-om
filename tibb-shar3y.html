@@ -46,6 +46,28 @@ a{color:inherit;}
 .filter-chip{font-size:11.5px;padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--gray);cursor:pointer;background:transparent;font-family:'Cairo',sans-serif;}
 .filter-chip.active{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.08);}
 
+/* ═══ main section tabs (تصنيف الإصابات / مواد القانون) ═══ */
+.main-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+.main-tab{position:relative;padding:11px 20px;font-size:13.5px;font-weight:800;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;display:inline-flex;align-items:center;gap:6px;}
+.main-tab.active{color:var(--gold);border-color:var(--gold);}
+.main-view{display:none;}
+.main-view.active{display:block;}
+
+/* ═══ penal code articles ═══ */
+.article-grid{display:grid;gap:14px;}
+.article-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;transition:border-color .2s;}
+.article-card:hover{border-color:rgba(212,175,55,0.35);}
+.article-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.article-num{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#0A0A0D;background:linear-gradient(135deg,var(--gold),var(--gold-soft));padding:4px 12px;border-radius:8px;white-space:nowrap;}
+.article-title{font-size:14.5px;font-weight:800;margin-top:8px;}
+.article-severity{font-size:9.5px;padding:3px 10px;border-radius:9px;white-space:nowrap;font-weight:700;}
+.article-severity.jinaya{background:rgba(255,107,107,0.14);color:var(--danger);}
+.article-severity.jonha{background:rgba(0,229,255,0.1);color:var(--cyber);}
+.article-severity.khataa{background:rgba(212,175,55,0.14);color:var(--gold);}
+.article-text{font-size:13px;line-height:2;color:var(--white);background:var(--surface);border-radius:10px;padding:14px 16px;margin-bottom:12px;border-inline-start:3px solid var(--gold);}
+.article-note-label{font-size:10.5px;color:var(--cyber);letter-spacing:.5px;font-weight:800;margin-bottom:6px;}
+.article-note{font-size:12.5px;line-height:1.9;color:var(--gray);}
+
 .wound-grid{display:grid;gap:14px;}
 
 .wound-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s;}
@@ -103,23 +125,41 @@ a{color:inherit;}
     <b>ملحوظة:</b> المحتوى ده مرجع قانوني سريع للاستئناس بس، ومبني على المصادر الطبية الشرعية المتعارف عليها ونصوص قانون العقوبات المصري. تحديد نوع الإصابة والأداة المستخدمة وتقدير نسبة العجز بشكل قاطع من اختصاص الطبيب الشرعي المنتدب في القضية وحده.
   </div>
 
-  <div class="search-box">
-    <input id="searchInput" placeholder="دور على نوع جرح أو أداة... مثال: سكين">
+  <div class="main-tabs">
+    <div class="main-tab active" data-view="wounds">🔪 تصنيف الإصابات</div>
+    <div class="main-tab" data-view="articles">📜 مواد قانون العقوبات</div>
   </div>
 
-  <div class="filters" id="filtersRow">
-    <div class="filter-chip active" data-cat="الكل">الكل</div>
-    <div class="filter-chip" data-cat="حادة">أدوات حادة</div>
-    <div class="filter-chip" data-cat="كليلة">أدوات كليلة</div>
-    <div class="filter-chip" data-cat="نارية">إصابات نارية</div>
-    <div class="filter-chip" data-cat="أخرى">أخرى (حروق / خنق)</div>
+  <div class="main-view active" id="view-wounds">
+    <div class="search-box">
+      <input id="searchInput" placeholder="دور على نوع جرح أو أداة... مثال: سكين">
+    </div>
+
+    <div class="filters" id="filtersRow">
+      <div class="filter-chip active" data-cat="الكل">الكل</div>
+      <div class="filter-chip" data-cat="حادة">أدوات حادة</div>
+      <div class="filter-chip" data-cat="كليلة">أدوات كليلة</div>
+      <div class="filter-chip" data-cat="نارية">إصابات نارية</div>
+      <div class="filter-chip" data-cat="أخرى">أخرى (حروق / خنق)</div>
+    </div>
+
+    <div class="wound-grid" id="woundGrid"></div>
+
+    <div class="empty-search" id="emptySearch">
+      <div class="icon">🔍</div>
+      <div>مفيش نتايج مطابقة للبحث</div>
+    </div>
   </div>
 
-  <div class="wound-grid" id="woundGrid"></div>
-
-  <div class="empty-search" id="emptySearch">
-    <div class="icon">🔍</div>
-    <div>مفيش نتايج مطابقة للبحث</div>
+  <div class="main-view" id="view-articles">
+    <div class="search-box">
+      <input id="articleSearchInput" placeholder="دور برقم المادة أو كلمة... مثال: عاهة">
+    </div>
+    <div class="article-grid" id="articleGrid"></div>
+    <div class="empty-search" id="emptyArticleSearch">
+      <div class="icon">🔍</div>
+      <div>مفيش نتايج مطابقة للبحث</div>
+    </div>
   </div>
 
 </div>
@@ -366,6 +406,97 @@ document.getElementById('filtersRow').addEventListener('click', (e) => {
 });
 
 render();
+
+/* ══════════════ مواد قانون العقوبات ══════════════ */
+const ARTICLES = [
+  {
+    num: '236',
+    title: 'الضرب أو الجرح المفضي إلى الموت',
+    severity: 'jinaya',
+    severityLabel: 'جناية',
+    text: 'كل من جرح أو ضرب أحدًا عمدًا أو أعطاه مواد ضارة ولم يقصد من ذلك قتلاً، ولكنه أفضى إلى الموت، يعاقب بالسجن المشدد أو السجن من ثلاث سنين إلى سبع سنين. وأما إذا سبق ذلك إصرار أو ترصد فتكون العقوبة السجن المشدد أو السجن.',
+    note: 'الفارق الجوهري بينها وبين جريمة القتل العمد هو انتفاء قصد إزهاق الروح — الجاني قصد الإيذاء فقط، لكن الفعل أفضى للوفاة. إثبات أو نفي "قصد القتل" من أهم نقاط الدفاع في هذا النوع من القضايا، ويُستعان فيه بتقرير الصفة التشريحية.',
+  },
+  {
+    num: '240',
+    title: 'الجرح أو الضرب المفضي إلى عاهة مستديمة',
+    severity: 'jinaya',
+    severityLabel: 'جناية',
+    text: 'كل من أحدث بغيره جرحًا أو ضربًا نشأ عنه قطع أو انفصال عضو أو فقد منفعته، أو نشأ عنه كف البصر أو فقد إحدى العينين، أو نشأ عنه عاهة مستديمة يستحيل برؤها، يعاقب بالسجن من ثلاث سنين إلى خمس سنين. أما إذا كان الضرب أو الجرح صادرًا عن سبق إصرار أو ترصد أو تربص فيُحكم بالأشغال الشاقة من ثلاث سنين إلى عشر سنين. ويُضاعف الحد الأقصى للعقوبات المقررة إذا ارتُكبت الجريمة تنفيذًا لغرض إرهابي.',
+    note: 'القانون المصري لم يحدد نسبة مئوية معينة تلزم لقيام "العاهة المستديمة" — يكفي إثبات أن منفعة العضو فُقدت بصفة مستديمة ولو فقدًا جزئيًا مهما كان مقدار هذا الفقد (مستقر عليه في أحكام محكمة النقض). تقدير النسبة الفعلية من اختصاص الطبيب الشرعي فقط.',
+  },
+  {
+    num: '241',
+    title: 'الجرح أو الضرب المفضي إلى مرض أو عجز يزيد على ٢٠ يوم',
+    severity: 'jonha',
+    severityLabel: 'جنحة مشددة',
+    text: 'كل من أحدث بغيره جرحًا أو ضربًا نشأ عنه مرض أو عجز عن الأشغال الشخصية مدة تزيد على عشرين يومًا، يعاقب بالحبس مدة لا تزيد عن سنتين، أو بغرامة لا تقل عن عشرين جنيهًا ولا تجاوز ثلاثمائة جنيه مصري.',
+    note: 'الشرط الجوهري لتطبيق المادة دي هو أن يثبت التقرير الطبي بوضوح أن مدة العلاج أو العجز عن الأشغال الشخصية تجاوزت ٢٠ يومًا — لو الحكم ما بيّنش المدة دي بالتحديد بيُعد الحكم قاصرًا (مستقر عليه في أحكام النقض).',
+  },
+  {
+    num: '242',
+    title: 'الضرب أو الجرح البسيط (اللي متبلغش درجة الجسامة)',
+    severity: 'jonha',
+    severityLabel: 'جنحة',
+    text: 'إذا لم يبلغ الضرب أو الجرح درجة الجسامة المنصوص عليها في المادتين السابقتين، يعاقب فاعله بالحبس مدة لا تزيد على سنة أو بغرامة لا تقل عن عشرة جنيهات ولا تجاوز مائتي جنيه مصري. فإذا كان صادرًا عن سبق إصرار أو ترصد تكون العقوبة الحبس مدة لا تزيد على سنتين أو غرامة لا تقل عن عشرة جنيهات ولا تجاوز ثلاثمائة جنيه. وإذا حصل الضرب أو الجرح باستعمال أية أسلحة أو عصي أو آلات أو أدوات أخرى، تكون العقوبة الحبس وجوبًا.',
+    note: 'ده الأصل العام لكل واقعة ضرب أو جرح لم تصل لدرجة الجسامة (٢٠ يوم فأكثر). مهم قانونيًا: لا يُشترط لثبوت الجريمة وجود جرح أو أثر على الإطلاق — يكفي إثبات فعل الضرب ذاته. لكن استخدام أي أداة (حتى عصا) يحوّل العقوبة وجوبًا للحبس بدل الغرامة.',
+  },
+  {
+    num: '243',
+    title: 'الضرب أو الجرح الجماعي (عصبة أو تجمهر)',
+    severity: 'jonha',
+    severityLabel: 'جنحة مشددة',
+    text: 'إذا حصل الضرب أو الجرح المنصوص عليه في المادتين 241 و242 بواسطة أسلحة أو عصي أو آلات أخرى من واحد أو أكثر ضمن عصبة أو تجمهر مؤلف من خمسة أشخاص على الأقل توافقوا على التعدي والإيذاء، تكون العقوبة الحبس وجوبًا.',
+    note: 'مهمة في قضايا المشاجرات الجماعية (خناقات العائلات والمناطق) — يكفي إثبات الاتفاق المسبق على التعدي وتوافر عدد المشاركين (٥ فأكثر) لتشديد العقوبة، بغض النظر عمّن أحدث الإصابة فعليًا.',
+  },
+  {
+    num: '244',
+    title: 'الإصابة الخطأ (الإهمال أو الرعونة)',
+    severity: 'khataa',
+    severityLabel: 'جريمة غير عمدية',
+    text: 'من تسبب خطأً في جرح شخص أو إيذائه، بأن كان ذلك ناشئًا عن إهماله أو رعونته أو عدم احترازه أو عدم مراعاته للقوانين والقرارات واللوائح والأنظمة، يعاقب بالحبس مدة لا تزيد على سنة وبغرامة لا تجاوز مائتي جنيه أو بإحدى هاتين العقوبتين. وتكون العقوبة الحبس مدة لا تزيد على سنتين وغرامة لا تجاوز ثلاثمائة جنيه أو إحدى هاتين العقوبتين إذا نشأ عن الإصابة عاهة مستديمة، وتُغلّظ العقوبة إلى الحبس مدة لا تزيد على خمس سنين إذا تعدد المصابون لثلاثة أشخاص فأكثر.',
+    note: 'الأساس القانوني لحوادث السيارات والإهمال الطبي وحوادث العمل. الركن الجوهري هنا مختلف تمامًا عن باقي المواد: مفيش قصد جنائي للإيذاء، والمطلوب إثباته هو رابطة السببية بين الخطأ (إهمال/رعونة/مخالفة لائحة) والإصابة الحادثة، مش القصد الجنائي.',
+  },
+];
+
+const artGrid = document.getElementById('articleGrid');
+const artEmpty = document.getElementById('emptyArticleSearch');
+
+function renderArticles() {
+  const term = document.getElementById('articleSearchInput').value.trim().toLowerCase();
+  const items = ARTICLES.filter(a => {
+    if (!term) return true;
+    const hay = (a.num + ' ' + a.title + ' ' + a.text).toLowerCase();
+    return hay.includes(term);
+  });
+  artEmpty.style.display = items.length ? 'none' : 'block';
+  artGrid.innerHTML = items.map(a => `
+    <div class="article-card">
+      <div class="article-top">
+        <div>
+          <span class="article-num">مادة ${a.num}</span>
+          <div class="article-title">${a.title}</div>
+        </div>
+        <span class="article-severity ${a.severity}">${a.severityLabel}</span>
+      </div>
+      <div class="article-text">${a.text}</div>
+      <div class="article-note-label">💡 ملاحظة تطبيقية</div>
+      <div class="article-note">${a.note}</div>
+    </div>`).join('');
+}
+
+document.getElementById('articleSearchInput').addEventListener('input', renderArticles);
+renderArticles();
+
+/* ══════════════ تبديل التابات الرئيسية ══════════════ */
+document.querySelectorAll('.main-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+  });
+});
 </script>
 </body>
 </html>
