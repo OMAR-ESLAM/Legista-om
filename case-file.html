@@ -159,6 +159,26 @@ a{color:inherit;}
 .payment-amount{font-weight:800;color:var(--success);}
 .payment-meta{font-size:11.5px;color:var(--gray);}
 
+/* ═══ bailiff papers tab (أوراق المحضرين) ═══ */
+.bailiff-form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;}
+.bailiff-form .cw-field.full{grid-column:1/-1;}
+@media (max-width:760px){.bailiff-form{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.bailiff-form{grid-template-columns:1fr;}}
+.bailiff-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:0 10px 28px -18px rgba(0,0,0,.6);}
+.bailiff-table-scroll{overflow-x:auto;}
+table.bailiff-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px;}
+table.bailiff-table thead th{background:linear-gradient(160deg,rgba(212,175,55,0.14),rgba(212,175,55,0.05));color:var(--gold-soft);font-weight:800;font-size:11.5px;letter-spacing:.3px;text-align:right;padding:12px 14px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;}
+table.bailiff-table tbody td{padding:11px 14px;border-bottom:1px solid rgba(212,175,55,0.08);color:var(--white);vertical-align:top;line-height:1.6;}
+table.bailiff-table tbody tr:last-child td{border-bottom:none;}
+table.bailiff-table tbody tr{transition:background .2s;}
+table.bailiff-table tbody tr:hover{background:rgba(212,175,55,0.045);}
+.bp-type-pill{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(0,229,255,0.1);color:var(--cyber);white-space:nowrap;}
+.bp-num{font-weight:800;color:var(--gold);white-space:nowrap;}
+.bp-date{white-space:nowrap;color:var(--gray);font-size:12px;}
+.bp-notes{color:var(--gray);font-size:12px;max-width:220px;}
+.bp-empty-cell{color:var(--gray);opacity:.5;}
+.bailiff-table .del-bp-btn{white-space:nowrap;}
+
 /* ═══ notes tab ═══ */
 .notes-box textarea{width:100%;min-height:260px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--white);font-family:'Cairo',sans-serif;font-size:13.5px;line-height:1.9;direction:rtl;resize:vertical;outline:none;}
 .notes-box textarea:focus{border-color:var(--cyber);}
@@ -371,6 +391,7 @@ a{color:inherit;}
       <div class="tab active" data-tab="stages">مراحل القضية<span class="tab-badge" id="tabBadge-stages" style="display:none;"></span></div>
       <div class="tab" data-tab="info">بيانات القضية</div>
       <div class="tab" data-tab="hearings">الجلسات<span class="tab-badge" id="tabBadge-hearings" style="display:none;"></span></div>
+      <div class="tab" data-tab="bailiff">أوراق المحضرين<span class="tab-badge" id="tabBadge-bailiff" style="display:none;"></span></div>
       <div class="tab" data-tab="fees">الأتعاب<span class="tab-badge" id="tabBadge-fees" style="display:none;"></span></div>
       <div class="tab" data-tab="documents">المستندات<span class="tab-badge" id="tabBadge-documents" style="display:none;"></span></div>
       <div class="tab" data-tab="analyses">التحليل والدفوع<span class="tab-badge" id="tabBadge-analyses" style="display:none;"></span></div>
@@ -429,6 +450,53 @@ a{color:inherit;}
         <div class="icon">📅</div>
         <div class="t">مفيش جلسات مسجّلة لسه</div>
         <div>سجّل كل جلسة بتاريخها عشان تقدر تتابع مسار القضية بالتفصيل.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel paper" id="panel-bailiff">
+      <div class="bailiff-form">
+        <div class="cw-field"><label>نوع الورقة</label>
+          <select id="bpType">
+            <option>إعلان</option>
+            <option>إنذار</option>
+            <option>تكليف بالحضور</option>
+            <option>محضر تسليم</option>
+            <option>صورة تنفيذية</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+        <div class="cw-field"><label>رقم الورقة</label><input id="bpNumber" placeholder="مثال: ١٢٣٤ لسنة ٢٠٢٦"></div>
+        <div class="cw-field"><label>محضر المحكمة</label><input id="bpBailiff" placeholder="اسم المحضر"></div>
+        <div class="cw-field"><label>تاريخ تسليم الورقة</label><input type="date" id="bpDeliveryDate"></div>
+        <div class="cw-field"><label>اسم اللي استلم الورقة ومتى</label><input id="bpReceivedBy" placeholder="اسم المستلم"></div>
+        <div class="cw-field"><label>تاريخ الجلسة القادمة</label><input type="date" id="bpNextHearing"></div>
+        <div class="cw-field full"><label>ملاحظات</label><input id="bpNotes" placeholder="أي تفاصيل إضافية (اختياري)"></div>
+      </div>
+      <button class="btn-save-info" id="btnAddBailiffPaper" style="margin-bottom:20px;">+ إضافة ورقة</button>
+
+      <div class="bailiff-table-wrap" id="bailiffTableWrap" style="display:none;">
+        <div class="bailiff-table-scroll">
+          <table class="bailiff-table">
+            <thead>
+              <tr>
+                <th>نوع الورقة</th>
+                <th>رقم الورقة</th>
+                <th>محضر المحكمة</th>
+                <th>تاريخ التسليم</th>
+                <th>اسم المستلم</th>
+                <th>الجلسة القادمة</th>
+                <th>ملاحظات</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="bailiffTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="bailiffEmpty" class="empty-state" style="display:none;">
+        <div class="icon">📜</div>
+        <div class="t">مفيش أوراق محضرين مسجّلة لسه</div>
+        <div>سجّل كل ورقة (إعلان، إنذار، تكليف بالحضور...) بتفاصيلها عشان تتابع تسليمها بسهولة.</div>
       </div>
     </div>
 
@@ -775,6 +843,7 @@ async function openDetail(caseId) {
   await loadAnalyses(caseId);
   await loadEvidence(caseId);
   await loadHearings(caseId);
+  await loadBailiffPapers(caseId);
   await loadFees(caseId, c);
   await loadPortalTab(caseId);
   await refreshAllTabBadges(caseId);
@@ -1297,6 +1366,7 @@ const TAB_BADGE_CONFIG = {
     { name: 'messages',       timeField: 'createdAt', filter: (m) => m.sender === 'client' },
     { name: 'portalRequests', timeField: 'uploadedAt', filter: (r) => r.status === 'uploaded' },
   ] },
+  bailiff:   { subs: [{ name: 'bailiffPapers', timeField: 'createdAt' }] },
 };
 
 function tabSeenKey(caseId, tabKey) {
@@ -1451,6 +1521,66 @@ document.getElementById('btnAddHearing').addEventListener('click', async () => {
   document.getElementById('hDecision').value = '';
   window.CaseWidget.toast('تم تسجيل الجلسة ✓');
   loadHearings(currentCaseId);
+});
+
+/* ---------- bailiff papers tab (أوراق المحضرين) ---------- */
+async function loadBailiffPapers(caseId) {
+  const items = await window.CaseWidget.listSub(caseId, 'bailiffPapers');
+  items.sort((a, b) => {
+    const da = a.deliveryDate ? new Date(a.deliveryDate).getTime() : window.CaseWidget.toMillis(a.createdAt);
+    const db = b.deliveryDate ? new Date(b.deliveryDate).getTime() : window.CaseWidget.toMillis(b.createdAt);
+    return db - da;
+  });
+  const wrap = document.getElementById('bailiffTableWrap');
+  const body = document.getElementById('bailiffTableBody');
+  document.getElementById('bailiffEmpty').style.display = items.length ? 'none' : 'block';
+  wrap.style.display = items.length ? 'block' : 'none';
+  const cell = (v) => v ? window.CaseWidget.escapeHTML(v) : '<span class="bp-empty-cell">—</span>';
+  const dateCell = (v) => v ? new Date(v).toLocaleDateString('ar-EG') : '<span class="bp-empty-cell">—</span>';
+  body.innerHTML = items.map(p => `
+    <tr data-id="${p.id}">
+      <td><span class="bp-type-pill">${cell(p.paperType)}</span></td>
+      <td class="bp-num">${cell(p.paperNumber)}</td>
+      <td>${cell(p.bailiffName)}</td>
+      <td class="bp-date">${dateCell(p.deliveryDate)}</td>
+      <td>${cell(p.receivedBy)}</td>
+      <td class="bp-date">${dateCell(p.nextHearingDate)}</td>
+      <td class="bp-notes">${cell(p.notes)}</td>
+      <td><button class="link-btn danger del-bp-btn">حذف</button></td>
+    </tr>`).join('');
+  body.querySelectorAll('.del-bp-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('حذف الورقة دي؟')) return;
+      const id = btn.closest('tr').dataset.id;
+      await window.CaseWidget.deleteSubDoc(caseId, 'bailiffPapers', id);
+      loadBailiffPapers(caseId);
+    });
+  });
+}
+
+document.getElementById('btnAddBailiffPaper').addEventListener('click', async () => {
+  const paperType = document.getElementById('bpType').value;
+  const paperNumber = document.getElementById('bpNumber').value.trim();
+  const bailiffName = document.getElementById('bpBailiff').value.trim();
+  const deliveryDate = document.getElementById('bpDeliveryDate').value;
+  const receivedBy = document.getElementById('bpReceivedBy').value.trim();
+  const nextHearingDate = document.getElementById('bpNextHearing').value;
+  const notes = document.getElementById('bpNotes').value.trim();
+  if (!paperNumber && !bailiffName && !deliveryDate) {
+    window.CaseWidget.toast('اكتب تفاصيل الورقة الأول');
+    return;
+  }
+  await window.CaseWidget.addSubDoc(currentCaseId, 'bailiffPapers', {
+    paperType, paperNumber, bailiffName, deliveryDate, receivedBy, nextHearingDate, notes,
+  });
+  document.getElementById('bpNumber').value = '';
+  document.getElementById('bpBailiff').value = '';
+  document.getElementById('bpDeliveryDate').value = '';
+  document.getElementById('bpReceivedBy').value = '';
+  document.getElementById('bpNextHearing').value = '';
+  document.getElementById('bpNotes').value = '';
+  window.CaseWidget.toast('تم تسجيل الورقة ✓');
+  loadBailiffPapers(currentCaseId);
 });
 
 /* ---------- fees tab ---------- */
