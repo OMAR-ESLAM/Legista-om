@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>LEGANO — المحرك القانوني الذكي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&family=Pirata+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&family=Pirata+One&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0A0A0D;
@@ -128,7 +128,7 @@ nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 }
 .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 24px 80px; text-align: center; position: relative; z-index: 2; }
 .hero-eyebrow { font-size: 10px; letter-spacing: 6px; color: var(--cyber); font-weight: 700; margin-bottom: 28px; opacity: 0.8; animation: fadeUp 0.8s 2.2s both; }
-.hero-h1 { font-size: clamp(36px, 7vw, 80px); font-weight: 900; line-height: 1.05; margin-bottom: 24px; animation: fadeUp 0.8s 2.4s both; }
+.hero-h1 { font-family: 'Aref Ruqaa', 'Cairo', sans-serif; font-size: clamp(36px, 7vw, 80px); font-weight: 900; line-height: 1.05; margin-bottom: 24px; animation: fadeUp 0.8s 2.4s both; }
 .hero-h1 .line2 { background: linear-gradient(90deg, var(--gold), var(--gold-soft), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: block; }
 .hero-sub { font-size: clamp(14px, 2vw, 17px); color: var(--gray); max-width: 520px; line-height: 1.9; margin-bottom: 52px; animation: fadeUp 0.8s 2.6s both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
@@ -170,7 +170,7 @@ nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 
 .section-wrap { position: relative; z-index: 2; padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
 .section-label { font-size: 10px; letter-spacing: 5px; color: var(--gold); font-weight: 700; margin-bottom: 12px; opacity: .8; }
-.section-h2 { font-size: clamp(28px,4vw,44px); font-weight: 900; margin-bottom: 48px; line-height: 1.15; }
+.section-h2 { font-family: 'Aref Ruqaa', 'Cairo', sans-serif; font-size: clamp(28px,4vw,44px); font-weight: 900; margin-bottom: 48px; line-height: 1.15; }
 
 .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; }
 .module-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; text-decoration: none; color: inherit; transition: border-color .2s, transform .2s; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
@@ -888,6 +888,12 @@ div[id*="g_id_onload"],
 @media (max-width: 768px) {
   .rol-portal-card { flex-direction: column; text-align: center; padding: 32px 24px; }
   .rol-stats { justify-content: center; }
+}
+
+/* خط العناوين الموحّد — ما عدا شاشة الدخول (loader-logo) واللي طلب العميل تسيبها زي ما هي */
+.nav-logo, .footer-logo, .dafou-title, .rol-portal-title,
+.module-name, .pricing-name, .modal-title, .pw-title, .ws-title {
+  font-family: 'Aref Ruqaa', 'Cairo', sans-serif;
 }
 </style>
 </head>
