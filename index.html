@@ -215,6 +215,14 @@ nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 footer { position: relative; z-index: 2; padding: 48px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
 .footer-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 4px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; }
 .footer-sub { font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+.footer-policy-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 20px; padding: 10px 20px;
+  border: 1px solid var(--border); border-radius: 24px;
+  font-size: 12px; color: var(--gray); letter-spacing: .5px; font-weight: 600;
+  text-decoration: none; transition: border-color .2s, color .2s, background .2s;
+}
+.footer-policy-link:hover { border-color: rgba(0,229,255,0.35); color: var(--cyber); background: rgba(0,229,255,0.05); }
 
 .reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s, transform .7s; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -895,6 +903,20 @@ div[id*="g_id_onload"],
 .module-name, .pricing-name, .modal-title, .pw-title, .ws-title {
   font-family: 'Aref Ruqaa', 'Cairo', sans-serif;
 }
+
+/* ══ SUPPORT FAB (فريق الدعم / واتساب) ══ */
+.support-fab-wrap { position: fixed; bottom: 24px; left: 24px; z-index: 1002; display: flex; align-items: center; gap: 10px; }
+.support-fab { position: relative; width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #25D366, #128C7E); display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 6px 24px rgba(37,211,102,0.4); cursor: none; flex-shrink: 0; }
+.support-fab svg { width: 28px; height: 28px; fill: #fff; position: relative; z-index: 2; }
+.support-fab::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: rgba(37,211,102,0.5); animation: supportPulse 2.2s ease-out infinite; }
+@keyframes supportPulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.9); opacity: 0; } }
+.support-fab-label { background: rgba(10,10,13,0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border); color: var(--white); font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; padding: 10px 18px; border-radius: 20px; white-space: nowrap; letter-spacing: 0.3px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); flex-shrink: 0; }
+@media (max-width: 640px) {
+  .support-fab-wrap { bottom: 18px; left: 16px; }
+  .support-fab { width: 52px; height: 52px; }
+  .support-fab svg { width: 25px; height: 25px; }
+  .support-fab-label { display: none; }
+}
 </style>
 </head>
 <body>
@@ -1527,9 +1549,12 @@ div[id*="g_id_onload"],
   </div>
 </div>
 
-<footer>
+<footer id="siteFooter">
   <div class="footer-logo">LEGANO</div>
   <p class="footer-sub">المحرك القانوني الذكي · Legal Operating System · 2035</p>
+  <a href="refund-policy.html" class="footer-policy-link">
+    <span>📄</span> سياسة الإلغاء والاسترداد
+  </a>
 </footer>
 
 <!-- ══ FLOATING CTA ══ -->
@@ -1537,6 +1562,30 @@ div[id*="g_id_onload"],
   <span class="float-cta-icon">⚖️</span>
   <span class="float-cta-text">استشارة قانونية</span>
 </a>
+<script>
+(function(){
+  var footerEl = document.getElementById('siteFooter');
+  var ctaEl = document.getElementById('floatCta');
+  if (footerEl && ctaEl && 'IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        ctaEl.style.opacity = entry.isIntersecting ? '0' : '';
+        ctaEl.style.pointerEvents = entry.isIntersecting ? 'none' : '';
+        ctaEl.style.transition = 'opacity .25s';
+      });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    obs.observe(footerEl);
+  }
+})();
+</script>
+
+<!-- ══ SUPPORT FAB (فريق الدعم — واتساب) ══ -->
+<div class="support-fab-wrap">
+  <span class="support-fab-label">فريق الدعم متاح</span>
+  <a href="https://wa.me/201021472439?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A7%D8%AD%D8%AA%D8%A7%D8%AC%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%20%D8%A8%D8%AE%D8%B5%D9%88%D8%B5%20Legano" class="support-fab" id="supportFab" target="_blank" rel="noopener" aria-label="تواصل مع فريق الدعم عبر واتساب">
+    <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.2h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.26.86 5.82 2.42a8.19 8.19 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23m-4.52 4.7c-.15 0-.4.06-.61.3-.21.24-.8.78-.8 1.9s.82 2.2.93 2.36c.12.15 1.6 2.5 3.9 3.44 2.1.86 2.34.68 2.76.65.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.06-.1-.21-.16-.44-.28-.23-.12-1.36-.67-1.57-.75-.21-.08-.36-.12-.51.12-.15.23-.59.75-.72.9-.13.15-.27.17-.5.06-.23-.12-.96-.35-1.84-1.13-.68-.6-1.14-1.35-1.27-1.58-.13-.23-.01-.35.1-.47.11-.11.23-.27.35-.4.11-.14.15-.23.23-.39.08-.15.04-.29-.02-.4-.06-.12-.5-1.26-.7-1.72-.18-.44-.37-.38-.51-.39z"/></svg>
+  </a>
+</div>
 
 <!-- ══ ESTESHARA PAYMENT MODAL ══ -->
 <div class="modal-overlay" id="estesharaModal">
