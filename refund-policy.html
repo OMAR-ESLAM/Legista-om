@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سياسة الإلغاء والاسترداد — LEGANO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0D;
+  --card: #14141B;
+  --gold: #D4AF37;
+  --gold-soft: #F4E5A6;
+  --cyber: #00E5FF;
+  --white: #FFFFFF;
+  --gray: #8A8A8F;
+  --border: rgba(212,175,55,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  direction: rtl;
+  padding: 0 0 80px;
+}
+a { color: inherit; }
+
+.nav {
+  max-width: 900px; margin: 0 auto; padding: 24px 24px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 3px;
+  text-decoration: none;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.nav-back {
+  font-size: 12px; color: var(--gray); text-decoration: none; letter-spacing: 1px; font-weight: 600;
+  border: 1px solid var(--border); border-radius: 20px; padding: 8px 16px;
+  transition: border-color .2s, color .2s;
+}
+.nav-back:hover { border-color: rgba(0,229,255,0.35); color: var(--cyber); }
+
+header.page-head {
+  max-width: 900px; margin: 0 auto; padding: 40px 24px 32px;
+}
+.section-label { font-size: 11px; letter-spacing: 3px; color: var(--cyber); font-weight: 700; margin-bottom: 14px; }
+.page-title { font-family: 'Syne', sans-serif; font-size: clamp(26px,4vw,38px); font-weight: 800; margin-bottom: 12px; }
+.page-updated { color: var(--gray); font-size: 13px; }
+
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+.intro-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; margin-bottom: 36px; font-size: 14.5px; line-height: 2; color: #C9C9D1;
+}
+.intro-card p { margin-bottom: 12px; }
+.intro-card p:last-child { margin-bottom: 0; }
+
+.policy-section { margin-bottom: 8px; }
+.policy-item {
+  border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px;
+  background: var(--card); overflow: hidden;
+}
+.policy-head {
+  display: flex; align-items: center; gap: 14px; padding: 18px 20px;
+}
+.policy-num {
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--gold-soft);
+  border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; flex-shrink: 0;
+  white-space: nowrap;
+}
+.policy-title { font-size: 15.5px; font-weight: 700; }
+.policy-body {
+  padding: 0 20px 20px 20px; font-size: 14px; line-height: 2; color: #C9C9D1;
+}
+.policy-body p { margin-bottom: 12px; }
+.policy-body p:last-child { margin-bottom: 0; }
+.policy-body ul { margin: 8px 0 12px; padding-inline-start: 22px; }
+.policy-body li { margin-bottom: 8px; }
+.policy-body ol { margin: 8px 0 12px; padding-inline-start: 22px; }
+.policy-body ol li { margin-bottom: 8px; }
+
+.contact-card {
+  margin-top: 32px; background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(0,229,255,0.04));
+  border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; text-align: center;
+}
+.contact-card h3 { font-family: 'Syne', sans-serif; font-size: 18px; margin-bottom: 10px; }
+.contact-card p { color: var(--gray); font-size: 13.5px; line-height: 1.9; }
+
+footer { max-width: 900px; margin: 48px auto 0; padding: 24px; text-align: center; border-top: 1px solid var(--border); }
+.footer-logo {
+  font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
+}
+.footer-sub { font-size: 11px; color: var(--gray); letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a class="nav-logo" href="index.html">LEGANO</a>
+  <a class="nav-back" href="index.html">← الرجوع للرئيسية</a>
+</div>
+
+<header class="page-head">
+  <p class="section-label">POLICIES · سياسات المنصة</p>
+  <h1 class="page-title">سياسة الإلغاء والاسترداد</h1>
+</header>
+
+<div class="wrap">
+
+  <div class="intro-card">
+    <p>نحن في Legano نحرص على تقديم خدمات رقمية موثوقة ومفيدة للمستخدمين، ونلتزم بالوضوح والشفافية فيما يتعلق بعمليات الدفع والإلغاء والاسترداد.</p>
+    <p>نظرًا لأن Legano منصة رقمية تقدم خدمات إلكترونية، فإن هذه السياسة تنظم الحالات المتعلقة بإلغاء الخدمات المدفوعة واسترداد قيمتها، بما يتناسب مع طبيعة الخدمات الرقمية التي تقدمها المنصة.</p>
+  </div>
+
+  <div class="policy-section">
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">أولًا</span>
+        <span class="policy-title">طبيعة خدمات Legano</span>
+      </div>
+      <div class="policy-body">
+        <p>تقدم Legano خدمات رقمية وإلكترونية، وقد تشمل – بحسب الخدمة المتاحة – إنشاء المحررات والمستندات القانونية، وأدوات المساعدة القانونية، وتحليل المعلومات أو البيانات المدخلة من المستخدم، وحسابات وأدوات قانونية إلكترونية، وغيرها من الخدمات الرقمية المتاحة عبر المنصة.</p>
+        <p>ولا تقدم Legano منتجات مادية، ولذلك لا ينطبق على خدماتها مفهوم "استبدال المنتجات" أو "إرجاع السلع" بالمعنى المعتاد في المتاجر الإلكترونية.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">ثانيًا</span>
+        <span class="policy-title">الإلغاء قبل تنفيذ الخدمة</span>
+      </div>
+      <div class="policy-body">
+        <p>يجوز للمستخدم طلب إلغاء الخدمة المدفوعة إذا لم تكن الخدمة قد بدأت في التنفيذ أو لم يتم استخدام الميزة الرقمية التي تم الدفع مقابلها، وذلك وفقًا لطبيعة الخدمة وإمكانية إلغائها فنيًا.</p>
+        <p>تقوم Legano بفحص طلب الإلغاء وتحديد مدى استحقاق المستخدم للاسترداد بناءً على حالة الخدمة وقت تقديم الطلب.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">ثالثًا</span>
+        <span class="policy-title">الخدمات التي تم تنفيذها أو استخدامها</span>
+      </div>
+      <div class="policy-body">
+        <p>نظرًا للطبيعة الرقمية لبعض خدمات Legano، فقد يبدأ تنفيذ الخدمة أو يصبح محتواها أو نتيجتها متاحة للمستخدم فور إتمام عملية الدفع.</p>
+        <p>وفي هذه الحالات، لا يكون مجرد تغيير رأي المستخدم أو عدم تفضيله لنتيجة الخدمة سببًا تلقائيًا لاسترداد كامل المبلغ، متى كانت الخدمة قد تم تقديمها أو إتاحتها للمستخدم وفقًا للوصف والشروط المعلنة لها.</p>
+        <p>ومع ذلك، لا تؤثر هذه السياسة على أي حق قانوني إلزامي للمستخدم بموجب القوانين واللوائح المعمول بها.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">رابعًا</span>
+        <span class="policy-title">الأعطال والمشكلات التقنية</span>
+      </div>
+      <div class="policy-body">
+        <p>إذا واجه المستخدم عطلًا تقنيًا من جانب Legano أدى إلى عدم تمكنه من الحصول على الخدمة التي دفع مقابلها، فعليه التواصل مع فريق الدعم وشرح المشكلة.</p>
+        <p>تسعى Legano في هذه الحالة، بحسب طبيعة المشكلة، إلى أحد الحلول التالية:</p>
+        <ol>
+          <li>إصلاح العطل وإتاحة الخدمة للمستخدم.</li>
+          <li>إعادة إتاحة الخدمة أو تمكين المستخدم من استخدامها مرة أخرى.</li>
+          <li>تمديد فترة الاستفادة من الخدمة، إذا كان ذلك مناسبًا لطبيعة الخدمة.</li>
+          <li>رد قيمة الخدمة كليًا أو جزئيًا إذا تعذر تقديم الخدمة أو معالجة المشكلة بصورة مناسبة.</li>
+        </ol>
+        <p>ويتم تحديد الحل المناسب وفقًا لطبيعة الخدمة ومدى تأثير المشكلة على قدرة المستخدم على الاستفادة منها.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">خامسًا</span>
+        <span class="policy-title">وجود خطأ أو نقص في الخدمة</span>
+      </div>
+      <div class="policy-body">
+        <p>إذا ثبت وجود خطأ جوهري أو نقص في الخدمة المقدمة مقارنة بالخدمة المعلن عنها أو المتفق عليها، يجوز للمستخدم التواصل مع Legano لطلب معالجة المشكلة.</p>
+        <p>وبحسب طبيعة الحالة، قد تقوم Legano بتصحيح الخطأ أو إعادة تقديم الخدمة أو توفير حل بديل مناسب، أو رد المقابل المدفوع كليًا أو جزئيًا عندما يتعذر معالجة المشكلة أو تقديم الخدمة المتفق عليها.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">سادسًا</span>
+        <span class="policy-title">حالات الدفع غير المكتمل أو المكرر</span>
+      </div>
+      <div class="policy-body">
+        <p>في حال تم خصم المبلغ من المستخدم أكثر من مرة مقابل نفس العملية نتيجة خطأ تقني أو خلل في عملية الدفع، يحق للمستخدم التواصل مع Legano للتحقق من العملية.</p>
+        <p>وفي حال التأكد من وجود عملية دفع مكررة غير مستحقة، يتم رد المبلغ الزائد وفقًا لإجراءات بوابة الدفع والوسيلة المستخدمة في السداد.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">سابعًا</span>
+        <span class="policy-title">العمليات غير المصرح بها</span>
+      </div>
+      <div class="policy-body">
+        <p>إذا اعتقد المستخدم أن عملية دفع تمت من خلال حسابه دون علمه أو موافقته، فعليه التواصل مع Legano في أقرب وقت ممكن، بالإضافة إلى اتخاذ الإجراءات المناسبة مع البنك أو جهة إصدار وسيلة الدفع عند الحاجة.</p>
+        <p>تقوم Legano بمراجعة بيانات العملية المتاحة لديها واتخاذ الإجراءات المناسبة وفقًا لنتيجة المراجعة.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">ثامنًا</span>
+        <span class="policy-title">طريقة تقديم طلب الاسترداد</span>
+      </div>
+      <div class="policy-body">
+        <p>يمكن للمستخدم تقديم طلب الإلغاء أو الاسترداد من خلال وسائل التواصل الرسمية الموضحة على موقع Legano.</p>
+        <p>ويُفضل أن يتضمن الطلب:</p>
+        <ul>
+          <li>اسم المستخدم أو بيانات الحساب.</li>
+          <li>البريد الإلكتروني المرتبط بالحساب.</li>
+          <li>رقم أو مرجع عملية الدفع، إن وجد.</li>
+          <li>اسم الخدمة محل الطلب.</li>
+          <li>تاريخ عملية الدفع.</li>
+          <li>وصف مختصر لسبب طلب الإلغاء أو الاسترداد.</li>
+        </ul>
+        <p>لا تطلب Legano من المستخدم إرسال بيانات البطاقات البنكية السرية أو كلمات المرور.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">تاسعًا</span>
+        <span class="policy-title">مراجعة طلبات الاسترداد</span>
+      </div>
+      <div class="policy-body">
+        <p>تقوم Legano بمراجعة طلب الاسترداد والتحقق من تفاصيل العملية والخدمة المستخدمة أو المقدمة.</p>
+        <p>قد يتم طلب معلومات إضافية غير حساسة تساعد على التحقق من العملية أو المشكلة.</p>
+        <p>بعد الانتهاء من المراجعة، يتم إبلاغ المستخدم بالقرار والإجراء المتخذ.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">عاشرًا</span>
+        <span class="policy-title">طريقة رد المبالغ</span>
+      </div>
+      <div class="policy-body">
+        <p>عند الموافقة على الاسترداد، يتم رد المبلغ – متى كان ذلك ممكنًا – إلى وسيلة الدفع الأصلية التي تم استخدامها في عملية الشراء، وفقًا لإجراءات بوابة الدفع والبنك أو الجهة المالية ذات الصلة.</p>
+        <p>وقد يستغرق ظهور المبلغ في حساب المستخدم مدة إضافية تحددها الجهة المصدرة للبطاقة أو البنك أو مزود خدمة الدفع، ولا تتحمل Legano مسؤولية التأخير الناتج عن هذه الجهات بعد تنفيذ عملية رد المبلغ من جانبها.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">الحادي عشر</span>
+        <span class="policy-title">الرسوم</span>
+      </div>
+      <div class="policy-body">
+        <p>إذا ترتب على عملية الدفع أو الاسترداد رسوم مفروضة من البنك أو مزود خدمة الدفع أو أي جهة خارجية، فإن معالجة هذه الرسوم تكون وفقًا للقواعد والسياسات المطبقة من تلك الجهات والقوانين المعمول بها.</p>
+        <p>ولا تفرض Legano رسومًا إضافية على المستخدم لمجرد تقديم طلب استرداد.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">الثاني عشر</span>
+        <span class="policy-title">إساءة استخدام سياسة الاسترداد</span>
+      </div>
+      <div class="policy-body">
+        <p>تحتفظ Legano بحقها في مراجعة الطلبات التي يظهر فيها وجود استخدام متكرر أو غير معتاد لسياسة الاسترداد أو محاولة إساءة استخدامها، وذلك دون الإخلال بأي حقوق قانونية للمستخدم.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">الثالث عشر</span>
+        <span class="policy-title">الحقوق القانونية للمستخدم</span>
+      </div>
+      <div class="policy-body">
+        <p>لا تهدف هذه السياسة إلى تقييد أو إلغاء أي حقوق أو ضمانات مقررة للمستخدم بموجب القوانين واللوائح المصرية واجبة التطبيق.</p>
+        <p>وفي حال وجود تعارض بين أي بند من هذه السياسة وبين حكم قانوني إلزامي، يُطبق الحكم القانوني الإلزامي في حدود ذلك التعارض.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">الرابع عشر</span>
+        <span class="policy-title">الموافقة على السياسة</span>
+      </div>
+      <div class="policy-body">
+        <p>باستخدام خدمات Legano أو إتمام عملية الدفع، يقر المستخدم بأنه اطلع على سياسة الإلغاء والاسترداد هذه وفهم طبيعة الخدمة الرقمية التي يتم تقديمها، وذلك دون الإخلال بالحقوق التي يكفلها القانون للمستخدم.</p>
+      </div>
+    </div>
+
+    <div class="policy-item">
+      <div class="policy-head">
+        <span class="policy-num">الخامس عشر</span>
+        <span class="policy-title">تحديث السياسة</span>
+      </div>
+      <div class="policy-body">
+        <p>يجوز لـ Legano تحديث هذه السياسة من وقت لآخر بما يتناسب مع تطوير خدمات المنصة أو التغييرات القانونية أو التقنية.</p>
+        <p>ويتم نشر النسخة المحدثة على الموقع مع توضيح تاريخ آخر تحديث.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="contact-card">
+    <h3>التواصل</h3>
+    <p>للاستفسارات المتعلقة بالإلغاء أو الاسترداد أو عمليات الدفع، يمكن للمستخدم التواصل مع Legano من خلال قنوات التواصل الرسمية الموضحة على الموقع.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">LEGANO</div>
+  <p class="footer-sub">الخدمات القانونية الرقمية</p>
+</footer>
+
+</body>
+</html>
