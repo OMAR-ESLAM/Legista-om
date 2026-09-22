@@ -209,6 +209,23 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
             <div class="stat-card"><div class="lbl">زوار السنة</div><div class="val" id="statVisitsYear">—</div></div>
           </div>
         </div>
+        <div class="chart-card">
+          <h3>عرض الإطلاق السنوي (250 ج)</h3>
+          <div class="stats-grid" style="margin-bottom:0;">
+            <div class="stat-card gold">
+              <div class="lbl">أماكن العرض المستخدمة</div>
+              <div class="val" id="statPromoUsed">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="lbl">متبقي من 50</div>
+              <div class="val" id="statPromoLeft">—</div>
+            </div>
+          </div>
+          <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span style="font-size:12px; color:var(--gray)">لو محتاج تظبط الرقم يدويًا (مثلاً بعد رفض طلب مش راجع تلقائي)</span>
+            <button class="tab-btn" style="white-space:nowrap" onclick="adjustAnnualPromoManually()">✏️ تعديل الرقم</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -354,7 +371,7 @@ async function initDashboardData() {
     window.addEventListener('firebase-ready', initDashboardData, { once: true });
     return;
   }
-  await Promise.all([loadUsers(), loadPayments(), loadConsultations(), loadFeedback(), loadVisits(), loadMaintenanceStatus()]);
+  await Promise.all([loadUsers(), loadPayments(), loadConsultations(), loadFeedback(), loadVisits(), loadMaintenanceStatus(), loadAnnualPromoStatus()]);
   renderOverview();
 }
 
@@ -489,7 +506,7 @@ function renderPayments() {
         <div><b>الإيميل:</b> ${escapeHtml(p.email || '—')}</div>
         <div><b>الهاتف:</b> ${escapeHtml(p.phone || '—')}</div>
         <div><b>المحول منه:</b> ${escapeHtml(p.senderNumber || '—')}</div>
-        <div><b>الباقة:</b> ${escapeHtml(p.package || '—')} ${p.price ? '(' + p.price + ' جنيه)' : ''}</div>
+        <div><b>الباقة:</b> ${escapeHtml(p.package || '—')} ${p.price ? '(' + p.price + ' جنيه)' : ''} ${isAnnualPromoPayment(p) ? '<span style="color:#DC2626;font-weight:800">🔥 سعر عرض الإطلاق</span>' : ''}</div>
         <div><b>الحالة:</b> <span class="status-tag ${p.status || 'pending'}">${statusLabel(p.status)}</span></div>
       </div>
       <div class="payment-actions">
@@ -537,12 +554,82 @@ async function setPaymentStatus(paymentId, status) {
       ALL_USERS.push({ id: p.email, name: p.name, email: p.email, phone: p.phone, subscription: 'paid', subscriptionExpiry: expiry, paymentScreenshot: p.screenshot, code });
     }
   }
+
+  // لو الطلب اتعمله رفض وكان محجوز بيه مكان من عرض الإطلاق (سنوي بسعر 250)، نرجّع المكان ده للعداد
+  if (status === 'rejected' && isAnnualPromoPayment(p) && !p.promoSlotReleased) {
+    await releaseAnnualPromoSlot();
+    await updateDoc(doc(window._db, 'paymentRequests', paymentId), { promoSlotReleased: true });
+    p.promoSlotReleased = true;
+  }
+
   renderPayments();
   renderUsers();
   renderExpiry();
   renderOverview();
   showToast('تم تحديث حالة الطلب');
 }
+
+/* ══ عرض الإطلاق السنوي (أول 50 مشترك بـ 250 ج) ══ */
+const ANNUAL_PROMO_LIMIT = 50;
+let CURRENT_PROMO_USED = 0;
+
+function isAnnualPromoPayment(p) {
+  const pkg = (p.package || '').toString();
+  return /سنوي|yearly|annual/i.test(pkg) && !/نصف|ربع|quarterly|semi/i.test(pkg) && Number(p.price) === 250;
+}
+
+async function loadAnnualPromoStatus() {
+  const { doc, getDoc } = window._fs;
+  try {
+    const snap = await getDoc(doc(window._db, 'counters', 'annualPromo'));
+    CURRENT_PROMO_USED = snap.exists() ? (snap.data().used || 0) : 0;
+  } catch (e) { CURRENT_PROMO_USED = 0; }
+  renderAnnualPromoStatus();
+}
+
+function renderAnnualPromoStatus() {
+  const usedEl = document.getElementById('statPromoUsed');
+  const leftEl = document.getElementById('statPromoLeft');
+  if (!usedEl || !leftEl) return;
+  const left = Math.max(0, ANNUAL_PROMO_LIMIT - CURRENT_PROMO_USED);
+  usedEl.textContent = CURRENT_PROMO_USED + ' / ' + ANNUAL_PROMO_LIMIT;
+  leftEl.textContent = left;
+}
+
+// بينقص مكان واحد من العداد بأمان (Transaction) من غير ما ينزل تحت الصفر — بيتنادى لما طلب دفع سنوي بسعر العرض يترفض
+async function releaseAnnualPromoSlot() {
+  const { doc, runTransaction } = window._fs;
+  const ref = doc(window._db, 'counters', 'annualPromo');
+  try {
+    await runTransaction(window._db, async (tx) => {
+      const snap = await tx.get(ref);
+      const used = snap.exists() ? (snap.data().used || 0) : 0;
+      const next = Math.max(0, used - 1);
+      tx.set(ref, { used: next }, { merge: true });
+      CURRENT_PROMO_USED = next;
+    });
+  } catch (e) { console.error(e); }
+  renderAnnualPromoStatus();
+}
+
+// تعديل يدوي لعدد الأماكن المستخدمة (لو حابب تظبط الرقم بنفسك لأي سبب)
+async function adjustAnnualPromoManually() {
+  const input = prompt('اكتب عدد الأماكن المستخدمة فعليًا من الـ 50 (رقم من 0 لـ 50):', CURRENT_PROMO_USED);
+  if (input === null) return;
+  const val = parseInt(input, 10);
+  if (isNaN(val) || val < 0 || val > ANNUAL_PROMO_LIMIT) {
+    showToast('رقم غير صحيح — لازم يكون بين 0 و 50');
+    return;
+  }
+  const { doc, setDoc } = window._fs;
+  try {
+    await setDoc(doc(window._db, 'counters', 'annualPromo'), { used: val }, { merge: true });
+    CURRENT_PROMO_USED = val;
+    renderAnnualPromoStatus();
+    showToast('تم تحديث عداد عرض الإطلاق');
+  } catch (e) { console.error(e); showToast('حصل خطأ أثناء الحفظ'); }
+}
+
 
 /* ══ CONSULTATIONS ══ */
 let ALL_CONSULTATIONS = [];
@@ -669,6 +756,7 @@ function renderOverview() {
   document.getElementById('statTotalUsers').textContent = total;
   document.getElementById('statSubscribed').textContent = subscribed;
   document.getElementById('statUnsubscribed').textContent = unsubscribed;
+  renderAnnualPromoStatus();
 
   const todayKey = new Date().toISOString().slice(0, 10);
   const todayCount = ALL_VISITS[todayKey] || 0;
