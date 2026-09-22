@@ -1133,6 +1133,20 @@ div[id*="g_id_onload"],
   <p class="hero-sub">
     أتمتة شاملة لصياغة العقود، المذكرات، والعرائض القانونية في دقائق معدودة — مع تنظيم جدول الجلسات والاستشارات وفقاً للقوانين واللوائح المحلية.
   </p>
+  <div class="quicknav-grid" id="quickNavGrid" style="max-width:900px; margin-bottom:40px;">
+    <a href="rol.html" class="quicknav-item cy"><div class="quicknav-icon">📅</div><div class="quicknav-name">رول الجلسات</div></a>
+    <a href="#qaat" class="quicknav-item cy" data-target="qaat"><div class="quicknav-icon">🏛️</div><div class="quicknav-name">أماكن القاعات</div></a>
+    <a href="#tahlil" class="quicknav-item" data-target="tahlil"><div class="quicknav-icon">💡</div><div class="quicknav-name">تحليل القضية</div></a>
+    <a href="#tibbshari" class="quicknav-item cy" data-target="tibbshari"><div class="quicknav-icon">🩺</div><div class="quicknav-name">الطب الشرعي</div></a>
+    <a href="#dafou" class="quicknav-item cy" data-target="dafou"><div class="quicknav-icon">🛡️</div><div class="quicknav-name">الدفوع</div></a>
+    <a href="#ahkam" class="quicknav-item" data-target="ahkam"><div class="quicknav-icon">⚖️</div><div class="quicknav-name">أحكام محكمة النقض</div></a>
+    <a href="#tashrieat" class="quicknav-item cy" data-target="tashrieat"><div class="quicknav-icon">📚</div><div class="quicknav-name">التشريعات القانونية</div></a>
+    <a href="#maktabak" class="quicknav-item" data-target="maktabak"><div class="quicknav-icon">🏢</div><div class="quicknav-name">إدارة مكتبك</div></a>
+    <a href="#mawareeth" class="quicknav-item" data-target="mawareeth"><div class="quicknav-icon">📜</div><div class="quicknav-name">المواريث</div></a>
+    <a href="#mawaeed" class="quicknav-item" data-target="mawaeed"><div class="quicknav-icon">⏰</div><div class="quicknav-name">المواعيد القانونية</div></a>
+    <a href="#esteshara" class="quicknav-item" data-target="esteshara"><div class="quicknav-icon">💬</div><div class="quicknav-name">الاستشارات القانونية</div></a>
+    <a href="#pricing" class="quicknav-item" data-target="pricing"><div class="quicknav-icon">💳</div><div class="quicknav-name">قيمة الاشتراك</div></a>
+  </div>
   <div class="hero-ctas">
     <a href="inzarat.html" class="btn-primary">ابدأ التجربة المجانية الآن</a>
   </div>
@@ -2160,7 +2174,7 @@ window.addEventListener('load', () => {
 
 window.addEventListener('scroll', ()=>{ document.getElementById('mainNav').classList.toggle('scrolled',scrollY>60); });
 
-document.querySelectorAll('.tool-card[data-target], .mega-col a[data-target]').forEach(item=>{
+document.querySelectorAll('.tool-card[data-target], .mega-col a[data-target], #quickNavGrid .quicknav-item[data-target]').forEach(item=>{
   item.addEventListener('click', e=>{
     e.preventDefault();
     const target = document.getElementById(item.dataset.target);
