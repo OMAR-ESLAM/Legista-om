@@ -647,6 +647,59 @@ div[id*="g_id_onload"],
 .complaint-submit { width: 100%; margin-top: 8px; justify-content: center; }
 .complaint-success { display: none; text-align: center; padding: 20px; }
 .complaint-success.show { display: block; }
+
+/* ══ SHROUHAT — الشروحات القانونية بالفيديو ══ */
+.shrouhat-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.shrouhat-admin-add { background: transparent; border: 1px solid rgba(201,162,39,0.4); color: var(--gold); padding: 10px 22px; border-radius: 10px; font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; align-items: center; gap: 6px; transition: background .2s, color .2s; white-space: nowrap; }
+.shrouhat-admin-add:hover { background: var(--gold); color: #fff; }
+.shrouhat-admin-add.show { display: inline-flex; }
+.video-lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; margin-top: 24px; }
+.video-lib-empty, .video-lib-loading { grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--gray); font-size: 13px; opacity: .7; }
+.video-card { background: var(--surface); border: 1px solid rgba(15,23,42,0.06); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow .25s, transform .25s; }
+.video-card:hover { box-shadow: 0 14px 36px rgba(15,23,42,0.09); transform: translateY(-3px); }
+.video-embed-wrap { position: relative; width: 100%; padding-top: 56.25%; background: #0b0f19; }
+.video-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-card-body { padding: 20px 22px 22px; }
+.video-card-title { font-size: 16px; font-weight: 800; color: var(--white); margin-bottom: 6px; line-height: 1.5; }
+.video-card-meta { font-size: 11px; color: var(--gray); opacity: .65; margin-bottom: 10px; }
+.video-card-desc { font-size: 13px; line-height: 1.9; color: var(--gray); margin-bottom: 16px; white-space: pre-line; }
+.video-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.video-comments-toggle { background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.15); color: var(--cyber); padding: 9px 16px; border-radius: 9px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .2s; }
+.video-comments-toggle:hover { background: rgba(37,99,235,0.12); }
+.video-admin-del { background: none; border: none; color: #B91C1C; font-size: 12px; cursor: pointer; opacity: .6; font-weight: 700; }
+.video-admin-del:hover { opacity: 1; }
+.video-comments-panel { display: none; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(15,23,42,0.06); }
+.video-comments-panel.open { display: block; }
+.comment-form { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+.comment-form textarea { flex: 1; width: 100%; padding: 11px 14px; background: rgba(15,23,42,0.02); border: 1px solid rgba(15,23,42,0.08); border-radius: 10px; color: var(--white); font-family: 'Cairo', sans-serif; font-size: 12.5px; outline: none; resize: vertical; min-height: 44px; line-height: 1.7; transition: border-color .2s; }
+.comment-form textarea:focus { border-color: rgba(201,162,39,0.4); }
+.comment-form button { flex-shrink: 0; background: #0F172A; color: #fff; border: none; padding: 11px 18px; border-radius: 10px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .15s; }
+.comment-form button:hover { transform: scale(1.04); }
+.comment-list { display: flex; flex-direction: column; gap: 16px; }
+.comment-item { display: flex; gap: 10px; }
+.comment-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; object-fit: cover; background: rgba(15,23,42,0.08); }
+.comment-avatar-fallback { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--gold), var(--gold-soft)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+.comment-body { flex: 1; min-width: 0; }
+.comment-author-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 3px; }
+.comment-author { font-size: 12.5px; font-weight: 800; color: var(--white); }
+.comment-badge { font-size: 9px; background: linear-gradient(90deg, var(--gold), var(--gold-soft)); color: #fff; padding: 2.5px 9px; border-radius: 20px; font-weight: 800; letter-spacing: .5px; }
+.comment-time { font-size: 10px; color: var(--gray); opacity: .55; }
+.comment-text { font-size: 13px; line-height: 1.85; color: var(--gray); word-wrap: break-word; }
+.comment-actions { display: flex; align-items: center; gap: 14px; margin-top: 5px; }
+.comment-reply-btn, .comment-del-btn { font-size: 11px; color: var(--cyber); background: none; border: none; cursor: pointer; font-weight: 700; padding: 0; }
+.comment-del-btn { color: #B91C1C; opacity: .7; }
+.comment-del-btn:hover { opacity: 1; }
+.comment-replies { margin-top: 12px; padding-inline-end: 20px; border-inline-end: 2px solid rgba(15,23,42,0.07); display: flex; flex-direction: column; gap: 14px; }
+.comment-reply-form { margin-top: 8px; display: none; gap: 8px; align-items: flex-start; }
+.comment-reply-form.open { display: flex; }
+.comment-reply-form textarea { flex: 1; padding: 9px 12px; background: rgba(15,23,42,0.02); border: 1px solid rgba(15,23,42,0.08); border-radius: 9px; color: var(--white); font-family: 'Cairo', sans-serif; font-size: 12px; outline: none; resize: vertical; min-height: 38px; line-height: 1.6; }
+.comment-reply-form button { flex-shrink: 0; background: transparent; border: 1px solid rgba(15,23,42,0.15); color: var(--white); padding: 9px 14px; border-radius: 9px; font-family: 'Cairo', sans-serif; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.comment-empty { font-size: 12px; color: var(--gray); opacity: .6; padding: 6px 0 2px; }
+.comment-login-hint { font-size: 12px; color: var(--gray); background: rgba(15,23,42,0.03); border: 1px dashed rgba(15,23,42,0.12); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; cursor: pointer; text-align: center; }
+.comment-login-hint:hover { border-color: rgba(201,162,39,0.4); color: var(--gold); }
+@media (max-width: 640px) {
+  .video-lib-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 768px) {
   .complaint-card { padding: 24px; }
 }
@@ -1041,6 +1094,7 @@ div[id*="g_id_onload"],
           <a href="igraat-jnaeya.html">📜 الإجراءات الجنائية</a>
           <a href="#ahkam">⚖️ أحكام محكمة النقض</a>
           <a href="#tashrieat">📚 التشريعات القانونية</a>
+          <a href="#shrouhat">🎥 الشروحات القانونية</a>
         </div>
         <div class="mega-col">
           <p class="mega-col-title">حسابات وخدمات</p>
@@ -1705,6 +1759,48 @@ div[id*="g_id_onload"],
     </div>
   </div>
 </div>
+
+<!-- ══ SECTION: الشروحات القانونية بالفيديو ══ -->
+<div class="section-wrap reveal" id="shrouhat">
+  <div class="shrouhat-topbar">
+    <div>
+      <p class="section-label">شروحات قانونية بالفيديو</p>
+      <h2 class="section-h2" style="margin-bottom:0">افهم القانون بصوت وصورة.<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">من أ. هدى خميس نفسها.</span></h2>
+    </div>
+    <button type="button" class="shrouhat-admin-add" id="shrouhatAdminAddBtn" onclick="openAddVideoModal()">➕ أضيفي فيديو جديد</button>
+  </div>
+
+  <div class="video-lib-grid" id="videoLibGrid">
+    <div class="video-lib-loading">بنحمّل الفيديوهات…</div>
+  </div>
+</div>
+
+<!-- ══ ADD VIDEO MODAL (لوحة أ. هدى فقط) ══ -->
+<div class="modal-overlay" id="addVideoModal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="closeAddVideoModal()">✕</button>
+    <form id="addVideoForm">
+      <p class="modal-eyebrow">شروحات قانونية</p>
+      <h3 class="modal-title">إضافة فيديو شرح جديد</h3>
+
+      <div class="m-field">
+        <label>عنوان الفيديو</label>
+        <input type="text" id="avTitle" required placeholder="مثال: إزاي تكتب إنذار عادي صحيح؟">
+      </div>
+      <div class="m-field">
+        <label>رابط الفيديو (يوتيوب)</label>
+        <input type="url" id="avUrl" required placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+      <div class="m-field">
+        <label>وصف مختصر — هو بيشرح إيه بالظبط</label>
+        <textarea id="avDesc" required placeholder="اكتبي هنا ملخص للي الفيديو بيشرحه..."></textarea>
+      </div>
+
+      <button type="submit" class="m-submit" id="avSubmitBtn">نشر الفيديو ←</button>
+    </form>
+  </div>
+</div>
+
 <div class="section-wrap reveal" id="feedback">
   <p class="section-label">شاركنا رأيك</p>
   <h2 class="section-h2">واجهتك مشكلة أو عندك اقتراح؟<br><span style="background:linear-gradient(90deg,var(--gold),var(--gold-soft));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">قوللنا وهنسمعك.</span></h2>
@@ -2242,7 +2338,8 @@ document.getElementById('googleSignInBtn').addEventListener('click', () => {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, increment, runTransaction
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, increment, runTransaction,
+  query, orderBy, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -2255,7 +2352,7 @@ const app = initializeApp(firebaseConfig, "legista-site");
 const db = getFirestore(app);
 
 window._db = db;
-window._fs = { doc, getDoc, setDoc, updateDoc, addDoc, collection, increment, runTransaction };
+window._fs = { doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, increment, runTransaction, query, orderBy, onSnapshot, serverTimestamp };
 window.dispatchEvent(new Event('legista-firebase-ready'));
 </script>
 
@@ -2572,6 +2669,282 @@ document.getElementById('subscribeFormWrap').addEventListener('submit', async e 
         createdAt: Date.now()
       };
       try { await addDoc(collection(window._db, 'feedback'), payload); } catch (err) { console.error(err); }
+    });
+  });
+})();
+
+/* ══ SHROUHAT — مكتبة الفيديوهات القانونية + التعليقات ══ */
+(function () {
+  const grid = document.getElementById('videoLibGrid');
+  if (!grid) return;
+
+  // ✏️ استبدلي الإيميل ده بإيميل جوجل بتاع أ. هدى خميس، عشان تظهر شارة "المحامية" على ردودها
+  // ويظهرلها زرار "أضيفي فيديو جديد" لما تسجّل دخول بنفس الإيميل.
+  const ADMIN_EMAILS = ['hodakhamis08@gmail.com'];
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function getSavedUser() {
+    const saved = localStorage.getItem('legista_user');
+    if (!saved) return null;
+    try { return JSON.parse(saved); } catch (e) { return null; }
+  }
+  function isAdminUser(user) {
+    return !!user && ADMIN_EMAILS.includes(user.email);
+  }
+  function timeAgo(ts) {
+    if (!ts || !ts.toDate) return 'الآن';
+    const diffSec = Math.max(0, Math.floor((Date.now() - ts.toDate().getTime()) / 1000));
+    if (diffSec < 60) return 'الآن';
+    if (diffSec < 3600) return 'من ' + Math.floor(diffSec / 60) + ' دقيقة';
+    if (diffSec < 86400) return 'من ' + Math.floor(diffSec / 3600) + ' ساعة';
+    return 'من ' + Math.floor(diffSec / 86400) + ' يوم';
+  }
+  function extractYouTubeId(url) {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
+      if (u.searchParams.get('v')) return u.searchParams.get('v');
+      if (u.pathname.includes('/embed/')) return u.pathname.split('/embed/')[1];
+      if (u.pathname.includes('/shorts/')) return u.pathname.split('/shorts/')[1];
+    } catch (e) {}
+    return null;
+  }
+  function avatarHtml(user) {
+    if (user && user.picture) return `<img class="comment-avatar" src="${escapeHtml(user.picture)}" alt="${escapeHtml(user.name || '')}">`;
+    const initial = user && user.name ? user.name.trim().charAt(0) : '؟';
+    return `<div class="comment-avatar-fallback">${escapeHtml(initial)}</div>`;
+  }
+
+  function refreshShrouhatAdminUI() {
+    const btn = document.getElementById('shrouhatAdminAddBtn');
+    if (!btn) return;
+    btn.classList.toggle('show', isAdminUser(getSavedUser()));
+  }
+  window.refreshShrouhatAdminUI = refreshShrouhatAdminUI;
+  refreshShrouhatAdminUI();
+  const _origUpdateSignInUI = window.updateSignInUI;
+  window.updateSignInUI = function (user) {
+    if (typeof _origUpdateSignInUI === 'function') _origUpdateSignInUI(user);
+    refreshShrouhatAdminUI();
+    if (typeof window.shrouhatRenderGrid === 'function') window.shrouhatRenderGrid();
+  };
+
+  function requireLoginForComment() {
+    showLegistaToast('سجّل الدخول الأول عشان تقدر تكتب تعليق');
+    const returnUrl = window.location.pathname.split('/').pop() + '#shrouhat';
+    setTimeout(() => { window.location.href = 'login.html?next=' + encodeURIComponent(returnUrl); }, 600);
+  }
+  window.shrouhatRequireLogin = requireLoginForComment;
+
+  const openCommentPanels = new Set();
+  const lastComments = {};
+
+  function buildCommentTree(items) {
+    const byId = {};
+    items.forEach(it => { byId[it.id] = Object.assign({}, it, { replies: [] }); });
+    const roots = [];
+    items.forEach(it => {
+      if (it.parentId && byId[it.parentId]) byId[it.parentId].replies.push(byId[it.id]);
+      else roots.push(byId[it.id]);
+    });
+    return roots;
+  }
+
+  function renderCommentNode(c, videoId, isReply) {
+    const admin = isAdminUser({ email: c.email });
+    const user = getSavedUser();
+    const canDelete = user && (user.email === c.email || isAdminUser(user));
+    return `
+      <div class="comment-item" data-comment-id="${escapeHtml(c.id)}">
+        ${avatarHtml({ name: c.name, picture: c.picture })}
+        <div class="comment-body">
+          <div class="comment-author-row">
+            <span class="comment-author">${escapeHtml(c.name)}</span>
+            ${admin ? '<span class="comment-badge">⚖️ المحامية</span>' : ''}
+            <span class="comment-time">${timeAgo(c.createdAt)}</span>
+          </div>
+          <div class="comment-text">${escapeHtml(c.text)}</div>
+          <div class="comment-actions">
+            ${!isReply ? `<button type="button" class="comment-reply-btn" onclick="shrouhatToggleReply('${escapeHtml(videoId)}','${escapeHtml(c.id)}')">رد</button>` : ''}
+            ${canDelete ? `<button type="button" class="comment-del-btn" onclick="shrouhatDeleteComment('${escapeHtml(videoId)}','${escapeHtml(c.id)}')">حذف</button>` : ''}
+          </div>
+          ${!isReply ? `
+          <div class="comment-reply-form" id="replyForm-${escapeHtml(c.id)}">
+            <textarea placeholder="اكتب ردك..." id="replyText-${escapeHtml(c.id)}"></textarea>
+            <button type="button" onclick="shrouhatSubmitComment('${escapeHtml(videoId)}','${escapeHtml(c.id)}')">إرسال</button>
+          </div>` : ''}
+          ${(c.replies && c.replies.length) ? `<div class="comment-replies">${c.replies.map(r => renderCommentNode(r, videoId, true)).join('')}</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function renderCommentsList(videoId, items) {
+    const listEl = document.getElementById('commentsList-' + videoId);
+    if (!listEl) return;
+    if (!items.length) {
+      listEl.innerHTML = '<div class="comment-empty">لسه مفيش تعليقات — اكتب أول تعليق 👇</div>';
+      return;
+    }
+    const tree = buildCommentTree(items);
+    listEl.innerHTML = tree.map(c => renderCommentNode(c, videoId, false)).join('');
+  }
+
+  window.shrouhatToggleReply = function (videoId, commentId) {
+    const form = document.getElementById('replyForm-' + commentId);
+    if (form) form.classList.toggle('open');
+  };
+
+  window.shrouhatToggleComments = function (videoId) {
+    const panel = document.getElementById('commentsPanel-' + videoId);
+    if (!panel) return;
+    const willOpen = !panel.classList.contains('open');
+    panel.classList.toggle('open', willOpen);
+    if (willOpen && !openCommentPanels.has(videoId)) {
+      openCommentPanels.add(videoId);
+      withLegistaDb(() => {
+        const { collection, query, orderBy, onSnapshot } = window._fs;
+        const q = query(collection(window._db, 'legalVideos', videoId, 'comments'), orderBy('createdAt', 'asc'));
+        onSnapshot(q, snap => {
+          const items = [];
+          snap.forEach(d => items.push(Object.assign({ id: d.id }, d.data())));
+          lastComments[videoId] = items;
+          renderCommentsList(videoId, items);
+        }, err => console.error(err));
+      });
+    }
+  };
+
+  window.shrouhatSubmitComment = function (videoId, parentId) {
+    const user = getSavedUser();
+    if (!user) { requireLoginForComment(); return; }
+    const inputId = parentId ? ('replyText-' + parentId) : ('commentText-' + videoId);
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    withLegistaDb(async () => {
+      const { collection, addDoc, serverTimestamp } = window._fs;
+      try {
+        await addDoc(collection(window._db, 'legalVideos', videoId, 'comments'), {
+          text, name: user.name, email: user.email, picture: user.picture || null,
+          parentId: parentId || null, createdAt: serverTimestamp()
+        });
+        input.value = '';
+        if (parentId) {
+          const form = document.getElementById('replyForm-' + parentId);
+          if (form) form.classList.remove('open');
+        }
+      } catch (err) { console.error(err); showLegistaToast('حصل خطأ، جرب تاني'); }
+    });
+  };
+
+  window.shrouhatDeleteComment = function (videoId, commentId) {
+    if (!confirm('متأكد عايز تمسح التعليق ده؟')) return;
+    withLegistaDb(async () => {
+      const { doc, deleteDoc } = window._fs;
+      try { await deleteDoc(doc(window._db, 'legalVideos', videoId, 'comments', commentId)); }
+      catch (err) { console.error(err); }
+    });
+  };
+
+  function videoCardHtml(v) {
+    const embedId = extractYouTubeId(v.youtubeUrl);
+    const admin = isAdminUser(getSavedUser());
+    return `
+      <div class="video-card">
+        <div class="video-embed-wrap">
+          ${embedId ? `<iframe src="https://www.youtube.com/embed/${escapeHtml(embedId)}" title="${escapeHtml(v.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>` : ''}
+        </div>
+        <div class="video-card-body">
+          <div class="video-card-title">${escapeHtml(v.title)}</div>
+          <div class="video-card-meta">⚖️ أ. هدى خميس · ${timeAgo(v.createdAt)}</div>
+          <div class="video-card-desc">${escapeHtml(v.description)}</div>
+          <div class="video-card-footer">
+            <button type="button" class="video-comments-toggle" onclick="shrouhatToggleComments('${escapeHtml(v.id)}')">💬 التعليقات والردود</button>
+            ${admin ? `<button type="button" class="video-admin-del" onclick="shrouhatDeleteVideo('${escapeHtml(v.id)}')">حذف الفيديو</button>` : ''}
+          </div>
+          <div class="video-comments-panel" id="commentsPanel-${escapeHtml(v.id)}">
+            ${getSavedUser() ? `
+              <div class="comment-form">
+                <textarea placeholder="اكتب تعليقك أو سؤالك على الشرح..." id="commentText-${escapeHtml(v.id)}"></textarea>
+                <button type="button" onclick="shrouhatSubmitComment('${escapeHtml(v.id)}')">إرسال</button>
+              </div>` : `
+              <div class="comment-login-hint" onclick="shrouhatRequireLogin()">سجّل الدخول عشان تكتب تعليق أو ترد على حد</div>`}
+            <div class="comment-list" id="commentsList-${escapeHtml(v.id)}"></div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  window.shrouhatDeleteVideo = function (videoId) {
+    if (!confirm('متأكدة عايزة تمسحي الفيديو ده؟')) return;
+    withLegistaDb(async () => {
+      const { doc, deleteDoc } = window._fs;
+      try { await deleteDoc(doc(window._db, 'legalVideos', videoId)); }
+      catch (err) { console.error(err); }
+    });
+  };
+
+  let lastVideos = null;
+  function renderGrid() {
+    if (lastVideos === null) return;
+    if (!lastVideos.length) {
+      grid.innerHTML = '<div class="video-lib-empty">لسه مفيش فيديوهات شرح — تابعونا قريب 🎥</div>';
+      return;
+    }
+    const openIds = Array.from(openCommentPanels);
+    grid.innerHTML = lastVideos.map(v => videoCardHtml(v)).join('');
+    // نعيد فتح لوحات التعليقات اللي كانت مفتوحة قبل التحديث
+    openIds.forEach(id => {
+      const panel = document.getElementById('commentsPanel-' + id);
+      if (panel) panel.classList.add('open');
+      if (lastComments[id]) renderCommentsList(id, lastComments[id]);
+    });
+  }
+  window.shrouhatRenderGrid = renderGrid;
+
+  withLegistaDb(() => {
+    const { collection, query, orderBy, onSnapshot } = window._fs;
+    const q = query(collection(window._db, 'legalVideos'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+      lastVideos = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+      renderGrid();
+    }, err => console.error(err));
+  });
+
+  // ══ Admin: Add Video Modal ══
+  window.openAddVideoModal = function () {
+    if (!isAdminUser(getSavedUser())) { showLegistaToast('الإضافة متاحة للمحامية بس'); return; }
+    document.getElementById('addVideoModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeAddVideoModal = function () {
+    document.getElementById('addVideoModal').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  document.getElementById('addVideoModal').addEventListener('click', e => {
+    if (e.target.id === 'addVideoModal') closeAddVideoModal();
+  });
+  document.getElementById('addVideoForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const user = getSavedUser();
+    if (!isAdminUser(user)) { showLegistaToast('الإضافة متاحة للمحامية بس'); return; }
+    const title = document.getElementById('avTitle').value.trim();
+    const youtubeUrl = document.getElementById('avUrl').value.trim();
+    const description = document.getElementById('avDesc').value.trim();
+    if (!extractYouTubeId(youtubeUrl)) { showLegistaToast('رابط اليوتيوب مش صحيح'); return; }
+    withLegistaDb(async () => {
+      const { collection, addDoc, serverTimestamp } = window._fs;
+      try {
+        await addDoc(collection(window._db, 'legalVideos'), {
+          title, youtubeUrl, description, addedBy: user.email, createdAt: serverTimestamp()
+        });
+        form.reset();
+        closeAddVideoModal();
+      } catch (err) { console.error(err); showLegistaToast('حصل خطأ، جرب تاني'); }
     });
   });
 })();
