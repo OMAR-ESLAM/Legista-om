@@ -13,16 +13,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Syne:wght@400;700;800&family=Pirata+One&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F8FAFC;
+  --bg: #F8FAFB;
   --bg2: #FFFFFF;
   --gold: #0F172A;
   --gold-soft: #92620C;
   --cyber: #2563EB;
   --white: #1E293B;
-  --gray: #64748B;
+  --gray: #334155;
   --success: #059669;
   --surface: #FFFFFF;
-  --border: rgba(15,23,42,0.08);
+  --border: #E2E8F0;
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; max-width: 100%; }
@@ -127,8 +127,8 @@ nav.scrolled { padding: 10px 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
 .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.8s 2.8s both; }
-.btn-primary { background: linear-gradient(135deg, var(--gold), #1E3A5F); border: none; color: #FFFFFF; padding: 16px 36px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform .15s, box-shadow .2s; }
-.btn-primary:hover { transform: scale(1.04); box-shadow: 0 4px 32px rgba(201,162,39,0.4); }
+.btn-primary { background: #0F172A; border: none; color: #FFFFFF; padding: 16px 36px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 900; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform .15s, box-shadow .2s; box-shadow: 0 8px 24px rgba(15,23,42,0.22); }
+.btn-primary:hover { transform: scale(1.04); box-shadow: 0 10px 32px rgba(15,23,42,0.32); }
 .btn-secondary { background: transparent; border: 1px solid rgba(15,23,42,0.15); color: var(--white); padding: 16px 36px; border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: border-color .2s, background .2s; }
 .btn-secondary:hover { border-color: rgba(15,23,42,0.4); background: rgba(15,23,42,0.04); }
 
@@ -267,9 +267,29 @@ div[id*="g_id_onload"],
 .pricing-card.featured { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
 .pricing-badge { display:inline-block; font-size:11px; font-weight:800; padding:5px 14px; border-radius:20px; background:rgba(37,99,235,0.1); color:var(--cyber); margin-bottom:14px; }
 .pricing-badge.gold { background:rgba(201,162,39,0.12); color:var(--gold-soft); }
+.pricing-badge.fire { background:linear-gradient(90deg,#F97316,#DC2626); color:#fff; animation: firePulse 1.6s ease-in-out infinite; }
 .pricing-name { font-size:16px; font-weight:800; margin-bottom:10px; }
-.pricing-price { font-family:'Syne',sans-serif; font-size:40px; font-weight:800; color:var(--gold); margin-bottom:22px; }
+.pricing-price { font-family:'Syne',sans-serif; font-size:40px; font-weight:800; color:var(--gold); margin-bottom:22px; display:flex; align-items:baseline; justify-content:center; gap:10px; }
 .pricing-price span { font-size:13px; font-family:'Cairo',sans-serif; font-weight:700; color:var(--gray); }
+.price-old { font-size:20px !important; font-weight:700; color:var(--gray) !important; text-decoration:line-through; text-decoration-color:rgba(100,116,139,.65); text-decoration-thickness:2px; }
+@keyframes firePulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+.annual-promo-counter {
+  margin: -8px 0 20px; text-align: right; background: linear-gradient(135deg, rgba(5,150,105,0.09), rgba(16,185,129,0.03));
+  border: 1px solid rgba(5,150,105,0.25); border-radius: 14px; padding: 14px 16px;
+}
+.annual-promo-counter.urgent { background: linear-gradient(135deg, rgba(220,38,38,0.09), rgba(249,115,22,0.04)); border-color: rgba(220,38,38,0.28); }
+.annual-promo-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.annual-promo-label { font-size:12px; font-weight:800; color: var(--success); display:flex; align-items:center; gap:6px; }
+.annual-promo-counter.urgent .annual-promo-label { color:#DC2626; }
+.annual-promo-fraction { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; color:var(--white); background: rgba(255,255,255,0.75); padding:2px 12px; border-radius:20px; border:1px solid rgba(5,150,105,0.3); white-space:nowrap; }
+.annual-promo-counter.urgent .annual-promo-fraction { border-color: rgba(220,38,38,0.35); }
+.annual-promo-track { width: 100%; height: 8px; border-radius: 5px; background: rgba(15,23,42,0.08); overflow: hidden; }
+.annual-promo-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--success), #10B981); width: 100%; transition: width .5s ease, background .3s ease; }
+.annual-promo-counter.urgent .annual-promo-fill { background: linear-gradient(90deg, #F97316, #DC2626); }
+.annual-promo-caption { font-size: 11.5px; font-weight: 700; color: var(--gray); margin-top: 9px; letter-spacing: .2px; line-height: 1.6; }
+.annual-promo-caption b { color: var(--success); font-weight: 900; }
+.annual-promo-counter.urgent .annual-promo-caption b { color:#DC2626; }
+.annual-promo-caption.sold-out { color: var(--gray); text-align: center; }
 .pricing-features { list-style:none; text-align:right; margin-bottom:26px; }
 .pricing-features li { font-size:13px; color:var(--gray); margin-bottom:12px; line-height:1.7; }
 .pricing-cta { width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--white); font-family:'Cairo',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:all .2s; }
@@ -1270,7 +1290,7 @@ div[id*="g_id_onload"],
     <div class="pricing-card">
       <div class="pricing-badge">الأكثر مرونة</div>
       <div class="pricing-name">الاشتراك الشهري</div>
-      <div class="pricing-price">250<span> ج / شهريًا</span></div>
+      <div class="pricing-price">150<span> ج / شهريًا</span></div>
       <ul class="pricing-features">
         <li>✔ توليد غير محدود لكل العقود والصيغ</li>
         <li>✔ الوصول لكل الأقسام (عقود، إنذارات، جنح، دعاوى، دفوع)</li>
@@ -1278,20 +1298,31 @@ div[id*="g_id_onload"],
         <li>✔ تحديثات وصيغ جديدة أول بأول</li>
         <li>✔ دعم فني بالأولوية</li>
       </ul>
-      <button class="pricing-cta" onclick="openSubscribeModal('شهري', 250)">اشترك الآن ←</button>
+      <button class="pricing-cta" onclick="openSubscribeModal('شهري', 150)">اشترك الآن ←</button>
     </div>
     <div class="pricing-card featured">
-      <div class="pricing-badge gold">وفّر أكتر</div>
+      <div class="pricing-badge gold" id="annualBadge">وفّر أكتر</div>
       <div class="pricing-name">الاشتراك السنوي</div>
-      <div class="pricing-price">500<span> ج / سنويًا</span></div>
+      <div class="pricing-price">
+        <span class="price-old" id="annualPriceOld" style="display:none">500</span>
+        <span id="annualPriceNum">500</span><span> ج / سنويًا</span>
+      </div>
+      <div class="annual-promo-counter" id="annualPromoCounter" style="display:none">
+        <div class="annual-promo-top">
+          <span class="annual-promo-label">🔥 عرض الإطلاق</span>
+          <span class="annual-promo-fraction" id="annualPromoFraction">50 / 50</span>
+        </div>
+        <div class="annual-promo-track"><div class="annual-promo-fill" id="annualPromoFill"></div></div>
+        <p class="annual-promo-caption" id="annualPromoText">متبقي <b><span id="annualPromoLeft">50</span> مكان</b> بسعر الإطلاق — وبعدها يرجع السعر 500 ج تاني</p>
+      </div>
       <ul class="pricing-features">
         <li>✔ كل مميزات الاشتراك الشهري</li>
-        <li>✔ بدل 3000 جنيه في السنة، بتدفع 500 بس</li>
+        <li>✔ بدل 3000 جنيه في السنة، بتدفع <span id="annualSavingsEcho">250</span> بس</li>
         <li>✔ أولوية في أي مميزات جديدة تتضاف</li>
         <li>✔ دعم فني مباشر على مدار السنة</li>
         <li>✔ سعر ثابت من غير زيادة طول مدة الاشتراك</li>
       </ul>
-      <button class="pricing-cta gold" onclick="openSubscribeModal('سنوي', 500)">اشترك الآن ←</button>
+      <button class="pricing-cta gold" id="annualCtaBtn" onclick="openSubscribeModal('سنوي', window.__annualPrice || 500)">اشترك الآن ←</button>
     </div>
   </div>
 </div>
@@ -2211,7 +2242,7 @@ document.getElementById('googleSignInBtn').addEventListener('click', () => {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, increment
+  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, increment, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -2224,7 +2255,7 @@ const app = initializeApp(firebaseConfig, "legista-site");
 const db = getFirestore(app);
 
 window._db = db;
-window._fs = { doc, getDoc, setDoc, updateDoc, addDoc, collection, increment };
+window._fs = { doc, getDoc, setDoc, updateDoc, addDoc, collection, increment, runTransaction };
 window.dispatchEvent(new Event('legista-firebase-ready'));
 </script>
 
@@ -2244,8 +2275,11 @@ function withLegistaDb(cb) {
 
   if (action === 'subscribe') {
     const plan = params.get('plan') || 'شهري';
-    const price = parseInt(params.get('price'), 10) || 250;
-    window.addEventListener('load', () => setTimeout(() => openSubscribeModal(plan, price), 300));
+    const urlPrice = parseInt(params.get('price'), 10) || 250;
+    window.addEventListener('load', () => setTimeout(() => {
+      const price = plan === 'سنوي' ? (window.__annualPrice || urlPrice) : urlPrice;
+      openSubscribeModal(plan, price);
+    }, 500));
   } else if (action === 'tool') {
     const href = params.get('href');
     const trial = params.get('trial') === '1';
@@ -2353,6 +2387,98 @@ function handleToolClick(e, href, isTrialLimited) {
 /* ══ SUBSCRIBE MODAL ══ */
 let subCurrentPlan = 'شهري', subCurrentPrice = 250, subScreenshotData = null;
 
+/* ══ ANNUAL LAUNCH-PROMO COUNTER (أول 50 مشترك بـ 250 بدل 500) ══ */
+const ANNUAL_PROMO_LIMIT = 50;
+const ANNUAL_PROMO_PRICE = 250;
+const ANNUAL_REGULAR_PRICE = 500;
+window.__annualPrice = ANNUAL_REGULAR_PRICE; // default حتى يتحمل العداد
+let __annualPromoUsedAtLoad = ANNUAL_PROMO_LIMIT; // متشائم لحد ما نقرأ من قاعدة البيانات
+
+function renderAnnualPromoUI(used) {
+  const left = Math.max(0, ANNUAL_PROMO_LIMIT - used);
+  const price = left > 0 ? ANNUAL_PROMO_PRICE : ANNUAL_REGULAR_PRICE;
+  const urgent = left > 0 && left <= 10; // آخر 10 أماكن بيتلون تحذيري (برتقالي/أحمر)
+  window.__annualPrice = price;
+
+  const priceEl = document.getElementById('annualPriceNum');
+  const oldPriceEl = document.getElementById('annualPriceOld');
+  const counterWrap = document.getElementById('annualPromoCounter');
+  const fractionEl = document.getElementById('annualPromoFraction');
+  const fillEl = document.getElementById('annualPromoFill');
+  const captionEl = document.getElementById('annualPromoText');
+  const badgeEl = document.getElementById('annualBadge');
+  const savingsEl = document.getElementById('annualSavingsEcho');
+  if (!priceEl) return;
+
+  priceEl.textContent = price;
+  if (savingsEl) savingsEl.textContent = price;
+
+  counterWrap.style.display = '';
+  counterWrap.classList.toggle('urgent', urgent);
+  fractionEl.textContent = left + ' / ' + ANNUAL_PROMO_LIMIT;
+  fillEl.style.width = ((left / ANNUAL_PROMO_LIMIT) * 100) + '%';
+
+  if (left > 0) {
+    if (oldPriceEl) oldPriceEl.style.display = '';
+    captionEl.classList.remove('sold-out');
+    if (urgent) {
+      captionEl.innerHTML = '⚡ باقي <b>' + left + ' أماكن بس</b> — العرض قرب يخلص!';
+      if (badgeEl) { badgeEl.textContent = '🔥 آخر الفرصة'; badgeEl.classList.add('fire'); }
+    } else {
+      captionEl.innerHTML = 'أول <b>' + ANNUAL_PROMO_LIMIT + ' مشترك</b> بياخدوا سعر الإطلاق — باقي <b>' + left + ' مكان</b>';
+      if (badgeEl) { badgeEl.textContent = '🔥 عرض الإطلاق'; badgeEl.classList.add('fire'); }
+    }
+  } else {
+    if (oldPriceEl) oldPriceEl.style.display = 'none';
+    captionEl.classList.add('sold-out');
+    captionEl.innerHTML = '✅ الـ 50 مكان خلصوا — السعر التاني ثابت ' + ANNUAL_REGULAR_PRICE + ' ج / سنويًا';
+    if (badgeEl) { badgeEl.textContent = 'وفّر أكتر'; badgeEl.classList.remove('fire'); }
+  }
+}
+
+function loadAnnualPromoCounter() {
+  withLegistaDb(async () => {
+    const { doc, getDoc } = window._fs;
+    try {
+      const ref = doc(window._db, 'counters', 'annualPromo');
+      const snap = await getDoc(ref);
+      const used = snap.exists() ? (snap.data().used || 0) : 0;
+      __annualPromoUsedAtLoad = used;
+      renderAnnualPromoUI(used);
+    } catch (err) {
+      console.error(err);
+      renderAnnualPromoUI(0); // لو حصل خطأ في القراءة، اعرض سعر العرض بدل ما توقف الصفحة
+    }
+  });
+}
+loadAnnualPromoCounter();
+
+// بيزوّد عداد "أول 50" بأمان (Transaction) لو لسه فيه أماكن، وبيرجّع السعر الفعلي اللي اتسجل بيه
+async function claimAnnualPromoSlot() {
+  return new Promise((resolve) => {
+    withLegistaDb(async () => {
+      const { doc, runTransaction } = window._fs;
+      const ref = doc(window._db, 'counters', 'annualPromo');
+      try {
+        const finalPrice = await runTransaction(window._db, async (tx) => {
+          const snap = await tx.get(ref);
+          const used = snap.exists() ? (snap.data().used || 0) : 0;
+          if (used < ANNUAL_PROMO_LIMIT) {
+            tx.set(ref, { used: used + 1 }, { merge: true });
+            return ANNUAL_PROMO_PRICE;
+          }
+          return ANNUAL_REGULAR_PRICE;
+        });
+        resolve(finalPrice);
+      } catch (err) {
+        console.error(err);
+        resolve(window.__annualPrice || ANNUAL_REGULAR_PRICE);
+      }
+    });
+  });
+}
+
+
 function openSubscribeModal(plan, price) {
   const saved = localStorage.getItem('legista_user');
   if (!saved) {
@@ -2390,17 +2516,25 @@ document.getElementById('subScreenshot').addEventListener('change', () => {
   };
   reader.readAsDataURL(file);
 });
-document.getElementById('subscribeFormWrap').addEventListener('submit', e => {
+document.getElementById('subscribeFormWrap').addEventListener('submit', async e => {
   e.preventDefault();
   const saved = localStorage.getItem('legista_user');
   if (!saved) { showLegistaToast('سجل الدخول أولاً'); return; }
   const user = JSON.parse(saved);
   const wallet = document.querySelector('#subscribeModal .wallet-card.selected');
+
+  let finalPrice = subCurrentPrice;
+  if (subCurrentPlan === 'سنوي') {
+    // بنحجز مكان العرض دلوقتي (لو لسه فاضي) عشان نضمن إن أول 50 بس بياخدوا 250
+    finalPrice = await claimAnnualPromoSlot();
+    document.getElementById('subPriceEcho').textContent = finalPrice;
+  }
+
   const payload = {
     email: user.email,
     name: user.name,
     package: subCurrentPlan,
-    price: subCurrentPrice,
+    price: finalPrice,
     wallet: wallet.dataset.wallet,
     senderNumber: document.getElementById('subSenderNumber').value.trim(),
     screenshot: subScreenshotData,
@@ -2413,6 +2547,7 @@ document.getElementById('subscribeFormWrap').addEventListener('submit', e => {
       await addDoc(collection(window._db, 'paymentRequests'), payload);
     } catch (err) { console.error(err); }
   });
+  if (subCurrentPlan === 'سنوي') loadAnnualPromoCounter(); // نحدّث العداد على الصفحة فورًا
   document.getElementById('subscribeFormWrap').style.display = 'none';
   document.getElementById('subModalSuccess').classList.add('show');
 });
