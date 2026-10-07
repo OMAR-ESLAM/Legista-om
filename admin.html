@@ -452,9 +452,10 @@ async function toggleSubscription(userId) {
   const u = ALL_USERS.find(x => x.id === userId);
   if (!u) return;
   const nowPaid = u.subscription === 'paid';
+  const nowTs = Date.now();
   const updates = nowPaid
-    ? { subscription: 'free', subscriptionExpiry: null }
-    : { subscription: 'paid', subscriptionExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000 };
+    ? { subscription: 'free', subscriptionExpiry: null, subscriptionStart: null, subscriptionPlan: null }
+    : { subscription: 'paid', subscriptionStart: nowTs, subscriptionPlan: 'شهري', subscriptionExpiry: nowTs + 30 * 24 * 60 * 60 * 1000 };
   await updateDoc(doc(window._db, 'users', userId), updates);
   Object.assign(u, updates);
   renderUsers();
@@ -529,6 +530,11 @@ function getPlanDurationDays(packageText) {
   return 30; // افتراضي لو النص مش معروف
 }
 
+// اسم الباقة اللي بيتخزن في بروفايل المستخدم (بيظهر في صفحة الموقع)
+function getPlanLabel(days) {
+  return days >= 365 ? 'سنوي' : days >= 182 ? 'نصف سنوي' : days >= 91 ? 'ربع سنوي' : 'شهري';
+}
+
 async function setPaymentStatus(paymentId, status) {
   const { doc, updateDoc } = window._fs;
   const p = ALL_PAYMENTS.find(x => x.id === paymentId);
@@ -540,18 +546,21 @@ async function setPaymentStatus(paymentId, status) {
   if (status === 'approved' && p.email) {
     let u = ALL_USERS.find(x => x.email === p.email);
     const durationDays = getPlanDurationDays(p.package);
-    const expiry = Date.now() + durationDays * 24 * 60 * 60 * 1000;
+    const startTs = Date.now();
+    const expiry = startTs + durationDays * 24 * 60 * 60 * 1000;
+    const planLabel = getPlanLabel(durationDays);
     if (u) {
-      await updateDoc(doc(window._db, 'users', u.id), { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
-      Object.assign(u, { subscription: 'paid', subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
+      await updateDoc(doc(window._db, 'users', u.id), { subscription: 'paid', subscriptionStart: startTs, subscriptionPlan: planLabel, subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
+      Object.assign(u, { subscription: 'paid', subscriptionStart: startTs, subscriptionPlan: planLabel, subscriptionExpiry: expiry, phone: p.phone || u.phone, paymentScreenshot: p.screenshot || u.paymentScreenshot });
     } else {
       const { setDoc } = window._fs;
       const code = await generateUserCode();
       await setDoc(doc(window._db, 'users', p.email), {
         name: p.name || '', email: p.email, phone: p.phone || '', subscription: 'paid',
+        subscriptionStart: startTs, subscriptionPlan: planLabel,
         subscriptionExpiry: expiry, paymentScreenshot: p.screenshot || '', code, createdAt: Date.now()
       }, { merge: true });
-      ALL_USERS.push({ id: p.email, name: p.name, email: p.email, phone: p.phone, subscription: 'paid', subscriptionExpiry: expiry, paymentScreenshot: p.screenshot, code });
+      ALL_USERS.push({ id: p.email, name: p.name, email: p.email, phone: p.phone, subscription: 'paid', subscriptionStart: startTs, subscriptionPlan: planLabel, subscriptionExpiry: expiry, paymentScreenshot: p.screenshot, code });
     }
   }
 
