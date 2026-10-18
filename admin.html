@@ -1023,7 +1023,7 @@ function renderInvites() {
         <div class="nm">${escapeHtml(inv.name || 'بدون اسم')} <span class="cd">${escapeHtml(inv.id)}</span></div>
         <div class="meta">
           أُنشئت: ${fmtDT(inv.createdAt)} — تنتهي: ${fmtDT(inv.expiresAt)}<br>
-          أول فتح: ${fmtDT(inv.openedAt)}${inv.lastUsedAt ? ' — آخر تجربة: ' + fmtDT(inv.lastUsedAt) : ''}${tools ? '<br>استخدم: ' + tools : ''}
+          أول فتح: ${fmtDT(inv.openedAt)}${inv.lastUsedAt ? ' — آخر تجربة: ' + fmtDT(inv.lastUsedAt) : ''}${tools ? '<br>استخدم: ' + tools : ''}${inv.registeredEmail ? '<br>✅ سجّل بحساب: ' + escapeHtml(inv.registeredEmail) : ''}
         </div>
       </div>
       <span class="inv-st ${st.cls}">${st.txt}</span>
