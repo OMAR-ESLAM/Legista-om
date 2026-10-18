@@ -315,8 +315,10 @@
     finishTour(false);
   }
 
+  function tourKey() { return 'legano_tour_done_' + API.getCode(); }
+
   function finishTour(skipped) {
-    lsSet('legano_tour_done', '1');
+    lsSet(tourKey(), '1');
     if (tourFromChip) return;
     var code = API.getCode(); if (!code) return;
     initFirebase().then(function () {
@@ -339,12 +341,14 @@
   function boot() {
     var params = new URLSearchParams(location.search);
     var fromUrl = normCode(params.get('invite'));
+    var forceTour = params.get('tour') === '1'; // لإعادة عرض الترحيب والجولة (للتجربة): أضف &tour=1 للينك
     var isNew = false;
     if (fromUrl) {
       lsSet(LS_CODE, fromUrl);
       isNew = true;
       try {
         params.delete('invite');
+        params.delete('tour');
         var q = params.toString();
         history.replaceState({}, document.title, location.pathname + (q ? '?' + q : '') + location.hash);
       } catch (e) {}
@@ -379,7 +383,8 @@
 
       // الترحيب + الجولة تظهر على الصفحة الرئيسية بس، ولمرة واحدة
       var onHome = !!document.getElementById('toolTabsNav');
-      var tourDone = !!ev.data.tourDone || lsGet('legano_tour_done') === '1';
+      // القرار على مستوى المتصفح + الدعوة دي بس (دعوة جديدة = جولة جديدة، حتى في نفس المتصفح)
+      var tourDone = !forceTour && lsGet(tourKey()) === '1';
       if (onHome && !tourDone && ev.left > 0) {
         waitForLoader(function () { setTimeout(function () { showWelcome({ name: ev.data.name, left: ev.left }); }, 400); });
       }
