@@ -135,9 +135,8 @@
       '.lgt-title{font-size:16px;font-weight:900;color:#1E293B;margin-bottom:6px}',
       '.lgt-text{font-size:13px;line-height:1.85;color:#334155;margin-bottom:14px}',
       '.lgt-row{display:flex;align-items:center;justify-content:space-between;gap:8px}',
-      '.lgt-dots{display:flex;gap:5px}',
-      '.lgt-dot{width:7px;height:7px;border-radius:50%;background:#E2E8F0}',
-      '.lgt-dot.on{background:#0F172A;width:18px;border-radius:6px}',
+      '.lgt-prog{height:5px;border-radius:5px;background:#E2E8F0;overflow:hidden;margin-bottom:14px}',
+      '.lgt-prog i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#0F172A,#92620C);transition:width .3s}',
       '.lgt-actions{display:flex;gap:6px}',
       '.lgt-b{border:none;border-radius:10px;padding:9px 16px;font-family:Cairo,sans-serif;font-size:12.5px;font-weight:800;cursor:pointer}',
       '.lgt-b.next{background:#0F172A;color:#fff}',
@@ -205,13 +204,29 @@
 
   /* ═══ الجولة التعريفية ═══ */
   var STEPS = [
-    { sel: '#quickNavGrid', title: 'كل أدواتك في مكان واحد', text: 'من هنا توصل لأي قسم بضغطة: الرول، القاعات، الدفوع، أحكام النقض، التشريعات وغيرهم.' },
-    { sel: '#quickNavGrid .quicknav-item[href="rol.html"]', title: 'رول الجلسات', text: 'استعلم عن رول جلستك في ثانية. روابط مباشرة لكل نيابات ومحاكم شرق وغرب الإسكندرية.' },
-    { sel: '#toolTabsNav', pre: function () { var b = document.querySelector('.tool-tab-btn[data-tab="drafting"]'); if (b) b.click(); }, title: 'الصياغة والتحليل', text: 'في تبويب "التحليل والصياغة" هتلاقي العقود والإنذارات والجنح المباشرة وصيغ الدعاوى، تختار الصيغة وتطلع جاهزة في دقايق.' },
+    { sel: '#quickNavGrid', title: 'كل أدواتك في مكان واحد', text: 'دي أزرار الأقسام. هنعدّي على كل واحد فيهم بسرعة، وتقدر تتخطى الجولة في أي وقت.' },
+    { sel: '#quickNavGrid a[href="rol.html"]', title: 'رول الجلسات', text: 'استعلم عن رول جلستك في ثانية. روابط مباشرة لكل نيابات ومحاكم شرق وغرب الإسكندرية.' },
+    { sel: '#quickNavGrid a[href="#qaat"]', title: 'أماكن القاعات', text: 'خريطة قاعات مجمع السيد كريم (المحكمة البحرية) ومجمع المحاكم الجديد. دوّر برقم الدائرة أو نوع القضية ولاقي القاعة والدور.' },
+    { sel: '#quickNavGrid a[href="#tahlil"]', title: 'تحليل القضية', text: 'اكتب أو احكي وقايع القضية بصوتك، وهيطلعلك ملخص الموقف القانوني ونقاط القوة والضعف وأقوى الدفوع المناسبة.' },
+    { sel: '#quickNavGrid a[href="#tibbshari"]', title: 'الطب الشرعي', text: 'مرجع سريع لأنواع الإصابات حسب الأداة ودلالاتها القانونية، تقارنه بالتقرير الطبي وأقوال الشهود وقت التحقيق.' },
     { sel: '#dafou', title: 'مكتبة الدفوع', text: 'دفوع جنائية ومدنية جاهزة للمعركة، ومعاها أحكام النقض بالبحث بالكلمة أو برقم الطعن.' },
-    { sel: '#tahlil .rol-portal-card', title: 'تحليل القضية بالذكاء الاصطناعي', text: 'احكيلنا وقايع القضية، وهيطلعلك خطة دفاع بنقاط القوة والضعف وأقوى الدفوع.' },
-    { sel: '.hero-ctas .btn-primary', title: 'وقت التجربة 🎁', text: 'جرّب أول توليد دلوقتي. تجاربك المجانية متاحة على أي قسم، ومش محتاج بطاقة.', last: true }
+    { sel: '#quickNavGrid a[href="#ahkam"]', title: 'أحكام محكمة النقض', text: 'مبادئ الدوائر الجنائية والمدنية، بحث بالكلمة أو برقم الطعن، ونص القاعدة كاملة.' },
+    { sel: '#quickNavGrid a[href="#tashrieat"]', title: 'التشريعات القانونية', text: 'النصوص الكاملة والمحدّثة لأكتر من 15 قانون وكود مصري. دوّر بالكلمة أو برقم المادة ولاقي النص في ثانية.' },
+    { sel: '#quickNavGrid a[href="#maktabak"]', title: 'إدارة مكتبك', text: 'ملفات قضاياك ومستنداتها، ولوحة بمواعيدك وجلساتك، وفريق المكتب من محاميين وموظفين في مكان واحد.' },
+    { sel: '#quickNavGrid a[href="#mawareeth"]', title: 'حاسبة المواريث', text: 'بتطبق أحكام الفرائض (الحجب والفروض والتعصيب والعول والرد) وتشرحلك سبب كل نصيب بالتفصيل.' },
+    { sel: '#quickNavGrid a[href="#mawaeed"]', title: 'المواعيد القانونية', text: 'أكتر من 48 ميعاد ومدة قانونية، وحاسبة بتطلّعلك تاريخ انتهاء الميعاد من أول يوم تختاره.' },
+    { sel: '#quickNavGrid a[href="#esteshara"]', title: 'الاستشارات القانونية', text: 'اسأل أ. هدى خميس (محامية بالنقض) استشارة كتابية أو عاجلة أو مكالمة، ومعاها شروحات فيديو على الموقع.' },
+    { sel: '.tool-tab-panel[data-panel="drafting"] a[href="3oqood.html"]', pre: showDraftingTab, title: 'العقود', text: 'أكتر من 40 نوع عقد جاهزة للتوليد في دقايق.' },
+    { sel: '.tool-tab-panel[data-panel="drafting"] a[href="inzarat.html"]', pre: showDraftingTab, title: 'الإنذارات', text: '33 صيغة إنذار جاهزة للتوليد.' },
+    { sel: '.tool-tab-panel[data-panel="drafting"] a[href="junah.html"]', pre: showDraftingTab, title: 'الجنح المباشرة', text: '20 صيغة جنحة مباشرة جاهزة للتوليد.' },
+    { sel: '.tool-tab-panel[data-panel="drafting"] a[href="dawawi.html"]', pre: showDraftingTab, title: 'صيغ الدعاوى', text: '20 صيغة دعوى جاهزة للتوليد.' },
+    { sel: '.tool-tab-panel[data-panel="drafting"] a[href="igraat-jnaeya.html"]', pre: showDraftingTab, title: 'الإجراءات الجنائية', text: '340 مادة من قانون الإجراءات الجنائية في مكان واحد.' },
+    { sel: '.hero-ctas .btn-primary', pre: showHome, title: 'وقت التجربة 🎁', text: 'جرّب أول توليد دلوقتي. تجاربك المجانية متاحة على أي قسم، ومش محتاج بطاقة.', last: true }
   ];
+  // بيفتح تبويب الصياغة من غير ما يتشرح (مجرد تمهيد عشان الأزرار تبقى ظاهرة)
+  function showDraftingTab() { var b = document.querySelector('.tool-tab-btn[data-tab="drafting"]'); if (b && !b.classList.contains('active')) b.click(); }
+  function showOfficeTab() { var b = document.querySelector('.tool-tab-btn[data-tab="office"]'); if (b && !b.classList.contains('active')) b.click(); }
+  function showHome() { /* الزرار الأخير في الهيرو، مفيش تمهيد مطلوب */ }
   var tourIdx = 0, tourEls = null, tourFromChip = false;
 
   function startTour(manual) {
@@ -253,12 +268,13 @@
 
   function renderTip(step) {
     var total = STEPS.length;
-    var dots = STEPS.map(function (s, k) { return '<span class="lgt-dot' + (k === tourIdx ? ' on' : '') + '"></span>'; }).join('');
+    var pct = Math.round(((tourIdx + 1) / total) * 100);
     tourEls.tip.innerHTML =
       '<div class="lgt-step">الخطوة ' + (tourIdx + 1) + ' من ' + total + '</div>' +
       '<div class="lgt-title">' + esc(step.title) + '</div>' +
       '<div class="lgt-text">' + esc(step.text) + '</div>' +
-      '<div class="lgt-row"><div class="lgt-dots">' + dots + '</div><div class="lgt-actions">' +
+      '<div class="lgt-prog"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="lgt-row"><div></div><div class="lgt-actions">' +
       (tourIdx > 0 ? '<button class="lgt-b prev" id="lgtPrev">السابق</button>' : '') +
       '<button class="lgt-b next" id="lgtNext">' + (step.last ? 'يلا نجرّب ✓' : 'التالي ←') + '</button></div></div>' +
       (step.last ? '' : '<button class="lgt-skip" id="lgtSkip">تخطي الجولة</button>');
@@ -294,6 +310,7 @@
       window.removeEventListener('resize', repositionTour);
       window.removeEventListener('scroll', repositionTour);
     }
+    showOfficeTab(); // نرجّع التبويب الأول زي ما كان
     window.scrollTo({ top: 0, behavior: 'auto' });
     finishTour(false);
   }
