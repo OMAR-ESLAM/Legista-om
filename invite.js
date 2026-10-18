@@ -221,7 +221,7 @@
     { sel: '.tool-tab-panel[data-panel="drafting"] a[href="junah.html"]', pre: showDraftingTab, title: 'الجنح المباشرة', text: '20 صيغة جنحة مباشرة جاهزة للتوليد.' },
     { sel: '.tool-tab-panel[data-panel="drafting"] a[href="dawawi.html"]', pre: showDraftingTab, title: 'صيغ الدعاوى', text: '20 صيغة دعوى جاهزة للتوليد.' },
     { sel: '.tool-tab-panel[data-panel="drafting"] a[href="igraat-jnaeya.html"]', pre: showDraftingTab, title: 'الإجراءات الجنائية', text: '340 مادة من قانون الإجراءات الجنائية في مكان واحد.' },
-    { sel: '.hero-ctas .btn-primary', pre: showHome, title: 'وقت التجربة 🎁', text: 'جرّب أول توليد دلوقتي. تجاربك المجانية متاحة على أي قسم، ومش محتاج بطاقة.', last: true }
+    { sel: '.hero-ctas .btn-primary', pre: showHome, title: 'وقت التجربة 🎁', text: 'ابدأ من إدارة مكتبك، وجرّب أي قسم تحبه. تجاربك المجانية متاحة على كل الأقسام، ومش محتاج بطاقة.', last: true }
   ];
   // بيفتح تبويب الصياغة من غير ما يتشرح (مجرد تمهيد عشان الأزرار تبقى ظاهرة)
   function showDraftingTab() { var b = document.querySelector('.tool-tab-btn[data-tab="drafting"]'); if (b && !b.classList.contains('active')) b.click(); }
@@ -379,6 +379,12 @@
       // أول فتح: نسجّل وقت الفتح
       if (!ev.data.openedAt) {
         _fs.updateDoc(_fs.doc(_db, 'invites', code), { openedAt: Date.now() }).catch(function () {});
+      }
+
+      // لو سجّل بحساب جوجل بعد الدعوة، نسجّل إيميله على الدعوة (للمتابعة في لوحة التحكم). التجارب نفسها ما بتتأثرش بالتسجيل.
+      var su = null; try { su = JSON.parse(lsGet('legista_user') || 'null'); } catch (e) {}
+      if (su && su.email && !ev.data.registeredEmail) {
+        _fs.updateDoc(_fs.doc(_db, 'invites', code), { registeredEmail: su.email, registeredAt: Date.now() }).catch(function () {});
       }
 
       // الترحيب + الجولة تظهر على الصفحة الرئيسية بس، ولمرة واحدة
