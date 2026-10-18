@@ -2715,6 +2715,12 @@ function showMaintenanceOverlay(msg) {
 function handleToolClick(e, href, isTrialLimited) {
   e.preventDefault();
   const saved = localStorage.getItem('legista_user');
+  // صاحب دعوة (لينك مخصص) وفيه تجارب لسه → يدخل الأداة من غير تسجيل دخول.
+  // خصم التجربة بيحصل جوه صفحة الأداة لحظة التوليد الفعلي (LeganoInvite.consumeTrial).
+  if (!saved && window.LeganoInvite && window.LeganoInvite.hasActive()) {
+    window.location.href = href;
+    return false;
+  }
   if (!saved) {
     showLegistaToast('سجل الدخول أولاً عشان تقدر تستخدم الأداة دي');
     const returnUrl = window.location.pathname.split('/').pop() + '?action=tool&href=' + encodeURIComponent(href) + '&trial=' + (isTrialLimited ? '1' : '0');
@@ -3252,5 +3258,6 @@ document.getElementById('subscribeFormWrap').addEventListener('submit', async e 
   });
 })();
 </script>
+<script src="invite.js"></script>
 </body>
 </html>
