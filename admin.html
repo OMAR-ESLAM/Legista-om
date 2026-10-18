@@ -155,6 +155,32 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
 .lightbox.show { display:flex; }
 .lightbox img { max-width:90vw; max-height:90vh; border-radius:8px; }
 .loading-msg { text-align:center; padding:40px; color:var(--gray); font-size:13px; }
+
+/* ══ INVITES ══ */
+.inv-form { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:22px; display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; align-items:end; }
+.inv-form label { display:block; font-size:11.5px; font-weight:700; color:var(--gray); margin-bottom:6px; }
+.inv-form input { width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--border); background:var(--bg2); font-family:'Cairo',sans-serif; font-size:13px; outline:none; }
+.inv-form input:focus { border-color:var(--gold); }
+.inv-form .gen-btn { padding:12px 18px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--gold),#96700e); color:#fff; font-family:'Cairo',sans-serif; font-size:13px; font-weight:800; cursor:pointer; }
+.inv-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:20px; }
+.inv-stats .stat-card { padding:14px 16px; }
+.inv-stats .stat-card .val { font-size:24px; }
+.inv-row { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 18px; margin-bottom:10px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.inv-row .info { flex:1; min-width:200px; }
+.inv-row .nm { font-size:14px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.inv-row .cd { font-family:'Syne',sans-serif; font-size:11px; letter-spacing:1px; color:var(--gold-soft); background:rgba(184,134,11,0.1); padding:2px 9px; border-radius:6px; }
+.inv-row .meta { font-size:11.5px; color:var(--gray); margin-top:4px; line-height:1.8; }
+.inv-st { font-size:11px; font-weight:800; padding:5px 12px; border-radius:20px; white-space:nowrap; }
+.inv-st.new { background:rgba(107,107,120,0.12); color:var(--gray); }
+.inv-st.opened { background:rgba(0,119,182,0.12); color:var(--cyber); }
+.inv-st.toured { background:rgba(184,134,11,0.14); color:var(--gold-soft); }
+.inv-st.active { background:rgba(15,157,104,0.12); color:var(--success); }
+.inv-st.done { background:rgba(124,58,237,0.12); color:#7C3AED; }
+.inv-st.dead { background:rgba(229,72,77,0.12); color:var(--danger); }
+.inv-acts { display:flex; gap:6px; flex-wrap:wrap; }
+.inv-acts .pbtn { padding:8px 13px; }
+.pbtn.copy { background:var(--cyber); color:#fff; }
+.pbtn.wa { background:#25D366; color:#fff; }
 </style>
 </head>
 <body>
@@ -181,6 +207,7 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
       <button class="tab-btn" data-view="payments">طلبات الدفع</button>
       <button class="tab-btn" data-view="consultations">طلبات الاستشارات</button>
       <button class="tab-btn" data-view="feedback">الشكاوى والمقترحات</button>
+      <button class="tab-btn" data-view="invites">🎁 دعوات المحامين</button>
       <button class="tab-btn" data-view="maintenance">وضع الصيانة</button>
       <button class="tab-btn" data-view="files">ملفات الموقع</button>
     </div>
@@ -260,6 +287,22 @@ body { font-family:'Cairo',sans-serif; background:var(--bg); color:var(--white);
     <div class="view" id="view-feedback">
       <div class="section-title">الشكاوى والمقترحات</div>
       <div id="feedbackListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
+    </div>
+
+    <!-- INVITES -->
+    <div class="view" id="view-invites">
+      <div class="section-title">🎁 دعوات المحامين (لينك مخصص + تجارب مجانية)</div>
+
+      <div class="inv-form">
+        <div><label>اسم المحامي (اختياري — بيظهر في الترحيب)</label><input type="text" id="invName" placeholder="مثال: أحمد"></div>
+        <div><label>رقم واتساب (اختياري)</label><input type="tel" id="invPhone" placeholder="01xxxxxxxxx"></div>
+        <div><label>عدد التجارب المجانية</label><input type="number" id="invTrials" value="2" min="1" max="20"></div>
+        <div><label>صلاحية الدعوة (أيام)</label><input type="number" id="invDays" value="7" min="1" max="90"></div>
+        <button class="gen-btn" onclick="createInvite()">✨ ولّد لينك</button>
+      </div>
+
+      <div class="inv-stats" id="invStats"></div>
+      <div id="invitesListWrap"><div class="loading-msg">جارٍ التحميل...</div></div>
     </div>
 
     <!-- MAINTENANCE -->
@@ -371,7 +414,7 @@ async function initDashboardData() {
     window.addEventListener('firebase-ready', initDashboardData, { once: true });
     return;
   }
-  await Promise.all([loadUsers(), loadPayments(), loadConsultations(), loadFeedback(), loadVisits(), loadMaintenanceStatus(), loadAnnualPromoStatus()]);
+  await Promise.all([loadUsers(), loadPayments(), loadConsultations(), loadFeedback(), loadVisits(), loadMaintenanceStatus(), loadAnnualPromoStatus(), loadInvites()]);
   renderOverview();
 }
 
@@ -868,6 +911,150 @@ function handleFileUpload(e) {
   e.target.value = '';
 }
 document.querySelector('[data-view="files"]').addEventListener('click', () => { if (sessionStorage.getItem('legista_admin_ok') === '1') loadFiles(); });
+
+/* ══ INVITES (دعوات المحامين) ══ */
+const SITE_BASE = 'https://www.legano.site/';
+let ALL_INVITES = [];
+
+function inviteLink(code) { return SITE_BASE + '?invite=' + code; }
+
+function inviteWaText(inv) {
+  const nm = inv.name ? ('أستاذ ' + inv.name) : 'حضرتك';
+  return 'أهلاً ' + nm + ' 👋\n' +
+    'دي دعوة خاصة ليك لتجربة ليجانو (منصة المحامي الذكية)، فيها جولة سريعة تعرّفك على الموقع، ومعاك ' + (inv.trialsTotal || 2) + ' تجارب توليد مجانية 🎁\n\n' +
+    inviteLink(inv.id);
+}
+
+async function loadInvites() {
+  const { collection, getDocs } = window._fs;
+  try {
+    const snap = await getDocs(collection(window._db, 'invites'));
+    ALL_INVITES = [];
+    snap.forEach(d => ALL_INVITES.push({ id: d.id, ...d.data() }));
+    ALL_INVITES.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  } catch (e) { console.error(e); ALL_INVITES = []; }
+  renderInvites();
+}
+
+function genInviteCode() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // من غير حروف وأرقام متشابهة (0/O و 1/I/L)
+  let s = '';
+  const arr = new Uint32Array(6);
+  (window.crypto || window.msCrypto).getRandomValues(arr);
+  arr.forEach(n => { s += chars[n % chars.length]; });
+  return s;
+}
+
+async function createInvite() {
+  const { doc, getDoc, setDoc } = window._fs;
+  const name = document.getElementById('invName').value.trim();
+  const phone = document.getElementById('invPhone').value.trim();
+  const trials = Math.min(20, Math.max(1, parseInt(document.getElementById('invTrials').value, 10) || 2));
+  const days = Math.min(90, Math.max(1, parseInt(document.getElementById('invDays').value, 10) || 7));
+
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    const c = genInviteCode();
+    const snap = await getDoc(doc(window._db, 'invites', c));
+    if (!snap.exists()) { code = c; break; }
+  }
+  if (!code) { showToast('حصل خطأ في توليد الكود، جرب تاني'); return; }
+
+  const now = Date.now();
+  const data = {
+    name, phone, trialsTotal: trials, trialsUsed: 0,
+    createdAt: now, expiresAt: now + days * 86400000,
+    status: 'active', openedAt: null, tourDone: false
+  };
+  try {
+    await setDoc(doc(window._db, 'invites', code), data);
+  } catch (e) { console.error(e); showToast('تعذر الحفظ — راجع قواعد Firestore'); return; }
+
+  ALL_INVITES.unshift({ id: code, ...data });
+  document.getElementById('invName').value = '';
+  document.getElementById('invPhone').value = '';
+  renderInvites();
+  try { await navigator.clipboard.writeText(inviteLink(code)); showToast('تم توليد اللينك ونسخه ✓'); }
+  catch (e) { showToast('تم توليد اللينك ✓'); }
+}
+
+function inviteStatus(inv) {
+  const now = Date.now();
+  if (inv.status === 'revoked') return { cls: 'dead', txt: 'ملغية' };
+  if (inv.expiresAt && now > inv.expiresAt) return { cls: 'dead', txt: 'منتهية' };
+  const used = inv.trialsUsed || 0, total = inv.trialsTotal || 0;
+  if (total && used >= total) return { cls: 'done', txt: 'استنفد التجارب 🔥' };
+  if (used > 0) return { cls: 'active', txt: 'جرّب ' + used + '/' + total };
+  if (inv.tourDone) return { cls: 'toured', txt: 'خلّص الجولة' };
+  if (inv.openedAt) return { cls: 'opened', txt: 'فتح اللينك' };
+  return { cls: 'new', txt: 'لم يُفتح' };
+}
+
+function fmtDT(ts) { return ts ? new Date(ts).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' }) : '—'; }
+
+function renderInvites() {
+  const stats = document.getElementById('invStats');
+  const wrap = document.getElementById('invitesListWrap');
+  if (!stats || !wrap) return;
+
+  const total = ALL_INVITES.length;
+  const opened = ALL_INVITES.filter(i => i.openedAt).length;
+  const tried = ALL_INVITES.filter(i => (i.trialsUsed || 0) > 0).length;
+  const exhausted = ALL_INVITES.filter(i => i.trialsTotal && (i.trialsUsed || 0) >= i.trialsTotal).length;
+  stats.innerHTML = [
+    ['gold', 'دعوات اتبعتت', total],
+    ['cyber', 'فتحوا اللينك', opened],
+    ['success', 'جرّبوا فعلًا', tried],
+    ['danger', 'استنفدوا التجارب (سخّنهم)', exhausted]
+  ].map(s => `<div class="stat-card ${s[0]}"><div class="lbl">${s[1]}</div><div class="val">${s[2]}</div></div>`).join('');
+
+  if (!total) { wrap.innerHTML = '<div class="empty-state">لسه ما ولّدتش أي دعوة — املى الخانات فوق واضغط "ولّد لينك"</div>'; return; }
+
+  wrap.innerHTML = ALL_INVITES.map(inv => {
+    const st = inviteStatus(inv);
+    const phoneClean = (inv.phone || '').replace(/[^0-9]/g, '');
+    const waTarget = phoneClean ? phoneClean.replace(/^0/, '20') : '';
+    const waUrl = 'https://wa.me/' + waTarget + '?text=' + encodeURIComponent(inviteWaText(inv));
+    const tools = inv.toolsUsed ? Object.keys(inv.toolsUsed).map(k => escapeHtml(k) + ' ×' + inv.toolsUsed[k]).join('، ') : '';
+    const dead = st.cls === 'dead';
+    return `
+    <div class="inv-row">
+      <div class="info">
+        <div class="nm">${escapeHtml(inv.name || 'بدون اسم')} <span class="cd">${escapeHtml(inv.id)}</span></div>
+        <div class="meta">
+          أُنشئت: ${fmtDT(inv.createdAt)} — تنتهي: ${fmtDT(inv.expiresAt)}<br>
+          أول فتح: ${fmtDT(inv.openedAt)}${inv.lastUsedAt ? ' — آخر تجربة: ' + fmtDT(inv.lastUsedAt) : ''}${tools ? '<br>استخدم: ' + tools : ''}
+        </div>
+      </div>
+      <span class="inv-st ${st.cls}">${st.txt}</span>
+      <div class="inv-acts">
+        <button class="pbtn copy" onclick="copyInvite('${inv.id}')">📋 نسخ</button>
+        <a class="pbtn wa" style="text-decoration:none;display:inline-block" href="${waUrl}" target="_blank" rel="noopener">واتساب</a>
+        ${dead ? '' : `<button class="pbtn reject" onclick="revokeInvite('${inv.id}')">إلغاء</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function copyInvite(code) {
+  try { await navigator.clipboard.writeText(inviteLink(code)); showToast('تم نسخ اللينك'); }
+  catch (e) { prompt('انسخ اللينك:', inviteLink(code)); }
+}
+
+async function revokeInvite(code) {
+  if (!confirm('متأكد عايز تلغي الدعوة دي؟ اللينك هيبطل يشتغل.')) return;
+  const { doc, updateDoc } = window._fs;
+  try {
+    await updateDoc(doc(window._db, 'invites', code), { status: 'revoked', revokedAt: Date.now() });
+    const inv = ALL_INVITES.find(i => i.id === code);
+    if (inv) inv.status = 'revoked';
+    renderInvites();
+    showToast('تم إلغاء الدعوة');
+  } catch (e) { console.error(e); showToast('حصل خطأ'); }
+}
+
+// تحديث القائمة كل ما تفتح التبويب (عشان تشوف مين فتح/جرّب)
+document.querySelector('[data-view="invites"]').addEventListener('click', () => { if (window._db) loadInvites(); });
 
 /* ══ HELPERS ══ */
 function escapeHtml(str) {
