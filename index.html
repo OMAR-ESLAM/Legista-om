@@ -1187,7 +1187,7 @@ div[id*="g_id_onload"],
     <a href="#pricing" class="quicknav-item" data-target="pricing"><div class="quicknav-icon">💳</div><div class="quicknav-name">قيمة الاشتراك</div></a>
   </div>
   <div class="hero-ctas">
-    <a href="inzarat.html" class="btn-primary">ابدأ التجربة المجانية الآن</a>
+    <a href="welcome.html" class="btn-primary" onclick="return handleToolClick(event, 'welcome.html', false)">ابدأ التجربة المجانية الآن</a>
   </div>
   <p class="hero-microcopy">لا تتطلب بطاقة إلكترونية • تجربة مجانية بالكامل</p>
 </section>
@@ -2717,13 +2717,16 @@ function handleToolClick(e, href, isTrialLimited) {
   const saved = localStorage.getItem('legista_user');
   // صاحب دعوة (لينك مخصص) وفيه تجارب لسه → يدخل الأداة من غير تسجيل دخول.
   // خصم التجربة بيحصل جوه صفحة الأداة لحظة التوليد الفعلي (LeganoInvite.consumeTrial).
-  if (!saved && window.LeganoInvite && window.LeganoInvite.hasActive()) {
+  // (التجربة من غير تسجيل بتنطبق على أدوات التوليد بس. الصفحات اللي محتاجة حساب زي إدارة المكتب بتروح للتسجيل.)
+  if (!saved && isTrialLimited && window.LeganoInvite && window.LeganoInvite.hasActive()) {
     window.location.href = href;
     return false;
   }
   if (!saved) {
     showLegistaToast('سجل الدخول أولاً عشان تقدر تستخدم الأداة دي');
-    const returnUrl = window.location.pathname.split('/').pop() + '?action=tool&href=' + encodeURIComponent(href) + '&trial=' + (isTrialLimited ? '1' : '0');
+    // صاحب دعوة: بعد التسجيل يرجع للصفحة اللي كان رايحلها مباشرة (من غير ما يعدّي على الرئيسية)
+    const hasInvite = !!(window.LeganoInvite && window.LeganoInvite.getCode());
+    const returnUrl = hasInvite ? href : (window.location.pathname.split('/').pop() + '?action=tool&href=' + encodeURIComponent(href) + '&trial=' + (isTrialLimited ? '1' : '0'));
     setTimeout(() => { window.location.href = 'login.html?next=' + encodeURIComponent(returnUrl); }, 600);
     return false;
   }
